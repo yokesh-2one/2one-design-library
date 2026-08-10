@@ -158,3 +158,11 @@
 
 /* Light-only system: no .dark palette is defined, so every `dark:` utility
    the shadcn components carry stays inert (there is never a .dark ancestor). */
+
+/* 2one signature — buttons are pills. Applied via the component's data-slot
+   (unlayered, so it beats Tailwind's rounded-* utility) which means it survives
+   `shadcn add` regenerating button.tsx. Grouped buttons keep square inner edges. */
+[data-slot="button"] { border-radius: var(--radius-full); }
+[data-slot="button-group"] > [data-slot="button"]:not(:first-child):not(:last-child) { border-radius: 0; }
+[data-slot="button-group"] > [data-slot="button"]:first-child { border-radius: var(--radius-full) 0 0 var(--radius-full); }
+[data-slot="button-group"] > [data-slot="button"]:last-child { border-radius: 0 var(--radius-full) var(--radius-full) 0; }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Component, useEffect, useState, type ReactNode } from 'react'
 import {
   Star, Bold, Italic, Underline, Search, Mail, Bell, Home, User, Settings, Plus,
   ChevronRight, Rocket, CreditCard, LogOut, Check,
@@ -43,6 +43,13 @@ import { Logo } from '@/components/logo'
 import { AppBar } from '@/components/app-bar'
 import { BottomNavItem } from '@/components/bottom-nav-item'
 
+// blocks (templates)
+import { LoginForm as Login01 } from '@/blocks/login-01'
+import { LoginForm as Login03 } from '@/blocks/login-03'
+import { SignupForm as Signup01 } from '@/blocks/signup-01'
+import { Dashboard01 } from '@/blocks/dashboard-01/page'
+import { Sidebar07 } from '@/blocks/sidebar-07/page'
+
 /* ---------- foundation data (from tokens/*.css) ---------- */
 const NEUTRAL: [string, string][] = [['50', '#fafafa'], ['100', '#f4f4f5'], ['200', '#e4e4e7'], ['300', '#d4d4d8'], ['400', '#a1a1aa'], ['600', '#52525b'], ['700', '#3f3f46'], ['800', '#27272a'], ['950', '#09090b']]
 const ACCENT: [string, string][] = [['50', '#fafafa'], ['100', '#f4f4f4'], ['200', '#e4e4e4'], ['300', '#d1d1d1'], ['600', '#404040'], ['700', '#262626'], ['800', '#171717'], ['950', '#000000']]
@@ -56,8 +63,32 @@ const NAV = [
   { grp: '', items: [['overview', 'Overview', '']] },
   { grp: 'Foundations', items: [['color', 'Colour', ''], ['type', 'Typography', ''], ['radius', 'Radius', '']] },
   { grp: 'Components', items: [['actions', 'Actions', ''], ['forms', 'Forms', ''], ['overlays', 'Overlays', ''], ['data', 'Data display', ''], ['feedback', 'Feedback', ''], ['navigation', 'Navigation', ''], ['mobile', 'Mobile · 2one', '']] },
+  { grp: 'Templates', items: [['blocks', 'Blocks', '9']] },
   { grp: 'Reference', items: [['index', 'All components', '57']] },
 ]
+
+class ErrorBoundary extends Component<{ children: ReactNode; label: string }, { err: boolean }> {
+  state = { err: false }
+  static getDerivedStateFromError() { return { err: true } }
+  render() {
+    if (this.state.err) return <div style={{ padding: 24, fontFamily: 'var(--g-mono)', fontSize: 12, color: 'var(--g-ink-3)' }}>Preview for “{this.props.label}” hit a runtime error — open it standalone to inspect.</div>
+    return this.props.children
+  }
+}
+
+// Framed, scaled preview for full-page block shells.
+function Frame({ label, height = 460, children }: { label: string; height?: number; children: ReactNode }) {
+  return (
+    <div className="g-block">
+      <div className="g-block-head"><h3>{label}</h3><span className="meta">block · full shell</span></div>
+      <div style={{ border: '1px solid #e4e4e7', borderRadius: 14, overflow: 'hidden', height, position: 'relative', background: '#fff', boxShadow: 'var(--g-shadow)' }}>
+        <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
+          <ErrorBoundary label={label}><div style={{ minHeight: '100%' }}>{children}</div></ErrorBoundary>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const LogoMark = () => <Logo variant="black" width={58} className="dark:hidden" />
 
@@ -353,6 +384,25 @@ export function Showcase() {
                   <Logo variant="black" width={120} />
                   <div className="rounded-lg p-4" style={{ background: '#09090b' }}><Logo variant="white" width={120} /></div>
                 </Block>
+              </div>
+            </section>
+
+            {/* BLOCKS */}
+            <section id="blocks" className="g-section">
+              <div className="g-eyebrow">Templates</div><h2>Blocks</h2>
+              <p className="g-lede">Pre-composed shells built from the 2one components — auto-themed, ready to drop into an app. Login &amp; signup render as cards; the full app shells are framed previews.</p>
+              <div className="g-grid2" style={{ marginTop: 16 }}>
+                <Block title="login-03" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Login03 /></div></Block>
+                <Block title="login-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Login01 /></div></Block>
+                <Block title="signup-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Signup01 /></div></Block>
+              </div>
+              <div style={{ marginTop: 18 }}>
+                <Frame label="dashboard-01" height={520}><Dashboard01 /></Frame>
+                <Frame label="sidebar-07" height={460}><Sidebar07 /></Frame>
+              </div>
+              <div className="g-scale-label">All blocks</div>
+              <div className="g-index">
+                {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02', 'dashboard-01', 'sidebar-07'].map((b) => <a key={b} href="#blocks">{b}</a>)}
               </div>
             </section>
 
