@@ -4,28 +4,31 @@
 npm install @yokesh-2one/design-library react react-dom
 ```
 
-Add the tokens once at your app root, and point Tailwind at the package so its
-utility classes are generated:
+Add the theme once at your app root, run Tailwind v4, and point it at the package
+so the component utility classes are generated:
 
 ```ts
 // main.tsx
-import 'tailwindcss'
 import '@yokesh-2one/design-library/styles'
 ```
 
 ```css
 /* app.css */
+@import 'tailwindcss';
+@import '@yokesh-2one/design-library/styles';
 @source '../node_modules/@yokesh-2one/design-library/dist';
 ```
 
-Then compose screens from components (each obeys its Figma rules — see the
-component's README / component.json):
+Then compose screens from components (shadcn names, 2one-themed):
 
 ```tsx
-import { AppBar, TextField, Button, Checkbox } from '@yokesh-2one/design-library'
+import { AppBar, Input, Button, Checkbox, Label } from '@yokesh-2one/design-library'
 
 <AppBar title="Sign in" onBack={() => history.back()} />
-<TextField label="Email" placeholder="you@example.com" />
-<Checkbox label="Remember me" />
-<Button appearance="primary">Continue</Button>   // one primary per view
+<div className="grid gap-1.5">
+  <Label htmlFor="email">Email</Label>
+  <Input id="email" placeholder="you@example.com" />
+</div>
+<label className="flex items-center gap-2"><Checkbox /> Remember me</label>
+<Button>Continue</Button>   {/* pill, monochrome — one primary per view */}
 ```

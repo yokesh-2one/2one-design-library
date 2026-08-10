@@ -1,14 +1,14 @@
 /*
-  Typography tokens from two "2one Solutions" team files:
-  - "Components": Inter (body copy, field values, button labels) and
-    Atlassian Sans (links, required-field marks) — no heading scale.
+  Typography tokens from the "2one Solutions" team files:
+  - "Components": Inter (body copy, field values, button labels, links,
+    required-field marks) — no heading scale.
   - "Mobile App Design System": the full documented type scale — Display,
     Heading 1-6 (Satoshi Bold), Body and Small (Inter Regular) — each with
     real size/line-height pulled from get_design_context, not estimated.
 */
 @theme {
   --font-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-link: 'Atlassian Sans', Inter, system-ui, sans-serif;
+  --font-link: Inter, system-ui, sans-serif;
   --font-heading: Satoshi, Inter, system-ui, sans-serif;
 
   /* Mobile App Design System scale — font/size/*, font/line-height/* */

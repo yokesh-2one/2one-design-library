@@ -1,0 +1,6 @@
+/* Dev-only: the real theme + tell Tailwind to scan the component sources.
+   (The shipped globals.css stays free of dev @source paths.) */
+@import '../src/styles/globals.css';
+
+@source '../src/components/**/*.{ts,tsx}';
+@source './**/*.{ts,tsx}';

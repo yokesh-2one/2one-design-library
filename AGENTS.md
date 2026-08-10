@@ -1,49 +1,46 @@
-# 2one-system — agent guide
+# 2one Design Language System — agent guide
 
-This repository is the **single source of truth** for the 2one design system:
-components, design tokens, brand assets, and the context needed to use them
-correctly. It is written to be read by both humans and AI agents (Claude Code,
-Codex, Gemini, Copilot).
+This repository is the **single source of truth** for the 2one DLS: the
+[shadcn/ui](https://ui.shadcn.com) component set re-skinned to the 2one design
+tokens, plus the brand. Written for humans and AI agents (Claude Code, Codex,
+Gemini, Copilot).
 
 **If you are an AI agent, start here, then read [`registry.json`](registry.json).**
 
 ## How this repo is organized
 
-- `registry.json` — machine index of every component + token + known issue. Read
-  this first; it tells you what exists, where it lives, its props, and its rules.
-- `tokens/` — design tokens (Tailwind v4 `@theme` CSS). The single source of truth
-  for color, type, and spacing. Never hard-code values that a token covers.
-- `components/<Name>/` — one folder per component. `<Name>.tsx` is the source.
-  (Being expanded to also hold `component.json`, `README.md`, `*.stories.tsx`, and
-  per-target `examples/`.)
-- `brand/logo/` — the 2one logo (SVG + PNG + manifest). See its rules before use.
-- `recipes/` — how to assemble the system into an app, website, marketing asset,
-  or slide deck.
+- `registry.json` — machine index: the component set, the token→variable theme
+  map, naming conventions, and 2one overrides. Read this first.
+- `src/components/ui/` — 54 shadcn primitives, themed to 2one. **shadcn names**
+  (`Input`, `Select`, `RadioGroup`, `InputOTP`, `DropdownMenu`, …).
+- `src/components/` — 2one-only components shadcn lacks: `logo`, `app-bar`,
+  `bottom-nav-item`.
+- `src/styles/globals.css` — the theme: 2one tokens mapped onto shadcn's CSS
+  variables (light-only) + `@font-face` (Satoshi). Single source of truth for color.
+- `src/lib/utils.ts` — the `cn()` helper.
+- `tokens/` — raw `@theme` token files (color/type/spacing).
+- `components.json` — shadcn CLI config. Add components with `npx shadcn@latest add <name>`.
+- `dev/` — local sampler to verify the theme (`npm run dev`).
 
-## Rules for using components (read before generating code)
+## Rules for using / generating code
 
-1. **Obey each component's `rules`** in `registry.json` — they encode real design
-   constraints (e.g. one primary Button per view; Logo must never be recolored;
-   Checkbox must never be `disabled` + `invalid` at once). Do not emit
-   combinations a component's rules forbid.
-2. **Import from the package**, don't copy source: `import { Button } from '@yokesh-2one/ui'`.
-3. **Use tokens, not literals.** Colors/spacing/type come from `tokens/`.
-4. **Match existing conventions.** Read a neighboring component before adding one.
+1. **Import from the package**, don't copy source:
+   `import { Button } from '@yokesh-2one/design-library'`.
+2. **Use shadcn names.** TextField → `Input`, Dropdown → `Select`,
+   RadioButton → `RadioGroup`, OtpField → `InputOTP`.
+3. **Theme through the variables**, never hard-code color. Everything derives from
+   `globals.css` (grayscale; `danger`/`success` only for validation).
+4. **Buttons are pills** (`rounded-full`) — the 2one signature override.
+5. **Light-only.** Don't add a `.dark` palette; `dark:` utilities stay inert.
+6. **Icons:** lucide (`lucide-react`).
 
-## Status of components
+## Status
 
-All 12 components in `registry.json` are implemented 1:1 with the Mobile App
-Design System and build-verified. Link and Message are intentionally excluded
-(they live in a different Figma file, not the client's selection).
-
-## Known Figma-source issues
-
-`registry.json → issues` lists inconsistencies found during extraction (duplicate
-variants, mislabeled frames, case-duplicated states). Treat the code here as the
-corrected source of truth where it diverges from Figma.
+54 shadcn primitives + `Logo`/`AppBar`/`BottomNavItem`. Library build verified
+(ES/CJS + types + styles + fonts) and rendering verified in `dev/`. This replaced
+the earlier hand-built Figma-1:1 set (2026-08-10, user-directed).
 
 ## Source of truth chain
 
-Figma (`Mobile App Design System`, key `YzxnyL6a69WCOw9U8WJqBo`) → this repo →
-`@yokesh-2one/ui` (published package). When design and code disagree, this repo wins
-for code; Figma wins for visual intent.
+shadcn/ui (components, MIT) + 2one tokens/brand (Figma *Mobile App Design System*,
+`YzxnyL6a69WCOw9U8WJqBo`) → this repo → `@yokesh-2one/design-library`.

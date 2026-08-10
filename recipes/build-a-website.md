@@ -6,5 +6,7 @@ plain React + Tailwind, so they drop into Next.js, Vite, Remix, or Astro (React)
 - Import `@yokesh-2one/design-library/styles` once in the root layout.
 - Use `Logo` for the site header/footer (`variant="black"` on light, `"white"`
   on dark — never recolored).
-- Compose `BottomNavItem` into a nav row, or use `Button`/`TextField` for CTAs
-  and forms. Everything is responsive via the token spacing/type scales.
+- Compose `NavigationMenu` or `BottomNavItem` into a nav row, or use `Button`/
+  `Input` for CTAs and forms. Everything is responsive via the token scales.
+
+Note: the site is light-only (no `.dark` palette), and buttons are pills.

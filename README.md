@@ -1,59 +1,78 @@
-# 2one-system
+# 2one Design Language System
 
-The **one-point source** for the 2one design system — components, design tokens,
-and brand assets, structured so both people and AI tools can pull from it to build
-**apps, websites, marketing material, and slide decks**.
+The **2one DLS** — the [shadcn/ui](https://ui.shadcn.com) component set, re-skinned
+to the 2one design tokens. Grayscale, light-only, pill buttons, Satoshi headings +
+Inter body. `danger`/`success` are the only hues, reserved for validation.
 
-It consolidates what used to be scattered across separate projects: the verified
-component code (`@yokesh-2one/ui`), the design tokens, and the brand logo.
+It ships **54 shadcn primitives** (2one-themed) plus **3 mobile/brand components**
+shadcn has no equivalent for — `Logo`, `AppBar`, `BottomNavItem`.
 
 ## Layout
 
 ```
-tokens/            design tokens (Tailwind v4 @theme) — the source of truth for color/type/spacing
-components/<Name>/  one folder per component; <Name>.tsx is the source
-brand/logo/        2one logo — SVG + PNG + manifest + rules
-recipes/           how to build an app / website / marketing asset / deck
-registry.json      machine index of every component + token + known issue
-AGENTS.md          entry point for AI agents (Claude Code, Codex, Gemini, Copilot)
+src/components/ui/    54 shadcn primitives (Button, Input, Dialog, Tabs, …), themed to 2one
+src/components/       2one-only components (logo, app-bar, bottom-nav-item)
+src/styles/globals.css  the theme — 2one tokens mapped onto shadcn's CSS variables + @font-face
+src/styles/fonts/     Satoshi (woff2)
+src/lib/utils.ts      cn() helper
+tokens/               raw @theme token files (colors / typography / spacing)
+components.json       shadcn CLI config (style: new-york, baseColor: neutral)
+dev/                  local sampler for verifying the theme (npm run dev)
 ```
 
 ## For developers
 
 ```bash
-npm install @yokesh-2one/ui react react-dom
+npm install @yokesh-2one/design-library
 ```
 
 ```tsx
-import { Button, TextField, Logo } from '@yokesh-2one/ui'
-import '@yokesh-2one/ui/styles'
+import { Button, Input, Dialog } from '@yokesh-2one/design-library'
+import '@yokesh-2one/design-library/styles'
 ```
 
-Browse every component and state in Storybook (config in `.storybook/`).
+Names follow **shadcn** (`Input`, `Select`, `RadioGroup`, `InputOTP`…). Run Tailwind
+v4 and point it at the package so component utilities generate:
 
-## For AI tools
+```css
+/* app.css */
+@import 'tailwindcss';
+@import '@yokesh-2one/design-library/styles';
+@source '../node_modules/@yokesh-2one/design-library/dist';
+```
 
-Point the agent at [`AGENTS.md`](AGENTS.md) → [`registry.json`](registry.json).
-Between them they describe every component's props, rules, Figma origin, and the
-known source issues — enough to generate correct UI without guessing.
-
-## Status
-
-All **12 components** are implemented 1:1 with the Mobile App Design System,
-each carrying its verbatim Figma context (`component.json` + `README.md` per
-folder). Verified: type-check + Vite library build (ES/CJS + types) + install→
-import smoke test + Storybook render. See `registry.json` for per-component props
-and the list of Figma-source issues found and corrected during extraction.
-
-Browse everything locally:
+Add or update a component with the shadcn CLI (config in `components.json`):
 
 ```bash
-npm install
-npm run storybook      # interactive catalog at http://localhost:6006
-npm run build          # library build → dist/
+npx shadcn@latest add <component>
+```
+
+## Theming
+
+Everything reads from CSS variables defined in `src/styles/globals.css`, mapped 1:1
+from the 2one tokens:
+
+| shadcn variable | 2one token |
+| --- | --- |
+| `--primary` / `--primary-foreground` | neutral-950 / accent-50 |
+| `--secondary` / `--muted` / `--accent` | neutral-100 |
+| `--muted-foreground` | neutral-600 |
+| `--border` / `--input` | neutral-200 |
+| `--destructive` | danger-600 |
+| `--success` | success-600 |
+
+Light-only: no `.dark` palette is defined, so the `dark:` utilities the shadcn
+components carry stay inert.
+
+## Local preview
+
+```bash
+npm run dev        # sampler at http://localhost:4180 (vite.config.dev.ts)
+npm run build      # library build → dist/ (ES + CJS + types + styles + fonts)
 ```
 
 ## Source
 
-Figma — *Mobile App Design System* (`YzxnyL6a69WCOw9U8WJqBo`) and *Components*
-(`bIIZWa7XK9ajJYpI8RjwSz`), team "2one Solutions".
+- Components: shadcn/ui (MIT), new-york style, `baseColor: neutral`.
+- Tokens/brand: 2one Solutions — Figma *Mobile App Design System* (`YzxnyL6a69WCOw9U8WJqBo`).
+- Fonts: Satoshi (Fontshare) + Inter (self-hosted via `@fontsource-variable/inter`).

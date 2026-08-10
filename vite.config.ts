@@ -1,34 +1,40 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
+import { isAbsolute } from 'node:path'
 
 /*
-  Library build for @yokesh-2one/design-library.
+  Library build for @yokesh-2one/design-library (2one DLS).
 
-  React is external (peer dependency), not bundled. Modules are preserved so
-  consumers only pull the components they import, and each output file keeps its
-  source path (dist/index.js, dist/components/Button/Button.js, …). Tailwind is
-  NOT run here — components ship as class strings the CONSUMER's Tailwind v4
-  compiles; tokens ship separately as CSS (see scripts/copy-styles.mjs).
+  Entry is src/index.ts. React and every third-party dependency (Radix, lucide,
+  cva, tailwind-merge, recharts, …) are left EXTERNAL — consumers install them.
+  Modules are preserved so consumers only pull what they import. Tailwind is NOT
+  run here: components ship as class strings the CONSUMER's Tailwind v4 compiles;
+  the theme + tokens ship separately as CSS (see scripts/copy-styles.mjs).
 */
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
   build: {
-    lib: { entry: 'index.ts' },
+    lib: { entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)) },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      // externalize anything that isn't our own source (relative, aliased, or absolute)
+      external: (id) => !id.startsWith('.') && !id.startsWith('@/') && !isAbsolute(id),
       output: [
         {
           format: 'es',
           dir: 'dist',
           preserveModules: true,
-          preserveModulesRoot: '.',
+          preserveModulesRoot: 'src',
           entryFileNames: '[name].js',
         },
         {
           format: 'cjs',
           dir: 'dist',
           preserveModules: true,
-          preserveModulesRoot: '.',
+          preserveModulesRoot: 'src',
           entryFileNames: '[name].cjs',
           exports: 'named',
         },

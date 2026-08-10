@@ -1,21 +1,22 @@
-# 2one-system
+# 2one Design Language System
 
-> Single source of truth for the 2one design system — components, tokens, brand
-> assets, and usage context — structured for humans and AI.
+> shadcn/ui components re-skinned to the 2one design tokens. Grayscale, light-only,
+> pill buttons, Satoshi headings + Inter body. Structured for humans and AI.
 
 ## Start here
 - [Agent guide](AGENTS.md): how to work in this repo
-- [Registry](registry.json): machine index of components, tokens, and known issues
+- [Registry](registry.json): component set, theme map, conventions, overrides
 
 ## Components
-- Source: components/<Name>/<Name>.tsx
-- Published as: @yokesh-2one/ui
+- Source: src/components/ui/<name>.tsx (54 shadcn primitives, 2one-themed)
+- 2one-only: src/components/{logo,app-bar,bottom-nav-item}.tsx
+- Names: shadcn (Input, Select, RadioGroup, InputOTP, DropdownMenu, …)
+- Published as: @yokesh-2one/design-library
 
-## Tokens
-- tokens/colors.css, tokens/typography.css, tokens/spacing.css (Tailwind v4 @theme)
+## Theme
+- src/styles/globals.css — 2one tokens → shadcn CSS variables (light only)
+- Fonts: Satoshi (headings), Inter (body). Icons: lucide.
+- danger/success are the only hues, reserved for validation.
 
-## Brand
-- brand/logo/ — logo SVG + PNG + manifest (rules: no recolor, black on light / white on dark)
-
-## Build targets
-- recipes/ — app, website, marketing, deck
+## Add a component
+- npx shadcn@latest add <component>   (config in components.json)

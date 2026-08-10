@@ -1,36 +1,64 @@
 {
-  "name": "2one-design-library",
-  "title": "2one Design System — client library (Mobile App Design System, 1:1)",
-  "version": "0.1.0",
-  "figma": { "file": "Mobile App Design System", "fileKey": "YzxnyL6a69WCOw9U8WJqBo" },
-  "package": "@yokesh-2one/design-library",
-  "tokens": { "css": ["tokens/colors.css", "tokens/typography.css", "tokens/spacing.css"] },
-  "brand": { "logo": "brand/logo/manifest.json" },
-  "components": [
-    { "name": "Button", "path": "components/Button", "figmaNode": "152:36", "props": { "appearance": ["primary", "secondary"], "iconPosition": ["leading", "trailing"] } },
-    { "name": "TextField", "path": "components/TextField", "figmaNode": "167:44", "props": { "isInvalid": ["true", "false"], "leadingIcon": "ReactNode?", "trailingIcon": "ReactNode?", "message": "string?" } },
-    { "name": "Checkbox", "path": "components/Checkbox", "figmaNode": "202:130", "props": { "indeterminate": ["true", "false"], "isInvalid": ["true", "false"] } },
-    { "name": "Avatar", "path": "components/Avatar", "figmaNode": "138:81", "props": { "type": ["icon", "initial", "image"] } },
-    { "name": "AppBar", "path": "components/AppBar", "figmaNode": "160:417", "props": { "title": "string", "onBack": "() => void ?", "trailingSlot": "ReactNode?" } },
-    { "name": "Badge", "path": "components/Badge", "figmaNode": "138:39", "props": { "type": ["text", "notext"] } },
-    { "name": "Logo", "path": "components/Logo", "figmaNode": "198:23", "props": { "variant": ["black", "white"] } },
-    { "name": "OtpField", "path": "components/OtpField", "figmaNode": "210:204", "props": { "length": "number?", "isInvalid": ["true", "false"] } },
-    { "name": "Dropdown", "path": "components/Dropdown", "figmaNode": "230:631", "props": { "isInvalid": ["true", "false"], "open": ["true", "false"], "leadingIcon": "ReactNode?", "helperText": "string?" } },
-    { "name": "RadioButton", "path": "components/RadioButton", "figmaNode": "250:1224", "props": { "isInvalid": ["true", "false"], "name": "string?" } },
-    { "name": "BottomNavItem", "path": "components/BottomNavItem", "figmaNode": "265:1453", "props": { "icon": "ReactNode", "label": "string", "selected": ["true", "false"] } },
-    { "name": "Switch", "path": "components/Switch", "figmaNode": "265:1895", "props": { "checked": ["true", "false"], "disabled": ["true", "false"] } }
-  ],
-  "excludedFromSelection": {
-    "note": "Link and Message exist only in the separate 'Components' Figma file, not the Mobile App Design System selection — excluded to keep this library 1:1 with the client's selected frames."
+  "name": "@yokesh-2one/design-library",
+  "title": "2one Design Language System",
+  "description": "shadcn/ui components re-skinned to the 2one design tokens. Grayscale, light-only, pill buttons, Satoshi headings + Inter body.",
+  "basedOn": {
+    "source": "shadcn/ui",
+    "license": "MIT",
+    "style": "new-york",
+    "baseColor": "neutral",
+    "iconLibrary": "lucide",
+    "cli": "npx shadcn@latest add <component>"
   },
-  "targets": ["app", "website", "marketing", "deck"],
-  "figmaSourceIssues": [
-    { "id": "button-dup-variant", "severity": "blocking", "node": "152:36", "detail": "duplicate variant primary/trailing/disabled — set is errored in Figma. Code de-dupes." },
-    { "id": "switch-stray-radio", "severity": "blocking", "node": "265:1652", "detail": "a duplicated Radio button component sits on the Switch page; ignore it." },
-    { "id": "dropdown-case-dup-state", "severity": "high", "node": "230:631", "detail": "state has both 'Disabled' and 'disabled'; code treats them as one." },
-    { "id": "textfield-frame-name", "severity": "medium", "node": "167:44", "detail": "component set named 'Frame 4' not 'Text field'." },
-    { "id": "radius-frame-name", "severity": "medium", "node": "91:3", "detail": "Radius page frame named 'Color tokens'." },
-    { "id": "switch-variant-name", "severity": "low", "node": "265:1895", "detail": "Switch variant named 'state2'; code exposes checked on/off." },
-    { "id": "missing-descriptions", "severity": "low", "detail": "OTP field and Switch have no Figma description; context authored in code + docs." }
-  ]
+  "conventions": {
+    "naming": "shadcn (Input, Select, RadioGroup, InputOTP, DropdownMenu, …)",
+    "import": "import { Button } from '@yokesh-2one/design-library'",
+    "styles": "import '@yokesh-2one/design-library/styles' once at the app root",
+    "tailwind": "v4 — consumer runs Tailwind and @source's the package dist"
+  },
+  "theme": {
+    "mode": "light-only",
+    "note": "No .dark palette is defined; the dark: utilities in shadcn components stay inert.",
+    "hues": "grayscale; danger + success are the only hues, reserved for validation",
+    "fonts": { "heading": "Satoshi", "body": "Inter", "link": "Inter" },
+    "tokenMap": {
+      "--background": "#ffffff",
+      "--foreground": "neutral-950 #09090b",
+      "--primary": "neutral-950 #09090b",
+      "--primary-foreground": "accent-50 #fafafa",
+      "--secondary/--muted/--accent": "neutral-100 #f4f4f5",
+      "--muted-foreground": "neutral-600 #52525b",
+      "--border/--input": "neutral-200 #e4e4e7",
+      "--ring": "neutral-400 #a1a1aa",
+      "--destructive": "danger-600 #dc2626",
+      "--success": "success-600 #15803d",
+      "--radius": "0.375rem (6px)"
+    }
+  },
+  "overrides": [
+    "Button: rounded-full (pill) instead of shadcn's rounded-md — the 2one signature."
+  ],
+  "components": {
+    "ui": [
+      "accordion", "alert", "alert-dialog", "aspect-ratio", "avatar", "badge",
+      "breadcrumb", "button", "button-group", "calendar", "card", "carousel",
+      "chart", "checkbox", "collapsible", "command", "context-menu", "dialog",
+      "drawer", "dropdown-menu", "empty", "field", "form", "hover-card", "input",
+      "input-group", "input-otp", "item", "kbd", "label", "menubar",
+      "native-select", "navigation-menu", "pagination", "popover", "progress",
+      "radio-group", "resizable", "scroll-area", "select", "separator", "sheet",
+      "sidebar", "skeleton", "slider", "sonner", "spinner", "switch", "table",
+      "tabs", "textarea", "toggle", "toggle-group", "tooltip"
+    ],
+    "twoOneOnly": [
+      { "name": "Logo", "figma": "198:23", "rule": "black on light / white on dark; never recolored, rotated, or distorted; min width 96px." },
+      { "name": "AppBar", "figma": "160:417", "rule": "mobile top bar, 64px; leading = back/menu only; max one trailing action; title never blank." },
+      { "name": "BottomNavItem", "figma": "265:1453", "rule": "one tab in a bottom nav; compose several; only one selected at a time." }
+    ]
+  },
+  "notCovered": [
+    "Combobox / Date Picker / Data Table / Typography are shadcn composition patterns, not single components — build from the primitives above.",
+    "Toast ships as sonner."
+  ],
+  "history": "Replaced the earlier hand-built Figma-1:1 set (12 components) with this shadcn-based system on user direction (2026-08-10). Old components removed."
 }
