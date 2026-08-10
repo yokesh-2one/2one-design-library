@@ -76,13 +76,19 @@ class ErrorBoundary extends Component<{ children: ReactNode; label: string }, { 
   }
 }
 
-// Framed, scaled preview for full-page block shells.
-function Frame({ label, height = 460, children }: { label: string; height?: number; children: ReactNode }) {
+// Full app-shell blocks are shown inside a mock browser window, so they read
+// as "a screenshot of an app" — clearly distinct from the guide's own sidebar.
+function Frame({ label, url, height = 460, children }: { label: string; url: string; height?: number; children: ReactNode }) {
   return (
     <div className="g-block">
-      <div className="g-block-head"><h3>{label}</h3><span className="meta">block · full shell</span></div>
-      <div style={{ border: '1px solid #e4e4e7', borderRadius: 14, overflow: 'hidden', height, position: 'relative', background: '#fff', boxShadow: 'var(--g-shadow)' }}>
-        <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
+      <div className="g-block-head"><h3>{label}</h3><span className="meta">block · full app shell</span></div>
+      <div className="g-browser">
+        <div className="g-browser-bar">
+          <div className="g-browser-dots"><i /><i /><i /></div>
+          <div className="g-browser-url">{url}</div>
+          <span className="g-browser-tag">preview</span>
+        </div>
+        <div className="g-browser-view" style={{ height }}>
           <ErrorBoundary label={label}><div style={{ minHeight: '100%' }}>{children}</div></ErrorBoundary>
         </div>
       </div>
@@ -397,8 +403,8 @@ export function Showcase() {
                 <Block title="signup-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Signup01 /></div></Block>
               </div>
               <div style={{ marginTop: 18 }}>
-                <Frame label="dashboard-01" height={520}><Dashboard01 /></Frame>
-                <Frame label="sidebar-07" height={460}><Sidebar07 /></Frame>
+                <Frame label="dashboard-01" url="2one.app/dashboard" height={520}><Dashboard01 /></Frame>
+                <Frame label="sidebar-07" url="2one.app/app" height={460}><Sidebar07 /></Frame>
               </div>
               <div className="g-scale-label">All blocks</div>
               <div className="g-index">
