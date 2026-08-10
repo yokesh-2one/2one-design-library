@@ -9,6 +9,14 @@
 /* Self-hosted body/UI typeface (no CDN) */
 @import '@fontsource-variable/inter';
 
+/* -------- 2one foundations (the non-component design tokens) --------
+   Full color ramps (accent/neutral/danger/success), the Display→Small type
+   scale, and the spacing + radius scale. The shadcn semantic layer below is
+   derived from these. */
+@import '../../tokens/colors.css';
+@import '../../tokens/typography.css';
+@import '../../tokens/spacing.css';
+
 @custom-variant dark (&:is(.dark *));
 
 /* Self-hosted heading typeface — Satoshi (Fontshare) */
@@ -129,11 +137,8 @@
 
   --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, sans-serif;
   --font-heading: 'Satoshi', 'Inter Variable', system-ui, sans-serif;
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* radius scale comes from the 2one foundation (tokens/spacing.css):
+     --radius-xs 2 · sm 4 · md 6 · lg 8 · xl 12 · 2xl 16 · full 999 */
 }
 
 @layer base {

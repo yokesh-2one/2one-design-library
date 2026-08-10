@@ -15,8 +15,13 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const dist = resolve(root, 'dist')
 
-// 1) theme — ship globals.css as the styles entry
-const globals = readFileSync(resolve(root, 'src/styles/globals.css'), 'utf8')
+// 1) theme — ship globals.css as the styles entry.
+//    Rewrite the dev-relative token imports (../../tokens/) to the packaged
+//    location (./tokens/, copied below), so the shipped stylesheet resolves.
+const globals = readFileSync(resolve(root, 'src/styles/globals.css'), 'utf8').replaceAll(
+  '../../tokens/',
+  './tokens/',
+)
 mkdirSync(dist, { recursive: true })
 writeFileSync(resolve(dist, 'styles.css'), globals)
 

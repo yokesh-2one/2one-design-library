@@ -116,8 +116,35 @@ function App() {
       </Row>
 
       <Separator style={{ margin: '32px 0' }} />
-      <p style={{ fontFamily: 'var(--font-heading)', fontSize: 28, fontWeight: 700 }}>Satoshi heading specimen — Two one</p>
-      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 16 }}>Inter body specimen — the quick brown fox jumps over the lazy dog.</p>
+
+      <Row title="Foundations — type scale (Satoshi)">
+        <div>
+          <p className="font-heading text-h1 font-bold">Display</p>
+          <p className="font-heading text-h3 font-bold">Heading 3</p>
+          <p className="font-heading text-h5 font-bold">Heading 5</p>
+          <p className="text-base">Body — Inter, the quick brown fox.</p>
+          <p className="text-sm text-muted-foreground">Small — supporting copy.</p>
+        </div>
+      </Row>
+
+      <Row title="Foundations — colour ramps">
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['bg-neutral-50', 'bg-neutral-200', 'bg-neutral-400', 'bg-neutral-600', 'bg-neutral-700', 'bg-neutral-950'].map((c) => (
+            <span key={c} className={`${c} size-9 rounded-sm border`} />
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <span className="bg-accent-800 size-9 rounded-sm" />
+          <span className="bg-danger-600 size-9 rounded-sm" />
+          <span className="bg-success-600 size-9 rounded-sm" />
+        </div>
+      </Row>
+
+      <Row title="Foundations — radius scale">
+        {['rounded-xs', 'rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full'].map((r) => (
+          <span key={r} className={`${r} size-12 bg-secondary border grid place-items-center text-[10px] text-muted-foreground`}>{r.replace('rounded-', '')}</span>
+        ))}
+      </Row>
     </div>
   )
 }

@@ -38,22 +38,11 @@
   --color-danger-600: #dc2626;
   --color-danger-text: #ae2e24; /* token('color.text.danger'), used for required-field asterisks */
   --color-success-600: #15803d;
-
-  /* app-level aliases, mapped onto the tokens above */
-  --color-text: #09090b; /* neutral/950 */
-  --color-text-secondary: #52525b; /* neutral/600 */
-  --color-text-disabled: #d4d4d8; /* neutral/300 */
-  --color-border: #e4e4e7; /* neutral/200 */
-  --color-border-strong: #09090b; /* neutral/950, used on text field focus */
-  --color-bg: #ffffff;
-  --color-bg-muted: #fafafa; /* neutral/50 */
-  --color-surface: #ffffff;
-
-  --color-primary: #171717; /* accent/800 — Button appearance=primary, state=default */
-  --color-primary-hover: #404040; /* accent/600 — state=hover */
-  --color-primary-press: #262626; /* accent/700 — state=press */
-  --color-text-on-accent: #fafafa; /* accent/50 — Button label on primary */
-
-  --color-link: #000000; /* accent/950 — Link default */
-  --color-link-press: #3f3f46; /* neutral/700 — Link press */
 }
+
+/*
+  Note: the app-level semantic aliases (text/border/bg/primary/link) that used to
+  live here are now owned by the DLS theme in src/styles/globals.css, mapped onto
+  shadcn's variable contract (--primary, --border, --muted-foreground, …). These
+  raw ramps remain the single source those semantic values are derived from.
+*/
