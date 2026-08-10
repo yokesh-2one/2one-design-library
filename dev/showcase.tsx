@@ -47,6 +47,7 @@ import { BottomNavItem } from '@/components/bottom-nav-item'
 import { LoginForm as Login01 } from '@/blocks/login-01'
 import { LoginForm as Login03 } from '@/blocks/login-03'
 import { SignupForm as Signup01 } from '@/blocks/signup-01'
+import { DashboardPlain } from '@/blocks/dashboard-plain/page'
 
 /* ---------- foundation data (from tokens/*.css) ---------- */
 const NEUTRAL: [string, string][] = [['50', '#fafafa'], ['100', '#f4f4f5'], ['200', '#e4e4e7'], ['300', '#d4d4d8'], ['400', '#a1a1aa'], ['600', '#52525b'], ['700', '#3f3f46'], ['800', '#27272a'], ['950', '#09090b']]
@@ -61,7 +62,7 @@ const NAV = [
   { grp: '', items: [['overview', 'Overview', '']] },
   { grp: 'Foundations', items: [['color', 'Colour', ''], ['type', 'Typography', ''], ['radius', 'Radius', '']] },
   { grp: 'Components', items: [['actions', 'Actions', ''], ['forms', 'Forms', ''], ['overlays', 'Overlays', ''], ['data', 'Data display', ''], ['feedback', 'Feedback', ''], ['navigation', 'Navigation', ''], ['mobile', 'Mobile · 2one', '']] },
-  { grp: 'Templates', items: [['blocks', 'Blocks', '7']] },
+  { grp: 'Templates', items: [['blocks', 'Blocks', '8']] },
   { grp: 'Reference', items: [['index', 'All components', '57']] },
 ]
 
@@ -371,9 +372,15 @@ export function Showcase() {
                 <Block title="login-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Login01 /></div></Block>
                 <Block title="signup-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Signup01 /></div></Block>
               </div>
+              <div className="g-block" style={{ marginTop: 18 }}>
+                <div className="g-block-head"><h3>dashboard-plain</h3><span className="meta">block · content only, no menu</span></div>
+                <div style={{ border: '1px solid var(--g-line)', borderRadius: 14, overflow: 'auto', height: 600, background: '#fff', boxShadow: 'var(--g-shadow)' }}>
+                  <DashboardPlain />
+                </div>
+              </div>
               <div className="g-scale-label">All blocks</div>
               <div className="g-index">
-                {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02'].map((b) => <a key={b} href="#blocks">{b}</a>)}
+                {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02', 'dashboard-plain'].map((b) => <a key={b} href="#blocks">{b}</a>)}
               </div>
             </section>
 
