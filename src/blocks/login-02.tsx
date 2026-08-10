@@ -24,7 +24,7 @@ export function LoginForm({
         </div>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="team@2one.solutions" required />
         </Field>
         <Field>
           <div className="flex items-center">

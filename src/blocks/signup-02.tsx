@@ -28,7 +28,7 @@ export function SignupForm({
         </Field>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="team@2one.solutions" required />
           <FieldDescription>
             We&apos;ll use this to contact you. We will not share your email
             with anyone else.

@@ -26,85 +26,85 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
+// 2one sample data (replaces the block placeholder demo content).
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "2one Team",
+    email: "team@2one.solutions",
+    avatar: "/avatars/2one.jpg",
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "2one",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
     {
-      name: "Acme Corp.",
+      name: "2one Labs",
       logo: AudioWaveform,
-      plan: "Startup",
+      plan: "Studio",
     },
     {
-      name: "Evil Corp.",
+      name: "2one Client",
       logo: Command,
       plan: "Free",
     },
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Components",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "Overview",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Forms",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "Overlays",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Templates",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
+          title: "Login",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "Dashboard",
           url: "#",
         },
         {
-          title: "Quantum",
+          title: "Sidebar",
           url: "#",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Foundations",
       url: "#",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
+          title: "Colour",
           url: "#",
         },
         {
-          title: "Get Started",
+          title: "Typography",
           url: "#",
         },
         {
-          title: "Tutorials",
+          title: "Tokens",
           url: "#",
         },
         {
@@ -130,26 +130,22 @@ const data = {
           title: "Billing",
           url: "#",
         },
-        {
-          title: "Limits",
-          url: "#",
-        },
       ],
     },
   ],
   projects: [
     {
-      name: "Design Engineering",
+      name: "Design System",
       url: "#",
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
+      name: "Web",
       url: "#",
       icon: PieChart,
     },
     {
-      name: "Travel",
+      name: "Mobile",
       url: "#",
       icon: Map,
     },
