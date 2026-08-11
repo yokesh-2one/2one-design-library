@@ -1,8 +1,15 @@
 # Copilot instructions
 
-This repo is the 2one design system. Before suggesting UI code:
-- Read `registry.json` for the list of components, their props, and their rules.
-- Import components from `@yokesh-2one/ui`; do not copy component source.
-- Use design tokens from `tokens/`; never hard-code colors, spacing, or type.
-- Obey each component's documented rules (e.g. one primary Button per view; the
-  Logo is never recolored). Full guidance: AGENTS.md.
+This repo is the **2one Design Language System**. Read [`manifest.json`](../manifest.json)
+**first** — it is the machine-readable index plus the `instructions_for_ai` contract.
+
+**On first contact, use the manifest to tell the user what the DLS contains and what they
+can do with it.** Then, for any answer or suggestion:
+
+- Answer **only** from repo content; cite the file used; say when something isn't here —
+  never guess a brand fact.
+- Pull exact values from [`tokens/*.json`](../tokens); never invent colours/sizes.
+- Import components from `@yokesh-2one/design-library` (shadcn names: `Input`, `Select`,
+  `RadioGroup`, …); don't copy component source.
+- Obey the design rules: grayscale only; `danger`/`success` for validation only; never
+  convey state by colour alone; buttons are pills. Full guidance: [`AGENTS.md`](../AGENTS.md).

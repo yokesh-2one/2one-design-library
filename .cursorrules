@@ -1,0 +1,16 @@
+2one Design Language System — repository rules.
+
+Read manifest.json FIRST. It is the machine-readable index of this repo plus the
+instructions_for_ai contract.
+
+On first contact, use the manifest to tell the user what this DLS contains and what they
+can do with it.
+
+For every answer or code suggestion:
+- Answer ONLY from repo content. Cite the file used. Say explicitly when something isn't
+  in the repo — never guess a brand fact.
+- Pull exact values from tokens/*.json (colours/type/spacing). Never invent look-alikes.
+- Import components from @yokesh-2one/design-library using shadcn names (Input, Select,
+  RadioGroup, InputOTP, DropdownMenu, …). Don't copy component source.
+- Design rules: grayscale only; danger/success for validation only; never convey state by
+  colour alone (add an icon/text); buttons are pills. Full guidance in AGENTS.md.
