@@ -68,7 +68,7 @@ const NAV = [
   { grp: '', items: [['overview', 'Overview', '']] },
   { grp: 'Foundations', items: [['color', 'Colour', ''], ['type', 'Typography', ''], ['radius', 'Radius', '']] },
   { grp: 'Components', items: [['actions', 'Actions', ''], ['forms', 'Forms', ''], ['overlays', 'Overlays', ''], ['data', 'Data display', ''], ['feedback', 'Feedback', ''], ['navigation', 'Navigation', ''], ['mobile', 'Mobile · 2one', '']] },
-  { grp: 'Templates', items: [['blocks', 'Blocks', '8'], ['charts', 'Charts', '31']] },
+  { grp: 'Templates', items: [['blocks', 'Blocks', '9'], ['charts', 'Charts', '31']] },
   { grp: 'Reference', items: [['index', 'All components', '57']] },
 ]
 
@@ -386,7 +386,7 @@ export function Showcase() {
               </div>
               <div className="g-scale-label">All blocks</div>
               <div className="g-index">
-                {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02', 'dashboard-plain'].map((b) => <a key={b} href="#blocks">{b}</a>)}
+                {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02', 'signup-03', 'dashboard-plain'].map((b) => <a key={b} href="#blocks">{b}</a>)}
               </div>
             </section>
 
