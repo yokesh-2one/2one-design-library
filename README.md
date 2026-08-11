@@ -75,13 +75,28 @@ Component names follow **shadcn's** naming, not our earlier custom names (`Input
 
 ---
 
-## Quick start (developers)
+## Explore it first (testers — start here)
 
-**Requirements:** React 18 or 19, Tailwind CSS **v4**, Node 18+.
+The fastest way to see the whole system running. No auth, no package registry.
 
-### 1. Install
+```bash
+git clone https://github.com/yokesh-2one/2one-design-library.git
+cd 2one-design-library
+npm install          # .npmrc in the repo handles peer-dep resolution
+npm run dev          # live showcase at http://localhost:4180
+```
 
-The package is published to **GitHub Packages** under the `@yokesh-2one` scope, so point that scope at GitHub's registry first. Add an `.npmrc` next to your `package.json`:
+That opens the showcase — every component, the foundations (colour, type, radius), the templates and charts — rendered from source. To poke at the machine-readable data an AI would use: open [`manifest.json`](manifest.json), [`tokens/colors.json`](tokens/colors.json), and [`guide-app/knowledge-base.md`](guide-app/knowledge-base.md).
+
+**Requirements:** Node 18+ (React 18/19 + Tailwind v4 only matter when you consume it in your own app, below).
+
+---
+
+## Use it in your own app (developers)
+
+### 1. Install the package
+
+> **Note:** the package is published to **GitHub Packages**. GitHub Packages requires a personal access token to install **even when the repo is public** — there's no anonymous install. Point the scope at the registry with an `.npmrc` next to your `package.json`:
 
 ```ini
 @yokesh-2one:registry=https://npm.pkg.github.com
@@ -93,6 +108,8 @@ The package is published to **GitHub Packages** under the `@yokesh-2one` scope, 
 ```bash
 npm install @yokesh-2one/design-library react react-dom
 ```
+
+*(If you're just evaluating and don't want to deal with tokens, use the clone-and-run path above instead.)*
 
 ### 2. Wire up the theme + Tailwind
 
