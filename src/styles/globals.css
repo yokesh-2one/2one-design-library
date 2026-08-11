@@ -70,15 +70,17 @@
   --accent: #f4f4f5;                      /* neutral-100 (hover surfaces) */
   --accent-foreground: #09090b;
 
-  --destructive: #dc2626;                /* danger-600 — validation only */
-  --destructive-foreground: #fafafa;
+  --destructive: #c81e1e;                /* danger — validation only. a11y: darkened from #dc2626 so
+                                            white button label clears APCA Lc 75 (was -73.7 → -78.7) */
+  --destructive-foreground: #ffffff;
 
   --success: #15803d;                    /* success-600 — validation only (2one addition) */
-  --success-foreground: #fafafa;
+  --success-foreground: #ffffff;
 
-  --border: #e4e4e7;                     /* neutral-200 */
-  --input: #e4e4e7;                      /* neutral-200 */
-  --ring: #a1a1aa;                       /* neutral-400 focus ring */
+  --border: #dcdce0;                     /* a11y: darkened from neutral-200 #e4e4e7 to clear the APCA
+                                            non-text floor Lc 15 (was 13.4 → 18) */
+  --input: #dcdce0;
+  --ring: #a1a1aa;                       /* neutral-400 focus ring — APCA Lc 50 (non-text) */
 
   /* grayscale chart ramp — the system has no hues */
   --chart-1: #09090b;

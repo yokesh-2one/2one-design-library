@@ -35,6 +35,17 @@ Gemini, Copilot).
 4. **Buttons are pills** (`rounded-full`) — the 2one signature override.
 5. **Light-only.** Don't add a `.dark` palette; `dark:` utilities stay inert.
 6. **Icons:** lucide (`lucide-react`).
+7. **Accessibility is a build rule, not an afterthought** — see
+   [`docs/accessibility.md`](docs/accessibility.md). In short: never convey state
+   by colour alone (an invalid field needs an icon/text, not just a red border);
+   any new or changed colour token must pass `npm run a11y` (APCA Lc thresholds)
+   layered on top of WCAG 2.x AA; don't hug the math — leave margin.
+
+## Accessibility check
+
+`npm run a11y` runs an APCA contrast audit that parses the live token pairs from
+`globals.css` and fails (exit 1) if any drops below its Lc threshold. Run it after
+any theme/token change. Full rules and thresholds: [`docs/accessibility.md`](docs/accessibility.md).
 
 ## Status
 

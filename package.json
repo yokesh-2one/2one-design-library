@@ -25,7 +25,8 @@
     "build": "vite build && tsc --emitDeclarationOnly -p tsconfig.json && tsc-alias -p tsconfig.json && node scripts/copy-styles.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "a11y": "node scripts/apca-audit.mjs"
   },
   "peerDependencies": {
     "react": ">=18",
