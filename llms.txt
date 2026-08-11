@@ -6,6 +6,7 @@
 ## Start here
 - [Agent guide](AGENTS.md): how to work in this repo
 - [Registry](registry.json): component set, theme map, conventions, overrides
+- [Brand](brand/BRAND.md): voice, tone, personality, mission, personas — match this in copy
 
 ## Components
 - Source: src/components/ui/<name>.tsx (54 shadcn primitives, 2one-themed)

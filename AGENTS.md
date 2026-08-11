@@ -19,6 +19,8 @@ Gemini, Copilot).
   variables (light-only) + `@font-face` (Satoshi). Single source of truth for color.
 - `src/lib/utils.ts` — the `cn()` helper.
 - `tokens/` — raw `@theme` token files (color/type/spacing).
+- `brand/BRAND.md` — brand context: voice, tone, personality, mission, personas.
+  Match this when writing any 2one-facing copy. `brand/logo/` holds the mark.
 - `components.json` — shadcn CLI config. Add components with `npx shadcn@latest add <name>`.
 - `dev/` — local sampler to verify the theme (`npm run dev`).
 
