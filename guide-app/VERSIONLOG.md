@@ -16,7 +16,11 @@ flagged with **⚠ BREAKING** and migration guidance.
 - ✅ Typography tokens (Satoshi/Inter, full scale) — `tokens/typography.json`
 - ✅ Spacing + radius tokens — `tokens/spacing.json`
 - ✅ Theme (tokens → shadcn variables, light-only) — `src/styles/globals.css`
-- 🔲 Iconography, illustration, photography, patterns, moodboard — *not yet extracted*
+- 🔲 Iconography, illustration, photography, patterns, moodboard — *not in the current
+  Figma scope yet; will arrive as those are added to Figma (future content)*
+
+> **Everything currently in Figma is already integrated into this repo.** The items
+> marked 🔲 are not gaps against today's Figma — they're future design content.
 
 **Tier 3 — Design System (applied)**
 - ✅ 54 shadcn primitives, re-skinned to 2one — `src/components/ui/`
@@ -39,12 +43,12 @@ flagged with **⚠ BREAKING** and migration guidance.
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| Automated Figma → repo extraction pipeline | Planned | Needs Figma file access/keys + a schema-validated sync (PRD FR-1–4) |
+| Automated Figma → repo extraction pipeline | Owner-led, future version | Current Figma content is **already integrated**; the automated sync is a later version update (PRD FR-1–4) |
 | Per-component multi-format output (json/svg/html-css) | Planned | Generated from the same canonical source (PRD FR-7/8) |
 | iOS / Android token exports | Planned | From `tokens/*.json` |
 | MCP query server / API | Planned (stretch) | Structured queries; JSON index ships first (PRD FR-12) |
-| Canva integration | Planned | Consume from `tokens/` + `components/`, no data duplication (PRD FR-14/15) |
-| Tier 2 visual categories (icons/illustration/photo/moodboard) | Planned | Content lives in Figma |
+| Canva integration | **Repo accessible now** | Export + docs in `integrations/canva/`; the integration itself is **user-built**. Needs the repo reachable by Canva (public, or a PAT) |
+| Tier 2 visual categories (icons/illustration/photo/moodboard) | Future content | Arrive as added to Figma |
 | Dark theme | Not planned | System is intentionally light-only |
 
 ---

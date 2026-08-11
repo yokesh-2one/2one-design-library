@@ -9,7 +9,7 @@
 
   Run:  npm run tokens
 */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -110,9 +110,29 @@ const spacing = {
   notes: 'Buttons use radius-full (the 2one signature). Everything else uses xs–2xl.',
 }
 
+// ---- CANVA brand-kit export (derived from the tokens above; users' Canva
+//      integration consumes this — same canonical source, no duplication) ----
+const s = colors.semantic
+const canva = {
+  name: '2one',
+  source: 'Generated from tokens/colors.json + tokens/typography.json. Do not edit by hand — run `npm run tokens`.',
+  raw_url: 'https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/integrations/canva/brand-kit.json',
+  colors: [
+    { name: 'Ink', hex: s.foreground }, { name: 'Primary', hex: s.primary },
+    { name: 'Background', hex: s.background }, { name: 'Muted', hex: s.muted },
+    { name: 'Secondary text', hex: s['muted-foreground'] }, { name: 'Border', hex: s.border },
+    { name: 'Danger', hex: s.destructive }, { name: 'Success', hex: s.success },
+  ].filter((c) => c.hex),
+  neutral_ramp: Object.entries(colors.ramps.neutral).map(([step, hex]) => ({ name: `Neutral ${step}`, hex })),
+  fonts: { heading: typography.fonts.heading.split(',')[0].replace(/['"]/g, '').trim(), body: typography.fonts.body.split(',')[0].replace(/['"]/g, '').trim() },
+  rules: colors.rules,
+}
+
 const out = (p, obj) => { writeFileSync(join(root, p), JSON.stringify(obj, null, 2) + '\n'); console.log('  wrote', p) }
 console.log('Generating canonical token JSON:')
 out('tokens/colors.json', colors)
 out('tokens/typography.json', typography)
 out('tokens/spacing.json', spacing)
+mkdirSync(join(root, 'integrations/canva'), { recursive: true })
+out('integrations/canva/brand-kit.json', canva)
 console.log('Done.')

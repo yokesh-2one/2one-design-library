@@ -101,6 +101,15 @@ const manifest = {
       schema_validation: 'npm run validate',
     },
     schemas: { token: 'schema/token.schema.json', component: 'schema/component.schema.json' },
+    integrations: {
+      canva: {
+        status: 'repo accessible; integration is user-built',
+        export: 'integrations/canva/brand-kit.json',
+        guide: 'integrations/canva/README.md',
+        raw_url: 'https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/integrations/canva/brand-kit.json',
+        note: 'Fetching raw URLs requires the repo to be public or a PAT with repo scope.',
+      },
+    },
   },
 
   formats: {

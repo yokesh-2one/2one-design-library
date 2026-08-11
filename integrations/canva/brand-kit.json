@@ -1,0 +1,87 @@
+{
+  "name": "2one",
+  "source": "Generated from tokens/colors.json + tokens/typography.json. Do not edit by hand — run `npm run tokens`.",
+  "raw_url": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/integrations/canva/brand-kit.json",
+  "colors": [
+    {
+      "name": "Ink",
+      "hex": "#09090b"
+    },
+    {
+      "name": "Primary",
+      "hex": "#09090b"
+    },
+    {
+      "name": "Background",
+      "hex": "#ffffff"
+    },
+    {
+      "name": "Muted",
+      "hex": "#f4f4f5"
+    },
+    {
+      "name": "Secondary text",
+      "hex": "#52525b"
+    },
+    {
+      "name": "Border",
+      "hex": "#dcdce0"
+    },
+    {
+      "name": "Danger",
+      "hex": "#c81e1e"
+    },
+    {
+      "name": "Success",
+      "hex": "#15803d"
+    }
+  ],
+  "neutral_ramp": [
+    {
+      "name": "Neutral 50",
+      "hex": "#fafafa"
+    },
+    {
+      "name": "Neutral 100",
+      "hex": "#f4f4f5"
+    },
+    {
+      "name": "Neutral 200",
+      "hex": "#e4e4e7"
+    },
+    {
+      "name": "Neutral 300",
+      "hex": "#d4d4d8"
+    },
+    {
+      "name": "Neutral 400",
+      "hex": "#a1a1aa"
+    },
+    {
+      "name": "Neutral 600",
+      "hex": "#52525b"
+    },
+    {
+      "name": "Neutral 700",
+      "hex": "#3f3f46"
+    },
+    {
+      "name": "Neutral 800",
+      "hex": "#27272a"
+    },
+    {
+      "name": "Neutral 950",
+      "hex": "#09090b"
+    }
+  ],
+  "fonts": {
+    "heading": "Satoshi",
+    "body": "Inter"
+  },
+  "rules": [
+    "Grayscale only — never introduce a brand hue.",
+    "danger/success are for validation state only, never decoration.",
+    "Never convey state by colour alone — pair with an icon or text.",
+    "Any colour-token change must pass `npm run a11y`."
+  ]
+}
