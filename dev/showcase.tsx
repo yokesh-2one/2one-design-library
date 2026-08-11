@@ -48,6 +48,12 @@ import { LoginForm as Login01 } from '@/blocks/login-01'
 import { LoginForm as Login03 } from '@/blocks/login-03'
 import { SignupForm as Signup01 } from '@/blocks/signup-01'
 import { DashboardPlain } from '@/blocks/dashboard-plain/page'
+import { ChartAreaInteractive as ChartArea } from '@/blocks/charts/chart-area-interactive'
+import { ChartBarMultiple } from '@/blocks/charts/chart-bar-multiple'
+import { ChartLineMultiple } from '@/blocks/charts/chart-line-multiple'
+import { ChartPieDonutText } from '@/blocks/charts/chart-pie-donut-text'
+import { ChartRadarDefault } from '@/blocks/charts/chart-radar-default'
+import { ChartRadialStacked } from '@/blocks/charts/chart-radial-stacked'
 
 /* ---------- foundation data (from tokens/*.css) ---------- */
 const NEUTRAL: [string, string][] = [['50', '#fafafa'], ['100', '#f4f4f5'], ['200', '#e4e4e7'], ['300', '#d4d4d8'], ['400', '#a1a1aa'], ['600', '#52525b'], ['700', '#3f3f46'], ['800', '#27272a'], ['950', '#09090b']]
@@ -62,7 +68,7 @@ const NAV = [
   { grp: '', items: [['overview', 'Overview', '']] },
   { grp: 'Foundations', items: [['color', 'Colour', ''], ['type', 'Typography', ''], ['radius', 'Radius', '']] },
   { grp: 'Components', items: [['actions', 'Actions', ''], ['forms', 'Forms', ''], ['overlays', 'Overlays', ''], ['data', 'Data display', ''], ['feedback', 'Feedback', ''], ['navigation', 'Navigation', ''], ['mobile', 'Mobile · 2one', '']] },
-  { grp: 'Templates', items: [['blocks', 'Blocks', '8']] },
+  { grp: 'Templates', items: [['blocks', 'Blocks', '8'], ['charts', 'Charts', '31']] },
   { grp: 'Reference', items: [['index', 'All components', '57']] },
 ]
 
@@ -381,6 +387,24 @@ export function Showcase() {
               <div className="g-scale-label">All blocks</div>
               <div className="g-index">
                 {['login-01', 'login-02', 'login-03', 'login-04', 'login-05', 'signup-01', 'signup-02', 'dashboard-plain'].map((b) => <a key={b} href="#blocks">{b}</a>)}
+              </div>
+            </section>
+
+            {/* CHARTS */}
+            <section id="charts" className="g-section">
+              <div className="g-eyebrow">Templates · data viz</div><h2>Charts</h2>
+              <p className="g-lede">31 chart templates across every type — grayscale by default (the <code>--chart-1…5</code> tokens map to the neutral ramp, no hues). One of each type shown; the full set lives in <code>src/blocks/charts/</code>.</p>
+              <div className="g-grid2" style={{ marginTop: 18 }}>
+                <ChartArea />
+                <ChartBarMultiple />
+                <ChartLineMultiple />
+                <ChartRadarDefault />
+                <ChartPieDonutText />
+                <ChartRadialStacked />
+              </div>
+              <div className="g-scale-label">All 31 charts</div>
+              <div className="g-index">
+                {['area-default','area-linear','area-stacked','area-legend','area-interactive','bar-default','bar-horizontal','bar-multiple','bar-stacked','bar-label','bar-interactive','line-default','line-multiple','line-dots','line-label','line-interactive','pie-simple','pie-label','pie-donut','pie-donut-text','pie-interactive','radar-default','radar-dots','radar-multiple','radar-legend','radial-simple','radial-label','radial-grid','radial-stacked','tooltip-default','tooltip-advanced'].map((c) => <a key={c} href="#charts">chart-{c}</a>)}
               </div>
             </section>
 
