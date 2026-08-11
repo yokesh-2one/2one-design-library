@@ -1,0 +1,162 @@
+{
+  "$schema": "../schema/token.schema.json",
+  "description": "2one colour tokens. Grayscale system — no brand hue. danger/success are the only hues and are reserved for validation state only.",
+  "ramps": {
+    "neutral": {
+      "50": "#fafafa",
+      "100": "#f4f4f5",
+      "200": "#e4e4e7",
+      "300": "#d4d4d8",
+      "400": "#a1a1aa",
+      "600": "#52525b",
+      "700": "#3f3f46",
+      "800": "#27272a",
+      "950": "#09090b"
+    },
+    "accent": {
+      "50": "#fafafa",
+      "100": "#f4f4f4",
+      "200": "#e4e4e4",
+      "300": "#d1d1d1",
+      "600": "#404040",
+      "700": "#262626",
+      "800": "#171717",
+      "950": "#000000"
+    },
+    "danger": {
+      "500": "#ef4444",
+      "600": "#dc2626",
+      "text": "#ae2e24"
+    },
+    "success": {
+      "600": "#15803d"
+    }
+  },
+  "semantic": {
+    "background": "#ffffff",
+    "foreground": "#09090b",
+    "card": "#ffffff",
+    "card-foreground": "#09090b",
+    "popover": "#ffffff",
+    "popover-foreground": "#09090b",
+    "primary": "#09090b",
+    "primary-foreground": "#fafafa",
+    "secondary": "#f4f4f5",
+    "secondary-foreground": "#09090b",
+    "muted": "#f4f4f5",
+    "muted-foreground": "#52525b",
+    "accent": "#f4f4f5",
+    "accent-foreground": "#09090b",
+    "destructive": "#c81e1e",
+    "destructive-foreground": "#ffffff",
+    "success": "#15803d",
+    "success-foreground": "#ffffff",
+    "border": "#dcdce0",
+    "input": "#dcdce0",
+    "ring": "#a1a1aa",
+    "chart-1": "#09090b",
+    "chart-2": "#3f3f46",
+    "chart-3": "#52525b",
+    "chart-4": "#a1a1aa",
+    "chart-5": "#d4d4d8",
+    "sidebar": "#fafafa",
+    "sidebar-foreground": "#09090b",
+    "sidebar-primary": "#09090b",
+    "sidebar-primary-foreground": "#fafafa",
+    "sidebar-accent": "#f4f4f5",
+    "sidebar-accent-foreground": "#09090b",
+    "sidebar-border": "#e4e4e7",
+    "sidebar-ring": "#a1a1aa"
+  },
+  "contrast": {
+    "standard": "WCAG 2.x (ratio) + APCA / WCAG 3.0 draft (Lc). Layered: AA baseline, APCA as an additional perceptual check.",
+    "pairs": [
+      {
+        "name": "body-and-headings",
+        "text": "#09090b",
+        "background": "#ffffff",
+        "usage": "body + headings on page",
+        "wcag_ratio": 19.9,
+        "apca_lc": 105.9,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "name": "secondary-text",
+        "text": "#52525b",
+        "background": "#ffffff",
+        "usage": "secondary text / labels",
+        "wcag_ratio": 7.73,
+        "apca_lc": 86.9,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "name": "primary-button-label",
+        "text": "#fafafa",
+        "background": "#09090b",
+        "usage": "primary button label",
+        "wcag_ratio": 19.06,
+        "apca_lc": -104.5,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "name": "destructive-button-label",
+        "text": "#ffffff",
+        "background": "#c81e1e",
+        "usage": "destructive button label",
+        "wcag_ratio": 5.74,
+        "apca_lc": -82.1,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "name": "error-text",
+        "text": "#c81e1e",
+        "background": "#ffffff",
+        "usage": "error text / label",
+        "wcag_ratio": 5.74,
+        "apca_lc": 76.7,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "name": "success-text",
+        "text": "#15803d",
+        "background": "#ffffff",
+        "usage": "success text / label",
+        "wcag_ratio": 5.02,
+        "apca_lc": 74.2,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "name": "border-nontext",
+        "text": "#dcdce0",
+        "background": "#ffffff",
+        "usage": "border / input hairline (non-text UI)",
+        "wcag_ratio": 1.37,
+        "apca_lc": 18,
+        "apca_min": 15,
+        "passes": true
+      },
+      {
+        "name": "focus-ring-nontext",
+        "text": "#a1a1aa",
+        "background": "#ffffff",
+        "usage": "focus ring (non-text UI)",
+        "wcag_ratio": 2.56,
+        "apca_lc": 50.2,
+        "apca_min": 15,
+        "passes": true
+      }
+    ]
+  },
+  "rules": [
+    "Grayscale only — never introduce a brand hue.",
+    "danger/success are for validation state only, never decoration.",
+    "Never convey state by colour alone — pair with an icon or text.",
+    "Any colour-token change must pass `npm run a11y`."
+  ]
+}

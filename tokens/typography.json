@@ -1,0 +1,75 @@
+{
+  "$schema": "../schema/token.schema.json",
+  "fonts": {
+    "heading": "Satoshi, Inter, system-ui, sans-serif",
+    "body": "Inter, system-ui, -apple-system, sans-serif"
+  },
+  "weights": {
+    "normal": 400,
+    "medium": 500,
+    "semibold": 600,
+    "bold": 700
+  },
+  "scale": {
+    "display": {
+      "size_rem": 4.75,
+      "size_px": 76,
+      "line_height_px": 103,
+      "font": "heading"
+    },
+    "h1": {
+      "size_rem": 3.875,
+      "size_px": 62,
+      "line_height_px": 84,
+      "font": "heading"
+    },
+    "h2": {
+      "size_rem": 3,
+      "size_px": 48,
+      "line_height_px": 65,
+      "font": "heading"
+    },
+    "h3": {
+      "size_rem": 2.5,
+      "size_px": 40,
+      "line_height_px": 54,
+      "font": "heading"
+    },
+    "h4": {
+      "size_rem": 2,
+      "size_px": 32,
+      "line_height_px": 43,
+      "font": "heading"
+    },
+    "h5": {
+      "size_rem": 1.625,
+      "size_px": 26,
+      "line_height_px": 35,
+      "font": "heading"
+    },
+    "h6": {
+      "size_rem": 1.25,
+      "size_px": 20,
+      "line_height_px": 27,
+      "font": "heading"
+    },
+    "base": {
+      "size_rem": 1,
+      "size_px": 16,
+      "line_height_px": 19,
+      "font": "body"
+    },
+    "sm": {
+      "size_rem": 0.875,
+      "size_px": 14,
+      "line_height_px": 20,
+      "font": "body"
+    },
+    "xs": {
+      "size_rem": 0.75,
+      "size_px": 12,
+      "line_height_px": 15,
+      "font": "body"
+    }
+  }
+}

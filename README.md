@@ -290,12 +290,19 @@ It lands in `src/components/ui/`, already picking up the 2one theme. See [Troubl
 │   │   ├── globals.css      THE THEME — tokens → shadcn variables + @font-face
 │   │   └── fonts/           Satoshi (.woff2)
 │   └── index.ts             public entry — re-exports all 57 components
-├── tokens/                  raw @theme tokens (colors / typography / spacing)
+├── tokens/                  design tokens — CSS (Tailwind) + generated JSON
+│   ├── colors.{css,json}    ramps + semantic + WCAG/APCA contrast data
+│   ├── typography.{css,json}  fonts + type scale
+│   └── spacing.{css,json}   spacing + radius scale
 ├── brand/
-│   ├── BRAND.md             voice, tone, personality, mission, personas
+│   ├── brand.json           Tier 1 structured (mission, voice, tone, personas)
+│   ├── BRAND.md             prose version
 │   └── logo/                SVG + PNG + manifest (usage rules)
+├── guide-app/               local Q&A knowledge base + version log + feedback
+├── schema/                  JSON schemas (token, component) + validation
 ├── recipes/                 how to build an app / website / marketing / deck
 ├── dev/                     local showcase app (npm run dev)
+├── manifest.json            READ FIRST — machine index + instructions_for_ai
 ├── components.json          shadcn CLI config
 ├── registry.json            machine index (theme map, conventions, overrides)
 ├── AGENTS.md · llms.txt     AI entry points
@@ -343,14 +350,15 @@ npm publish
 
 ## For AI agents
 
-This repo is written to be machine-read. Point any AI tool at these, in order:
+This repo is written to be machine-read. Point any AI vendor at these, in order:
 
-1. [`AGENTS.md`](AGENTS.md) — how to work in the repo, the rules.
-2. [`registry.json`](registry.json) — machine index: the component set, the token→variable **theme map**, naming **conventions**, and **overrides**.
-3. [`brand/BRAND.md`](brand/BRAND.md) — voice, tone, personality, personas, so generated copy is on-brand.
-4. [`llms.txt`](llms.txt) — a short pointer file summarising the above.
+1. **[`manifest.json`](manifest.json) — READ FIRST.** The machine-readable index of everything, plus the **`instructions_for_ai`** contract: answer only from repo content, cite the file used, and say explicitly when something isn't here — **never fabricate a brand fact**.
+2. [`tokens/*.json`](tokens) — canonical colours (with WCAG + APCA **contrast data**), type, spacing. Pull exact values from here; never invent look-alikes.
+3. [`brand/brand.json`](brand/brand.json) — mission, voice, tone, personas (structured), so generated copy is on-brand.
+4. [`guide-app/knowledge-base.md`](guide-app/knowledge-base.md) — local Q&A source (works offline); [`VERSIONLOG.md`](guide-app/VERSIONLOG.md) — what's available vs. planned.
+5. [`AGENTS.md`](AGENTS.md) · [`registry.json`](registry.json) · [`llms.txt`](llms.txt) — rules, theme map, pointer.
 
-The rule for agents: **import from the package, use shadcn names, obey the tokens, match the brand voice.**
+The machine-readable data is **generated, not hand-kept** (no drift): `npm run tokens`, `npm run manifest`, validated by `npm run validate`. The contract for agents: **answer only from the repo, cite the file, use shadcn names, obey the tokens, match the brand voice — never guess a brand fact.**
 
 ---
 

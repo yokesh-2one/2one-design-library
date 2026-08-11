@@ -4,9 +4,15 @@
 > pill buttons, Satoshi headings + Inter body. Structured for humans and AI.
 
 ## Start here
+- [Manifest](manifest.json): READ FIRST — machine-readable index + instructions_for_ai (answer only from repo, cite files, never guess)
 - [Agent guide](AGENTS.md): how to work in this repo
 - [Registry](registry.json): component set, theme map, conventions, overrides
-- [Brand](brand/BRAND.md): voice, tone, personality, mission, personas — match this in copy
+- [Brand](brand/brand.json): mission, voice, tone, personas (structured) — match this in copy
+
+## Machine-readable data
+- Tokens: tokens/colors.json (+ contrast data), tokens/typography.json, tokens/spacing.json
+- Regenerate: npm run tokens · npm run manifest · npm run validate · npm run a11y
+- Local Q&A knowledge base: guide-app/knowledge-base.md · what's available vs planned: guide-app/VERSIONLOG.md
 
 ## Components
 - Source: src/components/ui/<name>.tsx (54 shadcn primitives, 2one-themed)

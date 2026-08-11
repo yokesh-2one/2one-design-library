@@ -1,0 +1,40 @@
+{
+  "tier": 1,
+  "name": "2one Solutions",
+  "about": "2one Solutions is a design and strategy consultancy helping businesses create structure in an ever-changing technology environment. We build business strategies that better connect you with your customers, leveraging our Design Language System architecture.",
+  "tagline": "Building business value by improving customer & user experience.",
+  "mission": "To create structure in an unstructured world.",
+  "vision": "Help build companies that customers can't stop talking about.",
+  "voice": {
+    "descriptors": ["Minimalistic", "Contemporary", "Changing"],
+    "note": "How the brand speaks — the enduring character of the language."
+  },
+  "tone": {
+    "descriptors": ["Empathetic", "Bold", "Strong"],
+    "note": "How that voice adapts to context — reassuring where it matters, decisive where it counts."
+  },
+  "personality": ["Open-minded", "Factual", "Experimenting"],
+  "archetype": { "name": "Explorer", "traits": ["problem-solving", "strategic"] },
+  "personas": [
+    { "id": "product-leaders", "label": "User-centered product leaders" },
+    { "id": "strategic-businesses", "label": "Businesses — strategic & goal-oriented" },
+    { "id": "saas-startups", "label": "SaaS, B2B & B2C startups" },
+    { "id": "fintech", "label": "Fintech" },
+    { "id": "social-accessibility", "label": "Social networking & accessibility products" }
+  ],
+  "writing_rules": {
+    "do": [
+      "Be minimal and contemporary — say it in fewer words.",
+      "Lead with the customer/user outcome.",
+      "Be factual and specific; show, don't hype.",
+      "Stay empathetic where the reader might be uncertain; be bold where a decision is needed."
+    ],
+    "dont": [
+      "Don't add filler, jargon, or generic marketing fluff.",
+      "Don't overstate or invent capabilities.",
+      "Don't use colour or emphasis as the only way to make a point."
+    ]
+  },
+  "source": "brand/BRAND.md",
+  "usage_for_ai": "Match this voice and tone for any 2one-facing copy. Do not invent brand facts not present here or in brand/BRAND.md."
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yokesh-2one/2one-design-library/schema/component.schema.json",
+  "title": "2one DLS component entry",
+  "description": "Contract for a component's machine-readable metadata (per PRD: every component entry must carry name, source, formats, status, and last-updated). Used to validate future per-component .json output.",
+  "type": "object",
+  "required": ["name", "path", "formats", "status"],
+  "properties": {
+    "name": { "type": "string", "description": "Component name (shadcn/ui naming), e.g. Button, Select." },
+    "path": { "type": "string", "description": "Repo-relative path to the source, e.g. src/components/ui/button.tsx." },
+    "category": { "type": "string" },
+    "tier": { "type": "integer", "enum": [2, 3] },
+    "formats": {
+      "type": "array",
+      "description": "Formats this component is available in.",
+      "items": { "type": "string", "enum": ["tsx", "json", "svg", "html-css", "ios", "android", "vue"] },
+      "minItems": 1
+    },
+    "status": { "type": "string", "enum": ["available", "planned", "deprecated"] },
+    "figma_source": {
+      "type": "object",
+      "description": "Traceability to the Figma source (PRD FR-2).",
+      "properties": { "file_key": { "type": "string" }, "node_id": { "type": "string" } }
+    },
+    "last_updated_commit": { "type": "string", "description": "Git SHA of the last change." },
+    "props": { "type": "object" },
+    "rules": { "type": "array", "items": { "type": "string" } },
+    "based_on": { "type": "string", "description": "e.g. shadcn/ui component id." }
+  },
+  "additionalProperties": true
+}

@@ -5,7 +5,10 @@ This repository is the **single source of truth** for the 2one DLS: the
 tokens, plus the brand. Written for humans and AI agents (Claude Code, Codex,
 Gemini, Copilot).
 
-**If you are an AI agent, start here, then read [`registry.json`](registry.json).**
+**If you are an AI agent, read [`manifest.json`](manifest.json) FIRST** — it is the
+machine-readable index plus the `instructions_for_ai` contract (answer only from repo
+content, cite the file, say when something isn't here — never guess). Then this guide,
+then [`registry.json`](registry.json).
 
 ## How this repo is organized
 

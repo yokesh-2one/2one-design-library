@@ -26,7 +26,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "a11y": "node scripts/apca-audit.mjs"
+    "a11y": "node scripts/apca-audit.mjs",
+    "tokens": "node scripts/build-tokens.mjs",
+    "manifest": "node scripts/build-manifest.mjs",
+    "validate": "node scripts/validate.mjs",
+    "build:meta": "npm run tokens && npm run manifest && npm run validate"
   },
   "peerDependencies": {
     "react": ">=18",
