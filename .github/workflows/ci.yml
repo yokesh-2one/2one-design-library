@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Validate machine-readable data
+        run: npm run validate
+
+      - name: Accessibility (APCA contrast) audit
+        run: npm run a11y
+
+      - name: Library build
+        run: npm run build
+
+      # Generated metadata must never silently go stale. Regenerate everything,
+      # then fail if the working tree changed — a non-empty diff means someone
+      # edited a source (a component, a token, the brand) and committed without
+      # running `npm run build:meta`.
+      - name: Generated files are in sync with sources
+        run: |
+          npm run build:meta
+          git diff --exit-code -- tokens/ manifest.json graph.json integrations/

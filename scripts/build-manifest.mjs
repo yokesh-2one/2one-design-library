@@ -22,7 +22,9 @@ const manifest = {
   name: pkg.name,
   version: pkg.version,
   kind: '2one Design Language System — AI-legible design repository',
-  updated: new Date().toISOString().slice(0, 10),
+  // No generated timestamp: it must stay deterministic so the CI "generated files
+  // in sync" guard never fails just because the clock ticked over. See git history
+  // for when this was last regenerated.
 
   description:
     "2one's Design Language System: the brand foundation, design tokens, and component library that define how every 2one product, deck, and marketing asset should look, feel, and sound. It is the single, authoritative source of truth — structured to be both human-understandable and AI-legible so any AI vendor can answer brand/design questions and generate on-brand output without guessing. The system is grayscale (no brand hue), light-only, with pill buttons, Satoshi headings and Inter body; danger/success are the only colours and are used for validation only.",
