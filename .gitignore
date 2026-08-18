@@ -4,3 +4,12 @@ dist-site
 *.log
 .DS_Store
 storybook-static
+
+# secrets — never commit env files or Vercel credentials
+.env
+.env.*
+.vercel
+
+# build artifacts
+*.tsbuildinfo
+coverage

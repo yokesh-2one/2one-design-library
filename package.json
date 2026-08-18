@@ -1,9 +1,17 @@
 {
   "name": "@yokesh-2one/design-library",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "2one Design Language System — shadcn/ui components re-skinned to the 2one tokens (grayscale, light-only, pill buttons, Satoshi + Inter).",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yokesh-2one/2one-design-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yokesh-2one/2one-design-library/issues"
+  },
+  "homepage": "https://github.com/yokesh-2one/2one-design-library#readme",
   "engines": {
     "node": ">=18"
   },

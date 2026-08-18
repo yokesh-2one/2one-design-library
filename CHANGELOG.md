@@ -6,24 +6,38 @@ uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-17
+
+Features landed since 0.1.0: an audited dark theme, CI, and repo hardening.
+
 ### Added
-- `LICENSE` (MIT) and a `license` field in `package.json` — the package can now
-  be distributed unambiguously.
-- CI workflow (`.github/workflows/ci.yml`): typecheck, public-API completeness,
+- **Audited dark theme.** A dark palette (`.dark` in `globals.css`) alongside
+  light — both grayscale, both APCA-audited (`npm run a11y` parses `:root` **and**
+  `.dark`; both must pass). Exported `ThemeProvider` (over `next-themes`) to switch
+  themes; the dev showcase has a light/dark toggle and a live theming playground.
+- **CI** (`.github/workflows/ci.yml`): typecheck, public-API completeness,
   data validation, accessibility thresholds, generated-file sync, and library build.
-- `scripts/check-exports.mjs` (`npm run check:exports`) — guards that every
+- **Deterministic generators + `npm run check:meta`** — `manifest.json`,
+  `graph.json`, and `tokens/*.json` regenerate deterministically (no date drift)
+  and CI fails if any drifts from source.
+- **`scripts/check-exports.mjs` (`npm run check:exports`)** — guards that every
   component is re-exported from `src/index.ts`.
-- `npm run check:meta` — fails if the generated `tokens/*.json`, `manifest.json`,
-  or `graph.json` drift from their sources.
-- `engines.node >= 18`.
-- `docs/building-with-the-dls.md` — consistency rules for building on the DLS.
+- **Knowledge graph** enrichments: component→component composition edges and graph
+  invariants folded into `npm run validate`; the `npm run what-uses` impact helper.
+- **AI representation contract** — AGENTS.md "How to represent this repository"
+  plus `manifest.instructions_for_ai.how_to_represent`.
+- **Consistency docs** — `docs/building-with-the-dls.md` and dark thresholds in
+  `docs/accessibility.md`.
+- `LICENSE` (MIT), a `license` field, `engines.node >= 18`, and `repository` /
+  `bugs` / `homepage` metadata so the package links back to the repo.
 
 ### Changed
 - **Trimmed the shipped dependency surface.** Moved dev-showcase-only packages
   (`@dnd-kit/*`, `@tanstack/react-table`, `date-fns`) from `dependencies` to
-  `devDependencies`, and removed `@tabler/icons-react` (→ lucide) and
-  `next-themes` (light-only) entirely. Consumers no longer install these.
-- `sonner` toaster is now fixed to the light theme (no `next-themes`).
+  `devDependencies` and removed `@tabler/icons-react` (→ lucide). Consumers install
+  less.
+- Rebuilt the dev showcase on the real components — one token system, one spacing
+  scale, token-driven demos — with catalog↔knowledge-graph deep links.
 
 ## [0.1.0] - 2026-08-12
 
