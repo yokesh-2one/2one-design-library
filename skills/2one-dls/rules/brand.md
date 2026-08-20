@@ -25,7 +25,7 @@ import { GalleryVerticalEnd } from "lucide-react"
 
 ✅ **Right** — React
 ```tsx
-import { Logo } from "@yokesh-2one/design-library"
+import { Logo } from "@2one/design-library"
 
 <Logo width={96} />                     {/* light surfaces */}
 <Logo variant="white" width={96} />     {/* dark surfaces */}

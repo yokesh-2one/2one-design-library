@@ -267,7 +267,7 @@ export function Showcase() {
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-1 !h-5" />
             <span className="font-mono text-xs text-muted-foreground">
-              <b className="font-semibold text-foreground">@yokesh-2one/design-library</b> · shadcn · 2one-themed
+              <b className="font-semibold text-foreground">@2one/design-library</b> · shadcn · 2one-themed
             </span>
             <ThemeToggle className="ml-auto" />
           </header>
@@ -277,7 +277,7 @@ export function Showcase() {
             <section id="overview" className="g-section g-hero">
               <div className="g-eyebrow">2one · design language system</div>
               <h1>The 2one system, <span className="thin">built on shadcn/ui.</span></h1>
-              <p>Every component on this page is the real <span className="mono">@yokesh-2one/design-library</span> — the shadcn/ui set re-skinned to the 2one tokens. Grayscale, light + dark, pill buttons, Satoshi headings, Inter body.</p>
+              <p>Every component on this page is the real <span className="mono">@2one/design-library</span> — the shadcn/ui set re-skinned to the 2one tokens. Grayscale, light + dark, pill buttons, Satoshi headings, Inter body.</p>
               <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {([['57', 'Components'], ['54', 'shadcn primitives'], ['3', '2one-only'], ['1', 'Hue-free system']] as const).map(([k, l]) => (
                   <Card key={l}>
@@ -304,7 +304,7 @@ export function Showcase() {
                     <CardDescription>React 19 · Tailwind v4.</CardDescription>
                   </CardHeader>
                   <CardContent className="min-w-0">
-                    <CodeBlock code={"import { Button } from '@yokesh-2one/design-library'\nimport '@yokesh-2one/design-library/styles'"} />
+                    <CodeBlock code={"import { Button } from '@2one/design-library'\nimport '@2one/design-library/styles'"} />
                   </CardContent>
                 </Card>
               </div>
@@ -670,7 +670,7 @@ export function Showcase() {
               </div>
             </section>
 
-            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@yokesh-2one/design-library · shadcn/ui re-skinned to the 2one tokens · light + audited dark · rendered live from the real components.</footer>
+            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@2one/design-library · shadcn/ui re-skinned to the 2one tokens · light + audited dark · rendered live from the real components.</footer>
           </div>
         </SidebarInset>
       </SidebarProvider>

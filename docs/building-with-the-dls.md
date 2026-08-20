@@ -11,7 +11,7 @@ trace back to breaking one of these rules.
 
 ## 1. Build *from* the library, not beside it
 Compose real components — `Card`, `Sidebar` / `SidebarInset`, `Button`, `Badge`,
-`Input`, `Table`, … from `@yokesh-2one/design-library` (or `src/components/ui/` in
+`Input`, `Table`, … from `@2one/design-library` (or `src/components/ui/` in
 this repo). **Never hand-roll a parallel chrome** (a custom sidebar, a bespoke
 "stage" box) for something the library already provides. If you're writing CSS for
 a sidebar, card, or badge — stop and use the component.

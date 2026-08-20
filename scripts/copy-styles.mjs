@@ -5,7 +5,7 @@
     dist/fonts/*.woff2      the Satoshi font files (referenced by styles.css)
     dist/tokens/*.css       the raw @theme token files (colors/typography/spacing)
 
-  Consumers: `import '@yokesh-2one/design-library/styles'` once at the app root,
+  Consumers: `import '@2one/design-library/styles'` once at the app root,
   run Tailwind v4, and `@source` the package's dist so component utilities generate.
 */
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync } from 'node:fs'

@@ -20,7 +20,7 @@ import { join, resolve } from 'node:path'
 const cwd = process.cwd()
 const asJson = process.argv.includes('--json')
 const readJson = (p) => { try { return JSON.parse(readFileSync(p, 'utf8')) } catch { return null } }
-const PKG = '@yokesh-2one/design-library'
+const PKG = '@2one/design-library'
 
 const consumerPkg = readJson(join(cwd, 'package.json'))
 const deps = { ...(consumerPkg?.dependencies ?? {}), ...(consumerPkg?.devDependencies ?? {}) }
@@ -43,7 +43,14 @@ const components = (() => {
   const dts = join(installedRoot, 'dist/index.d.ts')
   if (!existsSync(dts)) return []
   const src = readFileSync(dts, 'utf8')
-  return [...new Set([...src.matchAll(/export\s+\{[^}]*\}\s+from\s+['"]\.\/components\/(?:ui\/)?([a-z0-9-]+)['"]/g)].map((m) => m[1]))].sort()
+  // The barrel is `export * from './components/ui/<name>'`. Matching only
+  // `export { … } from` returned zero here, which a cold test caught — the
+  // command reported "0 components" while 57 were installed.
+  return [
+    ...new Set(
+      [...src.matchAll(/export\s+(?:\*|\{[^}]*\})\s+from\s+['"]\.\/components\/(?:ui\/)?([a-z0-9-]+)['"]/g)].map((m) => m[1])
+    ),
+  ].sort()
 })()
 
 // The two silent failures.
@@ -85,9 +92,22 @@ const info = {
     fonts: { heading: 'Satoshi', body: 'Inter' },
   },
   components: { count: components.length, names: components },
-  blocks: existsSync(join(inRepo ? cwd : installedRoot, 'src/blocks'))
-    ? readdirSync(join(inRepo ? cwd : installedRoot, 'src/blocks')).filter((f) => f.endsWith('.tsx')).map((f) => f.replace('.tsx', ''))
-    : [],
+  // Blocks are copy-paste templates, not package exports — they import via the
+  // `@/` alias, which does not resolve in a consumer. Only report them as local
+  // files inside the repo; elsewhere point at the source rather than implying
+  // an import that would fail. (A `file:` install symlinks the whole repo, so
+  // they LOOK present in a consumer — which is exactly the wrong impression.)
+  blocks: inRepo
+    ? {
+        available_locally: (existsSync(join(cwd, 'src/blocks')) ? readdirSync(join(cwd, 'src/blocks')) : [])
+          .filter((f) => f.endsWith('.tsx'))
+          .map((f) => f.replace('.tsx', '')),
+      }
+    : {
+        available_locally: [],
+        copy_from: 'https://github.com/yokesh-2one/2one-design-library/tree/main/src/blocks',
+        note: 'Blocks are templates you copy and adapt, not package exports.',
+      },
   problems,
 }
 
@@ -100,7 +120,8 @@ if (asJson) {
   console.log(`  project   ${framework}${tailwind ? ` · tailwind ${tailwind}` : ''}`)
   console.log(`  system    ${info.system.palette}`)
   console.log(`            themes: light + dark · icons: ${info.system.icons} · ${info.system.signature}`)
-  console.log(`  available ${components.length} components${info.blocks.length ? `, ${info.blocks.length} blocks` : ''}`)
+  const nBlocks = info.blocks.available_locally.length
+  console.log(`  available ${components.length} components${nBlocks ? `, ${nBlocks} blocks` : ''}`)
   if (problems.length) {
     console.log('\n  problems:')
     for (const p of problems) console.log(`    ! ${p}`)

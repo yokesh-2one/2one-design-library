@@ -28,6 +28,41 @@ const asJson = args.includes('--json')
 const strict = args.includes('--warnings')
 const targets = args.filter((a) => !a.startsWith('--'))
 
+/*
+  The knowledge graph is the authority on which tokens exist. Without it this
+  file can only catch tokens from OTHER systems (bg-blue-500) — it cannot catch
+  an invented 2one-shaped one. `bg-muted-strong` and `text-surface-elevated`
+  look exactly like this system's vocabulary, are entirely fictional, and passed
+  every check until graph.json was consulted. That is the failure mode a model
+  actually has: not reaching for Bootstrap, but confidently inventing a token
+  that sounds like yours.
+*/
+const graph = (() => {
+  for (const p of [join(root, 'graph.json'), join(root, '..', 'graph.json')]) {
+    try { return JSON.parse(readFileSync(p, 'utf8')) } catch { /* try next */ }
+  }
+  return null
+})()
+
+const knownTokens = new Set()
+if (graph) {
+  for (const n of graph.nodes) {
+    if (n.type === 'token-color') knownTokens.add(n.label)          // primary, muted-foreground …
+    if (n.type === 'ramp') knownTokens.add(n.label)                  // neutral-250, danger-700 …
+    if (n.type === 'token-radius') knownTokens.add(n.label.replace(/^radius-/, ''))
+  }
+}
+
+// Tailwind literals and utility keywords that share a prefix with colour utilities
+// but are not tokens. Without these the rule drowns in false positives.
+const NON_TOKEN = new Set([
+  'transparent', 'current', 'inherit', 'white', 'black', 'none', 'auto', 'clip', 'ellipsis',
+  'left', 'center', 'right', 'justify', 'start', 'end', 'top', 'bottom', 'balance', 'pretty',
+  'wrap', 'nowrap', 'solid', 'dashed', 'dotted', 'double', 'hidden', 'collapse', 'separate',
+  'xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl',
+  'display', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'full', 'md',
+])
+
 // Tailwind's stock palettes. The 2one system is grayscale: neutral/accent plus
 // danger/success for validation. Any other hue is a second palette by definition.
 const FOREIGN_HUES =
@@ -58,6 +93,35 @@ const RULES = [
           (m) => ({ line: i + 1, detail: `${m[0]} introduces a hue outside the system` })
         )
       ),
+  },
+  {
+    id: 'invented-token',
+    severity: 'error',
+    why: 'This token does not exist in the system. Check graph.json or tokens/colors.json for the real name — a plausible-sounding token silently renders as nothing.',
+    test: ({ lines }) => {
+      if (!graph) return [] // graph unavailable — stay silent rather than guess
+      return lines.flatMap((l, i) =>
+        [...l.matchAll(/\b(?:bg|text|border|ring|fill|stroke|outline|divide|placeholder|caret|decoration)-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\b/g)]
+          // Tailwind puts modifiers between the prefix and the colour:
+          // ring-offset-background, border-l-transparent, divide-y-border.
+          // Strip them so the check sees the colour name itself.
+          .map((m) => m[1].replace(/^(?:offset-|[btlrxyse]-(?=\D))/, ''))
+          .filter((name) => {
+            if (knownTokens.has(name) || NON_TOKEN.has(name)) return false
+            if (new RegExp(`^(?:${FOREIGN_HUES})(?:-\\d{2,3})?$`).test(name)) return false // its own rule
+            if (/^\d/.test(name) || /\[/.test(name)) return false                          // border-2, arbitrary
+            if (/^[btlrxyse](?:-\d+)?$/.test(name)) return false                           // border-b, border-t-0
+            if (/^gradient-/.test(name)) return false                                      // bg-gradient-to-r
+            if (name.length < 3) return false
+            // Only names shaped like this system's semantic tokens. A real but
+            // unlisted single word would be missed; the alternative is drowning
+            // the report in Tailwind's own utility vocabulary, which gets the
+            // check switched off entirely.
+            return /-/.test(name)
+          })
+          .map((name) => ({ line: i + 1, detail: `"${name}" is not a token in this system` }))
+      )
+    },
   },
   {
     id: 'foreign-icons',

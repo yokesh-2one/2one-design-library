@@ -1,5 +1,5 @@
 {
-  "name": "@yokesh-2one/design-library",
+  "name": "@2one/design-library",
   "title": "2one Design Language System",
   "description": "shadcn/ui components re-skinned to the 2one design tokens. Grayscale (light + audited dark), pill buttons, Satoshi headings + Inter body.",
   "basedOn": {
@@ -12,8 +12,8 @@
   },
   "conventions": {
     "naming": "shadcn (Input, Select, RadioGroup, InputOTP, DropdownMenu, …)",
-    "import": "import { Button } from '@yokesh-2one/design-library'",
-    "styles": "import '@yokesh-2one/design-library/styles' once at the app root",
+    "import": "import { Button } from '@2one/design-library'",
+    "styles": "import '@2one/design-library/styles' once at the app root",
     "tailwind": "v4 — consumer runs Tailwind and @source's the package dist"
   },
   "theme": {

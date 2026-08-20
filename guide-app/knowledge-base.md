@@ -74,7 +74,7 @@ colour alone.
 *Source: `tokens/colors.json → contrast`, `docs/accessibility.md`.*
 
 **How do I use it in an app?**
-Install `@yokesh-2one/design-library`, import `/styles`, point Tailwind v4 at the
+Install `@2one/design-library`, import `/styles`, point Tailwind v4 at the
 package. Full steps in `README.md → Quick start`.
 
 **What's coming next?**

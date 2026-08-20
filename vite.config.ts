@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { isAbsolute } from 'node:path'
 
 /*
-  Library build for @yokesh-2one/design-library (2one DLS).
+  Library build for @2one/design-library (2one DLS).
 
   Entry is src/index.ts. React and every third-party dependency (Radix, lucide,
   cva, tailwind-merge, recharts, …) are left EXTERNAL — consumers install them.

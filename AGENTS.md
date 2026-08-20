@@ -89,7 +89,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 ## Rules for using / generating code
 
 1. **Import from the package**, don't copy source:
-   `import { Button } from '@yokesh-2one/design-library'`.
+   `import { Button } from '@2one/design-library'`.
 2. **Use shadcn names.** TextField → `Input`, Dropdown → `Select`,
    RadioButton → `RadioGroup`, OtpField → `InputOTP`.
 3. **Theme through the variables**, never hard-code color. Everything derives from
@@ -141,4 +141,4 @@ the earlier hand-built Figma-1:1 set (2026-08-10, user-directed).
 ## Source of truth chain
 
 shadcn/ui (components, MIT) + 2one tokens/brand (Figma *Mobile App Design System*,
-`YzxnyL6a69WCOw9U8WJqBo`) → this repo → `@yokesh-2one/design-library`.
+`YzxnyL6a69WCOw9U8WJqBo`) → this repo → `@2one/design-library`.

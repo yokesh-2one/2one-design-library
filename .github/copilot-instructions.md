@@ -9,7 +9,7 @@ can do with it.** Then, for any answer or suggestion:
 - Answer **only** from repo content; cite the file used; say when something isn't here —
   never guess a brand fact.
 - Pull exact values from [`tokens/*.json`](../tokens); never invent colours/sizes.
-- Import components from `@yokesh-2one/design-library` (shadcn names: `Input`, `Select`,
+- Import components from `@2one/design-library` (shadcn names: `Input`, `Select`,
   `RadioGroup`, …); don't copy component source.
 - Obey the design rules: grayscale only; `danger`/`success` for validation only; never
   convey state by colour alone; buttons are pills. Full guidance: [`AGENTS.md`](../AGENTS.md).

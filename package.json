@@ -1,5 +1,5 @@
 {
-  "name": "@yokesh-2one/design-library",
+  "name": "@2one/design-library",
   "version": "0.1.0",
   "type": "module",
   "description": "2one Design Language System — shadcn/ui components re-skinned to the 2one tokens (grayscale, light + audited dark, pill buttons, Satoshi + Inter).",
@@ -21,7 +21,10 @@
   "files": [
     "dist",
     "scripts",
-    "skills"
+    "skills",
+    "graph.json",
+    "manifest.json",
+    "tokens"
   ],
   "sideEffects": [
     "**/*.css"

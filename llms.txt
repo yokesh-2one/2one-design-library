@@ -81,7 +81,7 @@ built FROM the library, so it inherits the accessibility, the states, the pill
 override, and every later fix:
 
 ```tsx
-import { Button, Input, Label, Card } from '@yokesh-2one/design-library'
+import { Button, Input, Label, Card } from '@2one/design-library'
 ```
 
 Only fall back to self-contained HTML when the consumer explicitly cannot run
@@ -91,7 +91,7 @@ React — and say plainly that it is a reproduction, not the real components.
 in-house kit), that library wins for structure and this repo supplies the
 *design decisions* — tokens, brand voice, rules, accessibility thresholds.
 Map 2one components to theirs by role (`Button` → their button); never import
-`@yokesh-2one/design-library` into a non-React or non-shadcn codebase. Ask which
+`@2one/design-library` into a non-React or non-shadcn codebase. Ask which
 library is in play before generating (see `instructions_for_ai.clarify_first`).
 
 ## By task
@@ -115,8 +115,8 @@ library is in play before generating (see `instructions_for_ai.clarify_first`).
   `RadioGroup` (not RadioButton), `InputOTP` (not OtpField)
 - Blocks (templates, copy-paste not import): `src/blocks/` — `login-01`…`login-05`,
   `signup-01`…`signup-03`, `dashboard-plain`, plus 31 chart examples
-- Published as `@yokesh-2one/design-library` on the **public npm registry** —
-  `npm install @yokesh-2one/design-library react react-dom`, no token required
+- Published as `@2one/design-library` on the **public npm registry** —
+  `npm install @2one/design-library react react-dom`, no token required
 
 ## Theme
 
@@ -140,7 +140,7 @@ State these plainly rather than improvising around them:
   this repo — that still has to be built or re-themed in Figma.
 - **No icon set of its own.** Icons come from `lucide-react`.
 - **No running preview from the URL.** Code written from this repo compiles only
-  after the package is installed (see the token requirement above) or inside a clone.
+  after `npm install @2one/design-library` in a project, or inside a clone.
 
 ## Add a component
 

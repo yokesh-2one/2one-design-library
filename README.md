@@ -97,7 +97,7 @@ That opens the showcase — every component, the foundations (colour, type, radi
 ### 1. Install the package
 
 ```bash
-npm install @yokesh-2one/design-library react react-dom
+npm install @2one/design-library react react-dom
 ```
 
 No token, no registry configuration, no `.npmrc` — it installs anonymously from
@@ -110,8 +110,8 @@ The components are plain React + Tailwind classes; your app's Tailwind has to **
 ```css
 /* app.css (or globals.css) */
 @import 'tailwindcss';
-@import '@yokesh-2one/design-library/styles';        /* 2one tokens, variables, fonts */
-@source '../node_modules/@yokesh-2one/design-library/dist';  /* scan the components */
+@import '@2one/design-library/styles';        /* 2one tokens, variables, fonts */
+@source '../node_modules/@2one/design-library/dist';  /* scan the components */
 ```
 
 Import that CSS once at your app root:
@@ -124,7 +124,7 @@ import './app.css'
 ### 3. Use a component
 
 ```tsx
-import { Button, Input, Label } from '@yokesh-2one/design-library'
+import { Button, Input, Label } from '@2one/design-library'
 
 export function SignIn() {
   return (
@@ -152,7 +152,7 @@ import {
   Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle,
   Switch, Badge, Tabs, TabsList, TabsTrigger, TabsContent,
-} from '@yokesh-2one/design-library'
+} from '@2one/design-library'
 
 // Buttons — variants: default | secondary | outline | ghost | destructive | link
 <Button>Primary</Button>
@@ -274,7 +274,7 @@ Three things shadcn doesn't provide, built to the same token system:
 | **`BottomNavItem`** | One tab in a mobile bottom nav (icon + label). Compose several in a row. | `icon`, `label`, `selected?`, `onClick?` |
 
 ```tsx
-import { Logo, AppBar, BottomNavItem } from '@yokesh-2one/design-library'
+import { Logo, AppBar, BottomNavItem } from '@2one/design-library'
 
 <Logo variant="black" width={120} />   {/* black on light, white on dark — never recoloured */}
 <AppBar title="Sign in" onBack={() => history.back()} />
@@ -421,7 +421,7 @@ Every `npx shadcn add` regenerates `button.tsx` with `rounded-md`. The pill is r
 The CLI appends its own sidebar dark palette (with a blue accent) to `globals.css` on some adds. It is **not** the 2one dark theme — it introduces a brand hue and will fight the audited palette. **Delete it after running the CLI**, and re-run `npm run a11y` to confirm both themes still pass.
 
 **Importing the package barrel drags in heavy deps.**
-`import { X } from '@yokesh-2one/design-library'` pulls the whole graph (including `Chart` → `recharts`). All required deps are declared, but if you see an unresolved transitive dep, install it. (A future improvement is subpath exports so consumers pull only what they use.)
+`import { X } from '@2one/design-library'` pulls the whole graph (including `Chart` → `recharts`). All required deps are declared, but if you see an unresolved transitive dep, install it. (A future improvement is subpath exports so consumers pull only what they use.)
 
 **Fonts 403 in a local symlinked/`file:` setup.**
 If you consume the package via a `file:`/symlink dep, your dev server may refuse to serve the fonts from outside its root. Add the library path to your bundler's filesystem allow-list. A normal `npm install` doesn't hit this.

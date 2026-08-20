@@ -1,6 +1,6 @@
 ---
 name: 2one-dls
-description: Build UI with the 2one Design Language System — screens, marketing pages, decks, and social assets that are on-brand by construction. Use whenever the work involves 2one components, tokens, brand voice, or the logo, or when a request mentions the 2one DLS, @yokesh-2one/design-library, or building something "on-brand" for 2one. Also use when auditing existing UI code against the 2one rules.
+description: Build UI with the 2one Design Language System — screens, marketing pages, decks, and social assets that are on-brand by construction. Use whenever the work involves 2one components, tokens, brand voice, or the logo, or when a request mentions the 2one DLS, @2one/design-library, or building something "on-brand" for 2one. Also use when auditing existing UI code against the 2one rules.
 ---
 
 # Building with the 2one Design Language System
@@ -51,7 +51,7 @@ someone who asked for a quick look.
 | Question | Default |
 | --- | --- |
 | What surface — product screen, marketing page, deck, social, email? | product screen |
-| Target stack — React + this library, or the client's own kit? | React + `@yokesh-2one/design-library` |
+| Target stack — React + this library, or the client's own kit? | React + `@2one/design-library` |
 | Which persona is reading? (`brand/brand.json`) | none — neutral 2one voice |
 | What is the ONE primary action? | infer from the request |
 | Light, dark, or both? | light |
@@ -70,7 +70,7 @@ components.
 **If the client has their own component library** (MudBlazor, Vuetify, in-house),
 their kit wins for structure and this system supplies the *design decisions* —
 tokens, brand voice, rules, contrast thresholds. Map by role; never import
-`@yokesh-2one/design-library` into a non-React codebase.
+`@2one/design-library` into a non-React codebase.
 
 ## The rules
 

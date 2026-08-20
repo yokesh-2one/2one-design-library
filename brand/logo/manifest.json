@@ -48,8 +48,8 @@
     }
   ],
   "react": {
-    "package": "@yokesh-2one/design-library",
-    "import": "import { Logo } from '@yokesh-2one/design-library'",
+    "package": "@2one/design-library",
+    "import": "import { Logo } from '@2one/design-library'",
     "props": { "variant": ["black", "white"] },
     "note": "No color prop by design — the brand rule forbids recoloring."
   }

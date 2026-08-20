@@ -1,7 +1,7 @@
 # Build an app
 
 ```bash
-npm install @yokesh-2one/design-library react react-dom
+npm install @2one/design-library react react-dom
 ```
 
 Add the theme once at your app root, run Tailwind v4, and point it at the package
@@ -9,20 +9,20 @@ so the component utility classes are generated:
 
 ```ts
 // main.tsx
-import '@yokesh-2one/design-library/styles'
+import '@2one/design-library/styles'
 ```
 
 ```css
 /* app.css */
 @import 'tailwindcss';
-@import '@yokesh-2one/design-library/styles';
-@source '../node_modules/@yokesh-2one/design-library/dist';
+@import '@2one/design-library/styles';
+@source '../node_modules/@2one/design-library/dist';
 ```
 
 Then compose screens from components (shadcn names, 2one-themed):
 
 ```tsx
-import { AppBar, Input, Button, Checkbox, Label } from '@yokesh-2one/design-library'
+import { AppBar, Input, Button, Checkbox, Label } from '@2one/design-library'
 
 <AppBar title="Sign in" onBack={() => history.back()} />
 <div className="grid gap-1.5">
