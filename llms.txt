@@ -60,6 +60,19 @@ Fonts / `@fontsource-variable/inter`.
 Prefix each with the raw base above. These are **generated from source** and
 verified in CI (`npm run check:meta`), so they never drift from the code.
 
+## If your tool supports skills
+
+`skills/2one-dls/` is the packaged version of everything below, with wrong/right
+code for each rule. It carries two commands that work in any project:
+
+```
+npx 2one info --json          what is installed here, and what is misconfigured
+npx 2one check <path>         audit generated code against the 2one rules
+```
+
+Use the loop: `info` → resolve assumptions → generate → `check` → fix → re-check.
+`check` exits non-zero on a violation, so it is a gate, not a suggestion.
+
 ## Output format — React by default
 
 **Default to React + Tailwind, importing real components.** Not standalone HTML,
