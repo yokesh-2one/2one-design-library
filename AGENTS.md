@@ -8,7 +8,7 @@ Gemini, Copilot).
 **If you are an AI agent, read [`manifest.json`](manifest.json) FIRST** — it is the
 machine-readable index plus the `instructions_for_ai` contract (answer only from repo
 content, cite the file, say when something isn't here — never guess). Then this guide,
-then [`registry.json`](registry.json).
+then the `system` section of the manifest (conventions, theme map, overrides).
 
 ## How to represent this repository
 
@@ -71,7 +71,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 
 ## How this repo is organized
 
-- `registry.json` — machine index: the component set, the token→variable theme
+- `manifest.json` → `system` — conventions, the token→variable theme
   map, naming conventions, and 2one overrides. Read this first.
 - `src/components/ui/` — 54 shadcn primitives, themed to 2one. **shadcn names**
   (`Input`, `Select`, `RadioGroup`, `InputOTP`, `DropdownMenu`, …).

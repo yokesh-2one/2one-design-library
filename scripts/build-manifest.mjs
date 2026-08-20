@@ -9,6 +9,7 @@ import { dirname, join } from 'node:path'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+const colors = JSON.parse(readFileSync(join(root, 'tokens/colors.json'), 'utf8'))
 const ls = (rel, filter = () => true) => existsSync(join(root, rel)) ? readdirSync(join(root, rel)).filter(filter).sort() : []
 
 // Base for fetchable raw files. Assets (logo, fonts) are only usable by an agent
@@ -193,6 +194,53 @@ const manifest = {
         note: 'The repo is public, so these raw URLs are fetchable with no auth. (If it is ever made private, external fetches would need a GitHub token with repo scope.)',
       },
     },
+  },
+
+  /*
+    Absorbed from the former registry.json, which was a second index maintained
+    by hand and guarded by nothing. At the point it was folded in, its
+    tokenMap was wrong about 3 of 7 values it listed (--border and --input said
+    #e4e4e7 when they were #dcdce0; --destructive said #dc2626 when it was
+    #c81e1e) — stale since the ramp fix, with no check to catch it. The map is
+    now derived from tokens/colors.json, so it cannot say something the theme
+    does not. The prose below is genuinely static and stays literal.
+  */
+  system: {
+    based_on: {
+      source: 'shadcn/ui',
+      license: 'MIT',
+      style: 'new-york',
+      baseColor: 'neutral',
+      iconLibrary: 'lucide',
+      cli: 'npx shadcn@latest add <component>',
+    },
+    conventions: {
+      naming: 'shadcn (Input, Select, RadioGroup, InputOTP, DropdownMenu, …) — not the pre-2026 custom names',
+      import: `import { Button } from '${pkg.name}'`,
+      styles: `import '${pkg.name}/styles' once at the app root`,
+      tailwind: "v4 — the consumer runs Tailwind and @source's the package dist",
+    },
+    theme: {
+      modes: ['light', 'dark'],
+      switch: 'the exported ThemeProvider (adds a .dark class, activating shadcn dark: utilities)',
+      hues: 'grayscale; danger + success are the only hues, reserved for validation state',
+      audited: 'both themes pass the APCA audit (npm run a11y)',
+      fonts: { heading: 'Satoshi', body: 'Inter' },
+      // Derived, never typed by hand.
+      tokenMap: Object.fromEntries(
+        ['background', 'foreground', 'primary', 'primary-foreground', 'secondary', 'muted', 'muted-foreground',
+         'accent', 'border', 'input', 'ring', 'destructive', 'success']
+          .filter((k) => colors.semantic[k])
+          .map((k) => [`--${k}`, colors.semantic[k]])
+      ),
+    },
+    overrides: ['Button: rounded-full (pill) instead of shadcn\'s rounded-md — the 2one signature, applied by an unlayered [data-slot="button"] rule so `shadcn add` cannot regress it.'],
+    not_covered: [
+      'Combobox / Date Picker / Data Table / Typography are shadcn composition patterns, not single components — build them from the primitives.',
+      'Toast ships as sonner.',
+    ],
+    history:
+      'Replaced the earlier hand-built Figma-1:1 set (12 components) with this shadcn-based system on user direction (2026-08-10). The old components were removed.',
   },
 
   formats: {

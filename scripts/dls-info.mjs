@@ -15,6 +15,7 @@
   Usage: 2one info [--json]
 */
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
 
 const cwd = process.cwd()
@@ -66,6 +67,22 @@ const stylesImported = inRepo ? true : new RegExp(`@import\\s+['"]${PKG.replace(
 
 const framework = deps.next ? 'next' : deps.vite || deps['@vitejs/plugin-react'] ? 'vite' : deps['react-scripts'] ? 'cra' : deps.react ? 'react' : 'unknown'
 
+/*
+  Icons need two separate facts, and conflating them produced a false statement.
+  lucide-react is a real dependency of this library, so npm hoists it and it
+  IS importable from a consumer — reporting "not installed here" because it was
+  absent from the consumer's own package.json said something untrue about a
+  package sitting in node_modules.
+
+  Resolvability is what determines whether an import works today. Being a direct
+  dependency is what determines whether it keeps working — hoisting is an npm
+  layout detail, and pnpm's strict store or Yarn PnP will refuse the same import.
+  Both are worth knowing; they are not the same question.
+*/
+const iconsDirect = deps['lucide-react'] ?? null
+let iconsResolvable = false
+try { createRequire(join(cwd, 'package.json')).resolve('lucide-react'); iconsResolvable = true } catch { /* not reachable */ }
+
 const problems = []
 if (!present) problems.push(`${PKG} is not installed here. Run: npm install ${PKG} react react-dom`)
 if (present && !inRepo) {
@@ -87,7 +104,16 @@ const info = {
     themes: ['light', 'dark'],
     theme_switch: 'wrap the app in the exported ThemeProvider',
     palette: 'grayscale — no brand hue; danger/success for validation state only',
-    icons: `lucide-react${deps['lucide-react'] ? ` (${deps['lucide-react']})` : ' (not installed here)'}`,
+    icons: {
+      library: 'lucide-react',
+      resolvable: iconsResolvable,
+      direct_dependency: iconsDirect,
+      note: iconsDirect
+        ? `declared directly (${iconsDirect})`
+        : iconsResolvable
+          ? 'resolvable via the library, but not a direct dependency — add it if you import icons yourself, or a strict installer (pnpm, Yarn PnP) will refuse the import'
+          : 'not resolvable — run: npm install lucide-react',
+    },
     signature: 'buttons are pills (radius-full)',
     fonts: { heading: 'Satoshi', body: 'Inter' },
   },
@@ -119,7 +145,13 @@ if (asJson) {
   console.log(`  import    ${info.dls.import}`)
   console.log(`  project   ${framework}${tailwind ? ` · tailwind ${tailwind}` : ''}`)
   console.log(`  system    ${info.system.palette}`)
-  console.log(`            themes: light + dark · icons: ${info.system.icons} · ${info.system.signature}`)
+  const icons = info.system.icons
+  const iconLabel = icons.direct_dependency
+    ? `lucide-react ${icons.direct_dependency}`
+    : icons.resolvable
+      ? 'lucide-react (via the library — not a direct dep)'
+      : 'lucide-react (not resolvable)'
+  console.log(`            themes: light + dark · icons: ${iconLabel} · ${info.system.signature}`)
   const nBlocks = info.blocks.available_locally.length
   console.log(`  available ${components.length} components${nBlocks ? `, ${nBlocks} blocks` : ''}`)
   if (problems.length) {

@@ -327,7 +327,7 @@ export function Showcase() {
                       <span className="mr-1 text-xs text-muted-foreground">It reads</span>
                       <Badge variant="secondary">manifest.json</Badge>
                       <Badge variant="secondary">brand/brand.json</Badge>
-                      <Badge variant="secondary">registry.json</Badge>
+                      <Badge variant="secondary">graph.json</Badge>
                     </div>
                     <Button asChild variant="outline" size="sm" className="w-fit">
                       <a href="https://github.com/yokesh-2one/2one-design-library" target="_blank" rel="noreferrer">Open the repo</a>

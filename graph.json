@@ -4,7 +4,7 @@
   "generated_for": "0.1.0",
   "stats": {
     "nodes": 204,
-    "edges": 588,
+    "edges": 596,
     "by_node_type": {
       "token-color": 34,
       "ramp": 23,
@@ -23,7 +23,7 @@
       "composed_of": 400,
       "uses": 108,
       "governed_by": 33,
-      "has_contrast": 8,
+      "has_contrast": 16,
       "serves": 5,
       "embodies": 5
     }
@@ -4056,6 +4056,46 @@
       "source": "token:muted",
       "target": "rule:multi-theme-audit",
       "type": "governed_by"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:body-and-headings",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:secondary-text",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:primary-foreground",
+      "target": "contrast:primary-button-label",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:destructive",
+      "target": "contrast:destructive-button-label",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:error-text",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:success-text",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:border-nontext",
+      "type": "has_contrast"
+    },
+    {
+      "source": "token:foreground",
+      "target": "contrast:focus-ring-nontext",
+      "type": "has_contrast"
     },
     {
       "source": "token:foreground",

@@ -20,8 +20,6 @@ Live rendered showcase (no install, see every component): https://origin.2one.so
   How to work in this repo, and how to represent it accurately (lead with evidence, state gaps, never hype)
 - https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/brand.json
   Mission, voice, tone, personas — match this in any 2one-facing copy
-- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/registry.json
-  Component set, theme map, naming conventions, 2one overrides
 
 ## Brand assets — embed these, never re-create them
 
@@ -99,7 +97,7 @@ library is in play before generating (see `instructions_for_ai.clarify_first`).
 | You want to produce | Read |
 | --- | --- |
 | Anything carrying the 2one mark | **Brand assets above** — fetch and inline the SVG |
-| **A screen or page (the default)** | `registry.json`, `src/components/ui/<name>.tsx`, a block in `src/blocks/` |
+| **A screen or page (the default)** | `manifest.json` → `system`, `src/components/ui/<name>.tsx`, a block in `src/blocks/` |
 | A deck / social / print asset | `manifest.json` → `index.assets`, then `tokens/*.json` for literal values |
 | On-brand copy | `brand/brand.json` (voice, tone, vocabulary, writing rules) |
 | Exact colour / type / spacing | `tokens/*.json` — pull literal values, never approximate |
@@ -115,8 +113,8 @@ library is in play before generating (see `instructions_for_ai.clarify_first`).
   `RadioGroup` (not RadioButton), `InputOTP` (not OtpField)
 - Blocks (templates, copy-paste not import): `src/blocks/` — `login-01`…`login-05`,
   `signup-01`…`signup-03`, `dashboard-plain`, plus 31 chart examples
-- Published as `@2one/design-library` on the **public npm registry** —
-  `npm install @2one/design-library react react-dom`, no token required
+- NOT yet on npm. Install from the repo: `npm install github:yokesh-2one/2one-design-library` —
+  it builds itself on install. `@2one/design-library` will 404 until published.
 
 ## Theme
 

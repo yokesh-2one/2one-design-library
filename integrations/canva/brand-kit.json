@@ -80,8 +80,21 @@
   ],
   "fonts": {
     "heading": "Satoshi",
-    "body": "Inter"
+    "body": "Inter",
+    "note": "Satoshi ships as .woff2 in src/styles/fonts/. Inter is NOT in this repo — it comes from the @fontsource-variable/inter npm package, or fonts.google.com. Canva brand-font upload may not accept .woff2; convert to .otf/.ttf if it refuses."
   },
+  "logo": {
+    "svg": {
+      "black": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-black.svg",
+      "white": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-white.svg"
+    },
+    "png": {
+      "black_1024": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/png/2one-logo-black-1024w.png",
+      "white_1024": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/png/2one-logo-white-1024w.png"
+    },
+    "rules": "Black on light surfaces, white on dark. Never recolour, rotate, distort, or add effects. Minimum width 96px; clear space 0.5x the logo height. Never typeset \"2one\" as text in place of the mark."
+  },
+  "theme": "light — Canva designs sit on light grounds. The dark palette is in tokens/colors.json → semantic_dark if needed.",
   "rules": [
     "Grayscale only — never introduce a brand hue.",
     "danger/success are for validation state only, never decoration.",

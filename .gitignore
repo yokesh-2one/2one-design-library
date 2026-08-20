@@ -4,4 +4,3 @@ dist-site
 .vercel
 *.log
 .DS_Store
-storybook-static

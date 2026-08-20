@@ -1,6 +1,6 @@
 {
   "$schema": "../schema/token.schema.json",
-  "description": "2one colour tokens. Grayscale system — no brand hue. danger/success are the only hues and are reserved for validation state only.",
+  "description": "2one colour tokens. Grayscale system — no brand hue. danger/success are the only hues and are reserved for validation state only. TWO THEMES: `semantic` is the light set, `semantic_dark` the dark one; always say which theme a value belongs to. Contrast pairs cover both and carry a `theme` field.",
   "ramps": {
     "neutral": {
       "50": "#fafafa",
@@ -34,6 +34,10 @@
       "600": "#15803d"
     }
   },
+  "themes": [
+    "light",
+    "dark"
+  ],
   "semantic": {
     "background": "#ffffff",
     "foreground": "#09090b",
@@ -70,10 +74,48 @@
     "sidebar-border": "#dcdce0",
     "sidebar-ring": "#a1a1aa"
   },
+  "semantic_dark": {
+    "background": "#09090b",
+    "foreground": "#fafafa",
+    "card": "#18181b",
+    "card-foreground": "#fafafa",
+    "popover": "#18181b",
+    "popover-foreground": "#fafafa",
+    "primary": "#fafafa",
+    "primary-foreground": "#09090b",
+    "secondary": "#27272a",
+    "secondary-foreground": "#fafafa",
+    "muted": "#27272a",
+    "muted-foreground": "#c2c2c8",
+    "accent": "#27272a",
+    "accent-foreground": "#fafafa",
+    "destructive": "#fecaca",
+    "destructive-foreground": "#09090b",
+    "success": "#4ade80",
+    "success-foreground": "#09090b",
+    "border": "#606069",
+    "input": "#606069",
+    "ring": "#a1a1aa",
+    "chart-1": "#fafafa",
+    "chart-2": "#d4d4d8",
+    "chart-3": "#a1a1aa",
+    "chart-4": "#71717a",
+    "chart-5": "#52525b",
+    "sidebar": "#131316",
+    "sidebar-foreground": "#fafafa",
+    "sidebar-primary": "#fafafa",
+    "sidebar-primary-foreground": "#09090b",
+    "sidebar-accent": "#27272a",
+    "sidebar-accent-foreground": "#fafafa",
+    "sidebar-border": "#606069",
+    "sidebar-ring": "#a1a1aa"
+  },
   "contrast": {
     "standard": "WCAG 2.x (ratio) + APCA / WCAG 3.0 draft (Lc). Layered: AA baseline, APCA as an additional perceptual check.",
+    "note": "Every pair carries a `theme`. Both themes are audited by `npm run a11y`, which is the authority — these values are the same maths, precomputed.",
     "pairs": [
       {
+        "theme": "light",
         "name": "body-and-headings",
         "text": "#09090b",
         "background": "#ffffff",
@@ -84,6 +126,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "secondary-text",
         "text": "#52525b",
         "background": "#ffffff",
@@ -94,6 +137,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "primary-button-label",
         "text": "#fafafa",
         "background": "#09090b",
@@ -104,6 +148,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "destructive-button-label",
         "text": "#ffffff",
         "background": "#c81e1e",
@@ -114,6 +159,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "error-text",
         "text": "#c81e1e",
         "background": "#ffffff",
@@ -124,6 +170,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "success-text",
         "text": "#15803d",
         "background": "#ffffff",
@@ -134,6 +181,7 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "border-nontext",
         "text": "#dcdce0",
         "background": "#ffffff",
@@ -144,12 +192,101 @@
         "passes": true
       },
       {
+        "theme": "light",
         "name": "focus-ring-nontext",
         "text": "#a1a1aa",
         "background": "#ffffff",
         "usage": "focus ring (non-text UI)",
         "wcag_ratio": 2.56,
         "apca_lc": 50.2,
+        "apca_min": 15,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "body-and-headings",
+        "text": "#fafafa",
+        "background": "#09090b",
+        "usage": "body + headings on page",
+        "wcag_ratio": 19.06,
+        "apca_lc": -104.5,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "secondary-text",
+        "text": "#c2c2c8",
+        "background": "#09090b",
+        "usage": "secondary text / labels",
+        "wcag_ratio": 11.22,
+        "apca_lc": -69.9,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "primary-button-label",
+        "text": "#09090b",
+        "background": "#fafafa",
+        "usage": "primary button label",
+        "wcag_ratio": 19.06,
+        "apca_lc": 102.9,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "destructive-button-label",
+        "text": "#09090b",
+        "background": "#fecaca",
+        "usage": "destructive button label",
+        "wcag_ratio": 13.75,
+        "apca_lc": 82.3,
+        "apca_min": 75,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "error-text",
+        "text": "#fecaca",
+        "background": "#09090b",
+        "usage": "error text / label",
+        "wcag_ratio": 13.75,
+        "apca_lc": -81.9,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "success-text",
+        "text": "#4ade80",
+        "background": "#09090b",
+        "usage": "success text / label",
+        "wcag_ratio": 11.42,
+        "apca_lc": -71.3,
+        "apca_min": 60,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "border-nontext",
+        "text": "#606069",
+        "background": "#09090b",
+        "usage": "border / input hairline (non-text UI)",
+        "wcag_ratio": 3.2,
+        "apca_lc": -20.7,
+        "apca_min": 15,
+        "passes": true
+      },
+      {
+        "theme": "dark",
+        "name": "focus-ring-nontext",
+        "text": "#a1a1aa",
+        "background": "#09090b",
+        "usage": "focus ring (non-text UI)",
+        "wcag_ratio": 7.76,
+        "apca_lc": -51.6,
         "apca_min": 15,
         "passes": true
       }

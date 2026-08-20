@@ -111,7 +111,7 @@ black logo on the dark sidebar simply vanishes.
 ## 15. Keep the claims in sync with the capabilities
 When you ship (or remove) a capability, fix **every** place that asserts the old state in
 the same change. Shipping dark mode meant updating the "light-only" wording in
-`globals.css`, `registry.json`, `AGENTS.md`, the manifest, `.cursorrules`, and the
+`globals.css`, `AGENTS.md`, the manifest, `.cursorrules`, and the
 copilot instructions — a repo that contradicts itself teaches the next reader (and every
 AI) the wrong thing. Generated files (`manifest.json`, `graph.json`) regenerate from
 source; prose files are updated by hand.

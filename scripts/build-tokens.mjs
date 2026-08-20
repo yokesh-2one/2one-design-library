@@ -47,35 +47,54 @@ const ramps = parseVars(colorsCss)          // --color-neutral-50 … etc
 const rootBlock = (globals.match(/:root\s*\{([^}]*)\}/) || ['', ''])[1]
 const sem = parseVars(rootBlock)
 
+// The dark set, parsed separately for the same reason: merged, the two would
+// clobber each other. Emitted alongside rather than instead of the light set —
+// `semantic` has four consumers (build-manifest, build-graph, check-usage,
+// validate) and renaming it would break them silently.
+const darkBlock = (globals.match(/\.dark\s*\{([^}]*)\}/) || ['', ''])[1]
+const semDark = parseVars(darkBlock)
+
 const hexOnly = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => /^#[0-9a-fA-F]{6}$/.test(v)))
 
 // ---- COLORS ----
 const ramp = (prefix) => Object.fromEntries(Object.entries(hexOnly(ramps)).filter(([k]) => k.startsWith(prefix)).map(([k, v]) => [k.replace(prefix, ''), v.toLowerCase()]))
 const bg = sem['--background'], fg = sem['--foreground']
-const pair = (name, txt, bgc, usage, apcaMin) => ({ name, text: txt, background: bgc, usage, wcag_ratio: wcagRatio(txt, bgc), apca_lc: apcaLc(txt, bgc), apca_min: apcaMin, passes: Math.abs(apcaLc(txt, bgc)) >= apcaMin })
+const pair = (theme, name, txt, bgc, usage, apcaMin) => ({ theme, name, text: txt, background: bgc, usage, wcag_ratio: wcagRatio(txt, bgc), apca_lc: apcaLc(txt, bgc), apca_min: apcaMin, passes: Math.abs(apcaLc(txt, bgc)) >= apcaMin })
+
+// The same eight pairs computed per theme. Previously only light was emitted
+// and the pairs carried no `theme` field, so a reader could not tell which
+// palette an Lc reading belonged to in a system that ships two.
+const pairsFor = (theme, s) => [
+  pair(theme, 'body-and-headings', s['--foreground'], s['--background'], 'body + headings on page', 75),
+  pair(theme, 'secondary-text', s['--muted-foreground'], s['--background'], 'secondary text / labels', 60),
+  pair(theme, 'primary-button-label', s['--primary-foreground'], s['--primary'], 'primary button label', 75),
+  pair(theme, 'destructive-button-label', s['--destructive-foreground'], s['--destructive'], 'destructive button label', 75),
+  pair(theme, 'error-text', s['--destructive'], s['--background'], 'error text / label', 60),
+  pair(theme, 'success-text', s['--success'], s['--background'], 'success text / label', 60),
+  pair(theme, 'border-nontext', s['--border'], s['--background'], 'border / input hairline (non-text UI)', 15),
+  pair(theme, 'focus-ring-nontext', s['--ring'], s['--background'], 'focus ring (non-text UI)', 15),
+]
 
 const colors = {
   $schema: '../schema/token.schema.json',
-  description: '2one colour tokens. Grayscale system — no brand hue. danger/success are the only hues and are reserved for validation state only.',
+  description: '2one colour tokens. Grayscale system — no brand hue. danger/success are the only hues and are reserved for validation state only. TWO THEMES: `semantic` is the light set, `semantic_dark` the dark one; always say which theme a value belongs to. Contrast pairs cover both and carry a `theme` field.',
   ramps: {
     neutral: ramp('--color-neutral-'),
     accent: ramp('--color-accent-'),
     danger: ramp('--color-danger-'),
     success: ramp('--color-success-'),
   },
+  themes: ['light', 'dark'],
+  /* `semantic` is the LIGHT set — kept under that name because four scripts read
+     it. Dark is a sibling, not a replacement. Always state which theme a value
+     belongs to; quoting `semantic.border` as "the border colour" is wrong in a
+     two-theme system. */
   semantic: Object.fromEntries(Object.entries(hexOnly(sem)).map(([k, v]) => [k.replace('--', ''), v.toLowerCase()])),
+  semantic_dark: Object.fromEntries(Object.entries(hexOnly(semDark)).map(([k, v]) => [k.replace('--', ''), v.toLowerCase()])),
   contrast: {
     standard: 'WCAG 2.x (ratio) + APCA / WCAG 3.0 draft (Lc). Layered: AA baseline, APCA as an additional perceptual check.',
-    pairs: [
-      pair('body-and-headings', fg, bg, 'body + headings on page', 75),
-      pair('secondary-text', sem['--muted-foreground'], bg, 'secondary text / labels', 60),
-      pair('primary-button-label', sem['--primary-foreground'], sem['--primary'], 'primary button label', 75),
-      pair('destructive-button-label', sem['--destructive-foreground'], sem['--destructive'], 'destructive button label', 75),
-      pair('error-text', sem['--destructive'], bg, 'error text / label', 60),
-      pair('success-text', sem['--success'], bg, 'success text / label', 60),
-      pair('border-nontext', sem['--border'], bg, 'border / input hairline (non-text UI)', 15),
-      pair('focus-ring-nontext', sem['--ring'], bg, 'focus ring (non-text UI)', 15),
-    ],
+    note: 'Every pair carries a `theme`. Both themes are audited by `npm run a11y`, which is the authority — these values are the same maths, precomputed.',
+    pairs: [...pairsFor('light', sem), ...pairsFor('dark', semDark)],
   },
   rules: [
     'Grayscale only — never introduce a brand hue.',
@@ -116,6 +135,7 @@ const spacing = {
 
 // ---- CANVA brand-kit export (derived from the tokens above; users' Canva
 //      integration consumes this — same canonical source, no duplication) ----
+const CANVA_RAW = 'https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/'
 const s = colors.semantic
 const canva = {
   name: '2one',
@@ -128,7 +148,23 @@ const canva = {
     { name: 'Danger', hex: s.destructive }, { name: 'Success', hex: s.success },
   ].filter((c) => c.hex),
   neutral_ramp: Object.entries(colors.ramps.neutral).map(([step, hex]) => ({ name: `Neutral ${step}`, hex })),
-  fonts: { heading: typography.fonts.heading.split(',')[0].replace(/['"]/g, '').trim(), body: typography.fonts.body.split(',')[0].replace(/['"]/g, '').trim() },
+  fonts: {
+    heading: typography.fonts.heading.split(',')[0].replace(/['"]/g, '').trim(),
+    body: typography.fonts.body.split(',')[0].replace(/['"]/g, '').trim(),
+    note: 'Satoshi ships as .woff2 in src/styles/fonts/. Inter is NOT in this repo — it comes from the @fontsource-variable/inter npm package, or fonts.google.com. Canva brand-font upload may not accept .woff2; convert to .otf/.ttf if it refuses.',
+  },
+  // A Canva Brand Kit holds a logo as well as colours and fonts. Omitting it
+  // was the same gap that produced a typeset wordmark in generated output —
+  // if the mark is not in the export, whoever wires this up will substitute text.
+  logo: {
+    svg: {
+      black: `${CANVA_RAW}brand/logo/svg/2one-logo-black.svg`,
+      white: `${CANVA_RAW}brand/logo/svg/2one-logo-white.svg`,
+    },
+    png: { black_1024: `${CANVA_RAW}brand/logo/png/2one-logo-black-1024w.png`, white_1024: `${CANVA_RAW}brand/logo/png/2one-logo-white-1024w.png` },
+    rules: 'Black on light surfaces, white on dark. Never recolour, rotate, distort, or add effects. Minimum width 96px; clear space 0.5x the logo height. Never typeset "2one" as text in place of the mark.',
+  },
+  theme: 'light — Canva designs sit on light grounds. The dark palette is in tokens/colors.json → semantic_dark if needed.',
   rules: colors.rules,
 }
 
