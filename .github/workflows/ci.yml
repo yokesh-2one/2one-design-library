@@ -28,6 +28,11 @@ jobs:
       - name: Machine-readable data is valid
         run: npm run validate
 
+      # Audits OUTPUT (the blocks clients copy) against the 2one rules, rather
+      # than the system itself. Errors fail; warnings are advisory.
+      - name: Blocks obey the design rules
+        run: npm run check:usage
+
       - name: Accessibility (APCA/WCAG) thresholds
         run: npm run a11y
 

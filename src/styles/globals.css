@@ -213,13 +213,25 @@
     color: var(--foreground);
     font-family: var(--font-sans);
   }
-  h1, h2, h3, h4, h5, h6 {
+  /* Satoshi covers real heading elements AND the component title slots.
+     Several shadcn titles (card, alert, empty, item) render a <div>, so an
+     element-only selector silently dropped them to Inter — invisible by eye at
+     semibold, caught only by reading the computed style. The Radix-backed
+     titles (dialog, sheet, drawer, alert-dialog) already render <h2>; they are
+     listed anyway so the rule survives an upstream change. */
+  h1, h2, h3, h4, h5, h6,
+  [data-slot="card-title"],
+  [data-slot="alert-title"],
+  [data-slot="alert-dialog-title"],
+  [data-slot="dialog-title"],
+  [data-slot="drawer-title"],
+  [data-slot="sheet-title"],
+  [data-slot="popover-title"],
+  [data-slot="empty-title"],
+  [data-slot="item-title"] {
     font-family: var(--font-heading);
   }
 }
-
-/* Light-only system: no .dark palette is defined, so every `dark:` utility
-   the shadcn components carry stays inert (there is never a .dark ancestor). */
 
 /* 2one signature — buttons are pills. Applied via the component's data-slot
    (unlayered, so it beats Tailwind's rounded-* utility) which means it survives

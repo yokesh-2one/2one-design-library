@@ -66,9 +66,9 @@ import { ChartRadialStacked } from '@/blocks/charts/chart-radial-stacked'
 // Foundation swatches derive colour + label from the live @theme tokens
 // (--color-<ramp>-<step> in tokens/colors.css), so this section can never
 // drift from the real theme — change a token and the swatch follows.
-const NEUTRAL = ['50', '100', '200', '300', '400', '600', '700', '800', '950']
+const NEUTRAL = ['50', '100', '200', '250', '300', '400', '600', '700', '800', '950']
 const ACCENT = ['50', '100', '200', '300', '600', '700', '800', '950']
-const SEM = ['danger-500', 'danger-600', 'success-600']
+const SEM = ['danger-500', 'danger-600', 'danger-700', 'success-600']
 const TYPE: [string, string, string][] = [['display', 'text-display', '76 / 103'], ['h1', 'text-h1', '62 / 84'], ['h2', 'text-h2', '48 / 65'], ['h3', 'text-h3', '40 / 54'], ['h4', 'text-h4', '32 / 43'], ['h5', 'text-h5', '26 / 35'], ['h6', 'text-h6', '20 / 27'], ['base', 'text-base', '16 · body'], ['sm', 'text-sm', '14 · UI'], ['xs', 'text-xs', '12 · small']]
 const RADII = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full']
 
@@ -397,7 +397,7 @@ export function Showcase() {
                   The swatches read var(--color-<ramp>-<step>) at runtime, so we force
                   those vars into :root by naming every ramp utility here (literal names
                   only — Tailwind can't see interpolated class names). Kept hidden. */}
-              <div className="hidden bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-300 bg-neutral-400 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-950 bg-accent-50 bg-accent-100 bg-accent-200 bg-accent-300 bg-accent-600 bg-accent-700 bg-accent-800 bg-accent-950 bg-danger-500 bg-danger-600 bg-success-600" aria-hidden />
+              <div className="hidden bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-250 bg-neutral-300 bg-neutral-400 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-950 bg-accent-50 bg-accent-100 bg-accent-200 bg-accent-300 bg-accent-600 bg-accent-700 bg-accent-800 bg-accent-950 bg-danger-500 bg-danger-600 bg-danger-700 bg-success-600" aria-hidden />
               <div className="g-scale-label">neutral</div>
               <Swatches items={NEUTRAL} prefix="neutral-" />
               <div className="g-scale-label">accent</div>

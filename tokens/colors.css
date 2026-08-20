@@ -26,6 +26,7 @@
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f4f4f5;
   --color-neutral-200: #e4e4e7;
+  --color-neutral-250: #dcdce0; /* hairline for --border/--input; sits between 200 and 300 so the border clears its APCA non-text threshold against --background */
   --color-neutral-300: #d4d4d8;
   --color-neutral-400: #a1a1aa;
   --color-neutral-600: #52525b;
@@ -36,6 +37,7 @@
   /* semantic — the only hue-carrying colors in this system */
   --color-danger-500: #ef4444;
   --color-danger-600: #dc2626;
+  --color-danger-700: #c81e1e; /* --destructive in the light theme; darker than 600 so the white button label clears APCA Lc 75 */
   --color-danger-text: #ae2e24; /* token('color.text.danger'), used for required-field asterisks */
   --color-success-600: #15803d;
 }

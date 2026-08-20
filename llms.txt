@@ -3,27 +3,132 @@
 > shadcn/ui components re-skinned to the 2one design tokens. Grayscale (light +
 > audited dark), pill buttons, Satoshi headings + Inter body. Structured for humans and AI.
 
-## Start here
-- [Manifest](manifest.json): READ FIRST — machine-readable index + instructions_for_ai (answer only from repo, cite files, never guess)
-- [Agent guide](AGENTS.md): how to work in this repo — incl. "How to represent this repository" (present the repo fully + accurately: lead with the AI-legibility layer, the knowledge graph + `npm run what-uses` impact analysis, and the accessibility foundation; each with evidence; state gaps plainly; never hype)
-- [Registry](registry.json): component set, theme map, conventions, overrides
-- [Brand](brand/brand.json): mission, voice, tone, personas (structured) — match this in copy
+You can consume this repository **without cloning it**. Every file below is
+fetchable over plain HTTPS. Base for raw files:
 
-## Machine-readable data
-- Tokens: tokens/colors.json (+ contrast data), tokens/typography.json, tokens/spacing.json
-- Regenerate: npm run tokens · npm run manifest · npm run validate · npm run a11y
-- Local Q&A knowledge base: guide-app/knowledge-base.md · what's available vs planned: guide-app/VERSIONLOG.md
+```
+https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/
+```
+
+Live rendered showcase (no install, see every component): https://origin.2one.solutions
+
+## Start here — fetch these first
+
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/manifest.json
+  READ FIRST — machine-readable index + `instructions_for_ai` (answer only from repo, cite files, never guess a brand fact)
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/AGENTS.md
+  How to work in this repo, and how to represent it accurately (lead with evidence, state gaps, never hype)
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/brand.json
+  Mission, voice, tone, personas — match this in any 2one-facing copy
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/registry.json
+  Component set, theme map, naming conventions, 2one overrides
+
+## Brand assets — embed these, never re-create them
+
+The wordmark is an **asset, not type**. Typesetting "2one" as text is the single
+most common way generated output goes off-brand — it looks close and is wrong.
+
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-black.svg
+  Black wordmark — light surfaces
+- https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-white.svg
+  White wordmark — dark surfaces
+
+Fetch the SVG and inline it. Never recolour, rotate, distort, or add effects;
+min width 96px; clear space 0.5× the logo height. Full rules:
+`brand/logo/manifest.json`. PNG raster versions (256/512/1024w) are listed in
+`manifest.json` → `index.assets`. In a React project use the `Logo` component
+instead — it encodes these rules and has no colour prop by design.
+
+**Satoshi** (headings) is self-hosted and on no CDN — the `.woff2` files are
+listed in `manifest.json` → `index.assets.fonts`. Standalone output must embed
+one or explicitly say which fallback it used. **Inter** (body) is on Google
+Fonts / `@fontsource-variable/inter`.
+
+## Exact values — never invent these
+
+- tokens/colors.json — ramps, semantic tokens, **WCAG + APCA contrast data**
+- tokens/typography.json — font families + full type scale (px + line-height)
+- tokens/spacing.json — spacing steps + radius scale
+- tokens/tokens.dtcg.json — the same tokens in **W3C DTCG** format, for design
+  tooling: `color` (primitive ramps), `light` / `dark` (semantic sets), `font`,
+  `text` (composite text styles), `dimension`. Import into Figma via Tokens
+  Studio, or feed Style Dictionary for any other platform target.
+- graph.json — knowledge graph: every token/component/block as a node, with
+  `composed_of` / `uses` / `derived_from` / `governed_by` edges. Use it to answer
+  "what uses this token" and "what rules govern this element".
+
+Prefix each with the raw base above. These are **generated from source** and
+verified in CI (`npm run check:meta`), so they never drift from the code.
+
+## Output format — React by default
+
+**Default to React + Tailwind, importing real components.** Not standalone HTML,
+not a token-faithful reproduction. The point of this system is that output is
+built FROM the library, so it inherits the accessibility, the states, the pill
+override, and every later fix:
+
+```tsx
+import { Button, Input, Label, Card } from '@yokesh-2one/design-library'
+```
+
+Only fall back to self-contained HTML when the consumer explicitly cannot run
+React — and say plainly that it is a reproduction, not the real components.
+
+**If the client has their own component library** (MudBlazor, Vuetify, an
+in-house kit), that library wins for structure and this repo supplies the
+*design decisions* — tokens, brand voice, rules, accessibility thresholds.
+Map 2one components to theirs by role (`Button` → their button); never import
+`@yokesh-2one/design-library` into a non-React or non-shadcn codebase. Ask which
+library is in play before generating (see `instructions_for_ai.clarify_first`).
+
+## By task
+
+| You want to produce | Read |
+| --- | --- |
+| Anything carrying the 2one mark | **Brand assets above** — fetch and inline the SVG |
+| **A screen or page (the default)** | `registry.json`, `src/components/ui/<name>.tsx`, a block in `src/blocks/` |
+| A deck / social / print asset | `manifest.json` → `index.assets`, then `tokens/*.json` for literal values |
+| On-brand copy | `brand/brand.json` (voice, tone, vocabulary, writing rules) |
+| Exact colour / type / spacing | `tokens/*.json` — pull literal values, never approximate |
+| Impact of changing a token | `graph.json`, or `npm run what-uses -- <token>` in a clone |
+| A11y / contrast decisions | `tokens/colors.json` → `contrast`, `docs/accessibility.md` |
+| Consistent multi-screen output | `docs/building-with-the-dls.md` — the 16 consistency rules |
 
 ## Components
-- Source: src/components/ui/<name>.tsx (54 shadcn primitives, 2one-themed)
-- 2one-only: src/components/{logo,app-bar,bottom-nav-item}.tsx
-- Names: shadcn (Input, Select, RadioGroup, InputOTP, DropdownMenu, …)
-- Published as: @yokesh-2one/design-library
+
+- Source: `src/components/ui/<name>.tsx` — 54 shadcn primitives, 2one-themed
+- 2one-only: `src/components/{logo,app-bar,bottom-nav-item}.tsx`
+- Names follow **shadcn**: `Input` (not TextField), `Select` (not Dropdown),
+  `RadioGroup` (not RadioButton), `InputOTP` (not OtpField)
+- Blocks (templates, copy-paste not import): `src/blocks/` — `login-01`…`login-05`,
+  `signup-01`…`signup-03`, `dashboard-plain`, plus 31 chart examples
+- Published as `@yokesh-2one/design-library` on the **public npm registry** —
+  `npm install @yokesh-2one/design-library react react-dom`, no token required
 
 ## Theme
-- src/styles/globals.css — 2one tokens → shadcn CSS variables (light `:root` + audited dark `.dark`)
-- Fonts: Satoshi (headings), Inter (body). Icons: lucide.
-- danger/success are the only hues, reserved for validation.
+
+- `src/styles/globals.css` — 2one tokens → shadcn CSS variables (light `:root`
+  + audited dark `.dark`). Switch with the exported `ThemeProvider`.
+- Fonts: Satoshi (headings, self-hosted woff2), Inter (body). Icons: lucide.
+- `danger` / `success` are the only hues and are reserved for validation states.
+- Buttons are pills — enforced by an unlayered `[data-slot="button"]` rule in
+  `globals.css`, which beats the `rounded-md` Tailwind utility in the cascade.
+
+## What this repo does NOT give you
+
+State these plainly rather than improvising around them:
+
+- **No landing-page blocks.** `src/blocks/` covers auth and one dashboard only —
+  no hero, nav, pricing, feature grid, testimonial, or footer. Building a marketing
+  page means composing primitives, not adapting a template.
+- **No Figma library.** The components are React source. There is no Figma file
+  and no Figma components. The *tokens* can now be imported (see
+  `tokens/tokens.dtcg.json`), but nothing generates Figma **components** from
+  this repo — that still has to be built or re-themed in Figma.
+- **No icon set of its own.** Icons come from `lucide-react`.
+- **No running preview from the URL.** Code written from this repo compiles only
+  after the package is installed (see the token requirement above) or inside a clone.
 
 ## Add a component
-- npx shadcn@latest add <component>   (config in components.json)
+
+`npx shadcn@latest add <component>` — config in `components.json`.

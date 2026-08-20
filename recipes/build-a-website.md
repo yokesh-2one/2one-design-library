@@ -9,4 +9,5 @@ plain React + Tailwind, so they drop into Next.js, Vite, Remix, or Astro (React)
 - Compose `NavigationMenu` or `BottomNavItem` into a nav row, or use `Button`/
   `Input` for CTAs and forms. Everything is responsive via the token scales.
 
-Note: the site is light-only (no `.dark` palette), and buttons are pills.
+Note: the system ships light and dark (both grayscale, both APCA-audited) — wrap the
+site in the exported `ThemeProvider` to switch. Buttons are pills.

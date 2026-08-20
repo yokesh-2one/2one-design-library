@@ -10,6 +10,11 @@ import { dirname, join } from 'node:path'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 const ls = (rel, filter = () => true) => existsSync(join(root, rel)) ? readdirSync(join(root, rel)).filter(filter).sort() : []
+
+// Base for fetchable raw files. Assets (logo, fonts) are only usable by an agent
+// that never clones the repo if it gets an absolute URL, so every asset entry in
+// the manifest is emitted fully qualified rather than as a repo-relative path.
+const RAW = 'https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/'
 const base = (f) => f.replace(/\.[^.]+$/, '')
 
 const ui = ls('src/components/ui', (f) => f.endsWith('.tsx')).map(base)
@@ -45,6 +50,17 @@ const manifest = {
       'Colour rules are non-negotiable: grayscale only; danger/success for validation only; never convey state by colour alone (pair with an icon/text). See tokens/colors.json → rules.',
       'When BUILDING any UI, follow docs/building-with-the-dls.md — the consistency rules distilled from real build mistakes: (1) build FROM the library, never hand-roll parallel chrome; (2) one token system — no hard-coded hex or second palette; (3) one 8px spacing scale — no ad-hoc inline margins; (4) one container language — every panel a real Card, never nested; (5) light + audited dark via the exported ThemeProvider — no hand-rolled palette, no brand hue; (6) lucide icons only; (7) never signal state by colour alone; (8) cap width by content type — a reading cap is for prose only, app layouts get a generous responsive cap (max-w-7xl) or go fluid; (9) reading a @theme token at runtime (swatch/palette view) requires a live var — Tailwind tree-shakes unused ramp vars, so safelist the ramp utilities or prefer semantic tokens; (10) verify the render at ultrawide/laptop/mobile AND in both themes, not just the build; (11) Tailwind only keeps classes it can see — @source every folder you render (an arbitrary value used once is the canary); (12) brand marks need a FIXED ground, not a theme token, and in-app marks must be theme-adaptive; (13) dark is not invert-and-ship — re-audit every rendered pair in both themes and keep component colours token-driven so the audit matches the render.',
     ],
+    clarify_first: {
+      why: 'Most off-brand output traces to an unstated assumption, not a missing token. Ask these BEFORE generating, then state the answers you are using. If the user says "just pick" or is evaluating, choose the default, name it explicitly, and continue — never block.',
+      questions: [
+        { ask: 'What surface is this — product screen, marketing page, deck slide, social asset, or email?', default: 'product screen', why: 'Decides which components and which width cap apply (rule 10).' },
+        { ask: 'Which target stack — React + this library, or your own component library (MudBlazor, Vuetify, in-house)?', default: 'React + @yokesh-2one/design-library', why: 'If they have their own kit, it wins for structure and this repo supplies tokens, voice, and rules only.' },
+        { ask: 'Which of the 5 personas in brand/brand.json is the reader?', default: 'none — write neutrally in the 2one voice', why: 'Drives copy register and the level of detail.' },
+        { ask: 'What is the ONE primary action on this view?', default: 'infer from the request', why: 'One primary Button per view is a hard rule; without this the model invents two.' },
+        { ask: 'Light, dark, or both?', default: 'light', why: 'Both themes ship and both are audited; brand marks must swap per theme (rule 14).' },
+        { ask: 'Real content or placeholder?', default: 'realistic placeholder in the 2one voice', why: 'Stops lorem ipsum and stops invented product claims.' },
+      ],
+    },
     how_to_use: {
       'what is in here': 'Read this manifest\'s index + README.md.',
       'brand foundation (mission, voice, personas)': 'brand/brand.json (structured) or brand/BRAND.md (prose).',
@@ -63,6 +79,55 @@ const manifest = {
       structured: 'brand/brand.json',
       prose: 'brand/BRAND.md',
       contains: ['mission', 'vision', 'tagline', 'voice', 'tone', 'personality', 'archetype', 'personas'],
+      logo: {
+        rules: 'brand/logo/manifest.json',
+        component: 'src/components/logo.tsx (React consumers only)',
+        critical:
+          'The wordmark is an ASSET, never type. Do NOT typeset "2one" as text in any output — embed the SVG below. Black on light surfaces, white on dark. Never recolour, rotate, distort, or add effects. Minimum width 96px; clear space 0.5x the logo height.',
+        svg: {
+          black: `${RAW}brand/logo/svg/2one-logo-black.svg`,
+          white: `${RAW}brand/logo/svg/2one-logo-white.svg`,
+        },
+        png: Object.fromEntries(
+          ls('brand/logo/png', (f) => f.endsWith('.png')).map((f) => [
+            f.replace('2one-logo-', '').replace('.png', ''),
+            `${RAW}brand/logo/png/${f}`,
+          ])
+        ),
+      },
+    },
+    assets: {
+      note: 'Every non-code asset the repo serves, with a fetchable URL. Standalone output (HTML artifact, deck, social image) must embed these rather than substituting text or a system font — that is the most common way generated output silently goes off-brand.',
+      logo: [...['black', 'white'].map((v) => ({
+        id: `logo-${v}`,
+        type: 'image/svg+xml',
+        url: `${RAW}brand/logo/svg/2one-logo-${v}.svg`,
+        usage: `Wordmark for ${v === 'black' ? 'light' : 'dark'} surfaces. Embed inline; never retype as text.`,
+      }))],
+      fonts: ls('src/styles/fonts', (f) => f.endsWith('.woff2')).map((f) => ({
+        id: f.replace('.woff2', ''),
+        type: 'font/woff2',
+        url: `${RAW}src/styles/fonts/${f}`,
+        usage: 'Satoshi — headings. Self-hosted, on no CDN. Standalone output must embed this or declare the fallback it used.',
+      })),
+      body_font: {
+        family: 'Inter',
+        source: '@fontsource-variable/inter (npm) or https://rsms.me/inter/',
+        usage: 'Body and UI text.',
+      },
+      icons: {
+        library: 'lucide',
+        package: `lucide-react@${pkg.dependencies?.['lucide-react'] ?? 'latest'}`,
+        react: "import { Rocket } from 'lucide-react'  —  <Button><Rocket /> Launch</Button>",
+        non_react: 'https://unpkg.com/lucide-static@latest/icons/<name>.svg (same glyphs as SVG files)',
+        browse: 'https://lucide.dev/icons',
+        rule: 'lucide ONLY. Never mix in heroicons, tabler, font-awesome, or hand-drawn SVG icons — a second icon set is one of the most visible "AI-generated" tells. Icons inherit currentColor and default to size-4 inside a Button.',
+      },
+      absent: {
+        note: 'These asset categories do NOT exist in this repo. Say so rather than generating a substitute — an invented illustration or stock photo is off-brand by definition.',
+        categories: ['illustration', 'photography', 'patterns', 'textures', 'motion/animation presets', 'sound'],
+        status: 'Not yet in the 2one Figma scope. See guide-app/VERSIONLOG.md.',
+      },
     },
     tokens: {
       tier: 2,
@@ -71,6 +136,12 @@ const manifest = {
         colors: { json: 'tokens/colors.json', css: 'tokens/colors.css', includes_contrast_data: true },
         typography: { json: 'tokens/typography.json', css: 'tokens/typography.css' },
         spacing: { json: 'tokens/spacing.json', css: 'tokens/spacing.css' },
+        dtcg: {
+          json: 'tokens/tokens.dtcg.json',
+          format: 'W3C Design Tokens Community Group',
+          purpose:
+            'Neutral interchange format for design tooling and non-web platforms. Groups: color (primitive ramps), light/dark (semantic sets, apply one at a time), font, text (composite typography → Figma text styles), dimension (px). Semantic tokens alias their ramp step. Import via Tokens Studio (Figma) or Style Dictionary (other platforms).',
+        },
       },
       theme: 'src/styles/globals.css (2one tokens → shadcn CSS variables; light :root + audited dark .dark, toggled via the exported ThemeProvider)',
     },
@@ -119,7 +190,7 @@ const manifest = {
         export: 'integrations/canva/brand-kit.json',
         guide: 'integrations/canva/README.md',
         raw_url: 'https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/integrations/canva/brand-kit.json',
-        note: 'Fetching raw URLs requires the repo to be public or a PAT with repo scope.',
+        note: 'The repo is public, so these raw URLs are fetchable with no auth. (If it is ever made private, external fetches would need a GitHub token with repo scope.)',
       },
     },
   },

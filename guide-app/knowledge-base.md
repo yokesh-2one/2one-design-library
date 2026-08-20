@@ -34,7 +34,7 @@ human-understandable and AI-legible**, so any AI vendor can answer brand/design
 questions and generate on-brand output without hallucinating.
 
 It is delivered as a component library **built on shadcn/ui, re-skinned to the 2one
-tokens**. Identity in one line: **grayscale (no brand hue), light-only, pill buttons,
+tokens**. Identity in one line: **grayscale (no brand hue), light + audited dark, pill buttons,
 Satoshi headings + Inter body; danger/success are the only colours, used only for
 validation.**
 

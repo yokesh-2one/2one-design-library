@@ -2,7 +2,7 @@
   "name": "@yokesh-2one/design-library",
   "version": "0.1.0",
   "type": "module",
-  "description": "2one Design Language System — shadcn/ui components re-skinned to the 2one tokens (grayscale, light-only, pill buttons, Satoshi + Inter).",
+  "description": "2one Design Language System — shadcn/ui components re-skinned to the 2one tokens (grayscale, light + audited dark, pill buttons, Satoshi + Inter).",
   "license": "MIT",
   "engines": {
     "node": ">=18"
@@ -32,10 +32,11 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "a11y": "node scripts/apca-audit.mjs",
-    "tokens": "node scripts/build-tokens.mjs",
+    "tokens": "node scripts/build-tokens.mjs && node scripts/build-dtcg.mjs",
     "manifest": "node scripts/build-manifest.mjs",
     "validate": "node scripts/validate.mjs",
     "check:exports": "node scripts/check-exports.mjs",
+    "check:usage": "node scripts/check-usage.mjs",
     "check:meta": "npm run build:meta && git diff --exit-code -- tokens manifest.json graph.json",
     "build:meta": "npm run tokens && npm run manifest && npm run graph && npm run validate",
     "graph": "node scripts/build-graph.mjs",
@@ -67,7 +68,7 @@
     "vite": "^8.1.1"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
