@@ -1,7 +1,7 @@
 /* =========================================================
    2one Design Language System — global theme
    shadcn/ui component contract mapped 1:1 onto the 2one tokens.
-   Grayscale, light-only. Danger/success are the only hues.
+   Grayscale, light + audited dark. Danger/success are the only hues.
    ========================================================= */
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -56,6 +56,12 @@
 
   --background: #ffffff;                 /* neutral / surface */
   --foreground: #09090b;                 /* neutral-950 */
+
+  /* Scrim — a translucent overlay to lay BEHIND text placed over an image/video.
+     Theme-independent (media is media): darkens the media so light caption text
+     stays readable. The APCA audit can only check token pairs, never text over
+     media — always put this behind such text. See docs/accessibility.md. */
+  --scrim: rgb(9 9 11 / 0.55);           /* neutral-950 @ 55% */
 
   --card: #ffffff;
   --card-foreground: #09090b;
@@ -168,6 +174,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-scrim: var(--scrim);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -222,9 +229,10 @@
   }
 }
 
-/* Both themes ship: the `.dark` palette above activates whenever a `.dark`
-   ancestor is present (ThemeProvider adds it), and the shadcn `dark:` utilities
-   activate with it. Both light and dark are contrast-audited by `npm run a11y`. */
+/* Two themes ship: the light `:root` palette and the audited `.dark` palette are
+   both defined above. Every shadcn `dark:` utility resolves under the `.dark`
+   ancestor added by the exported ThemeProvider. Both are grayscale and both are
+   APCA-audited (`npm run a11y` parses `:root` and `.dark` separately). */
 
 /* 2one signature — buttons are pills. Applied via the component's data-slot
    (unlayered, so it beats Tailwind's rounded-* utility) which means it survives

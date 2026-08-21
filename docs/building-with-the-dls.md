@@ -110,11 +110,24 @@ black logo on the dark sidebar simply vanishes.
 
 ## 15. Keep the claims in sync with the capabilities
 When you ship (or remove) a capability, fix **every** place that asserts the old state in
-the same change. Shipping dark mode meant updating the "light-only" wording in
+the same change. Shipping dark mode meant updating the stale single-theme wording in
 `globals.css`, `registry.json`, `AGENTS.md`, the manifest, `.cursorrules`, and the
 copilot instructions — a repo that contradicts itself teaches the next reader (and every
 AI) the wrong thing. Generated files (`manifest.json`, `graph.json`) regenerate from
 source; prose files are updated by hand.
+
+**Definition of Done for a capability change.** A capability change is not done until the
+claims match it *and a check enforces the match*:
+
+1. Run `npm run check:claims` — it fails the build if a known-stale phrase (e.g. a
+   single-theme claim after dark shipped) survives anywhere in tracked prose/config.
+2. Grep the old claim repo-wide in the **same** PR and fix every hit (prose is hand-edited;
+   `manifest.json` / `graph.json` regenerate via `npm run build:meta`).
+3. If the change introduces a *new* class of stale phrasing, add it to the banned list in
+   `scripts/check-claims.mjs` so the same drift can never silently return.
+
+The rule of thumb for this whole repo: **generate it or check it — never hand-maintain a
+claim about the repo in prose alone.** See the *Invariants* list in `AGENTS.md`.
 
 ## 16. Verify the render, not just the build — in every theme
 Compiling and a green audit are **not** "done." **Look** at the page — at multiple widths
@@ -122,3 +135,42 @@ Compiling and a green audit are **not** "done." **Look** at the page — at mult
 tables, a chart, and brand marks. The APCA audit passed while the dark destructive button
 was unreadable and the logo was invisible; only looking caught them. Run `npm run a11y`
 after any token change, and remove dead CSS as you go.
+
+## 17. Change a component's colour with its `variant`, not a `className`
+To recolour a component, use its **`variant` prop** (`<Button variant="destructive">`),
+never a raw colour utility (`<Button className="bg-destructive">`). `twMerge` de-dupes
+*known* conflicting utilities, but a component's base colour often comes from a
+`data-slot`/CVA rule that `twMerge` can't see as conflicting — so your `bg-*` className
+and the variant's base **both** apply, and the variant usually wins the cascade. A
+destructive button written as `className="bg-destructive"` silently rendered as the
+primary. Reach for the variant; add a new variant to the component if none fits.
+
+## 18. Critical actions must never require horizontal scroll — use `Toolbar`
+An action bar that overflows its width must **wrap**, never hide controls behind an
+`overflow-x-auto` scroll. A hand-rolled control bar that used horizontal scroll clipped
+its **Leave** button at narrow widths — the one control a user most needs. Compose action
+rows from the `Toolbar` primitive (it is `flex-wrap` by default and never scrolls);
+`ToolbarSpacer` pushes trailing actions over when there's room and collapses when it wraps.
+
+## 19. A side panel must be reachable at *every* width
+Never gate a panel's **only** entry point behind `hidden md:block` — a "People" button
+that existed only on desktop was dead on mobile. Render the trigger **always**; switch the
+*presentation* (inline on `md+`, a `Sheet` on mobile via the exported `useIsMobile`), not
+the *existence*:
+
+```tsx
+import { useIsMobile, Sheet, SheetContent, SheetTrigger, Button } from '@yokesh-2one/design-library'
+
+function DetailsPanel({ children }: { children: React.ReactNode }) {
+  const isMobile = useIsMobile()
+  if (isMobile) {
+    return (
+      <Sheet>
+        <SheetTrigger asChild><Button variant="outline">People</Button></SheetTrigger>
+        <SheetContent side="right">{children}</SheetContent>
+      </Sheet>
+    )
+  }
+  return <aside className="w-80 shrink-0 border-l p-4">{children}</aside>   // inline on md+
+}
+```

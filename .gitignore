@@ -4,5 +4,7 @@ dist-site
 site
 *.tgz
 *.log
+*.tgz
 .DS_Store
 storybook-static
+site

@@ -9,6 +9,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { INTERACTIVE } from './interactive-components.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const R = (p) => readFileSync(join(root, p), 'utf8')
@@ -45,7 +46,11 @@ const componentFiles = [
   ...ls('src/components/ui', (f) => f.endsWith('.tsx')).map((f) => ['component', 'src/components/ui/' + f, baseName(f)]),
   ...ls('src/components', (f) => f.endsWith('.tsx')).map((f) => ['component-2one', 'src/components/' + f, baseName(f)]),
 ]
-const compId = (name) => `component:${name}`
+// Node ids match their type: ui primitives are `component:<name>`, 2one-only
+// components are `component-2one:<name>`. (An impact-analysis consumer keyed on the
+// id prefix broke when the two shared a namespace — id prefix now equals `type`.)
+const kindByName = new Map(componentFiles.map(([kind, , name]) => [name, kind]))
+const compId = (name) => `${kindByName.get(name) === 'component-2one' ? 'component-2one' : 'component'}:${name}`
 for (const [kind, path, name] of componentFiles) addNode(compId(name), kind, titleize(name), { path })
 
 const utilRe = (tok) => new RegExp(`\\b(?:bg|text|border|ring|fill|stroke|from|to|via|outline|placeholder|divide|caret|decoration|shadow)-${tok}(?:/\\d+)?\\b`)
@@ -73,6 +78,30 @@ for (const [, path, name] of componentFiles) {
   }
 }
 
+// ---- DEPENDENCY edges: component → external npm package it imports ----
+// Parse bare import specifiers (skip internal @/ aliases + relative paths); React
+// peers are excluded (not bundled). Makes `npm run what-uses recharts` answer real
+// bundle-impact questions ("which components pull recharts?").
+const PEERS = new Set(['react', 'react-dom'])
+const pkgName = (spec) => (spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0])
+const externalPackages = (src) => {
+  const set = new Set()
+  for (const m of src.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+    const spec = m[1]
+    if (spec.startsWith('.') || spec.startsWith('@/')) continue
+    const pkg = pkgName(spec)
+    if (!PEERS.has(pkg)) set.add(pkg)
+  }
+  return set
+}
+for (const [, path, name] of componentFiles) {
+  for (const pkg of externalPackages(R(path))) {
+    const id = `pkg:${pkg}`
+    addNode(id, 'package', pkg)
+    addEdge(compId(name), id, 'depends_on')
+  }
+}
+
 const addTemplate = (id, label, type, files) => {
   addNode(id, type, label)
   const used = new Set()
@@ -89,21 +118,23 @@ for (const f of ls('src/blocks/charts', (f) => f.endsWith('.tsx'))) addTemplate(
 const rule = (id, label, targets) => { addNode(`rule:${id}`, 'rule', label); for (const t of targets) addEdge(t, `rule:${id}`, 'governed_by') }
 rule('grayscale', 'Grayscale only — no brand hue', ['token:primary', 'token:secondary', 'token:muted', 'token:accent', 'token:background'])
 rule('validation-only', 'danger/success for validation only', ['token:destructive', 'token:success'])
-rule('no-color-alone', 'Never convey state by colour alone', ['token:destructive', 'token:success'])
+// no-color-alone governs the semantic tokens AND every interactive component (the
+// surfaces where state is shown) — enforced by validate.mjs against INTERACTIVE.
+rule('no-color-alone', 'Never convey state by colour alone', ['token:destructive', 'token:success', ...INTERACTIVE.map(compId)])
 rule('pill-buttons', 'Buttons are pills (radius-full)', ['component:button', 'radius:full'])
-rule('logo-untouchable', 'Logo: never recolour/rotate/distort', ['component:logo'])
+rule('logo-untouchable', 'Logo: never recolour/rotate/distort', [compId('logo')])
 rule('one-primary', 'One primary action per view', ['component:button'])
 // build-consistency rules (docs/building-with-the-dls.md) — added from real build mistakes
 rule('build-from-library', 'Build from the library — never hand-roll parallel chrome', ['component:card', 'component:sidebar', 'component:button'])
 rule('tokens-only', 'Theme only through tokens — no hard-coded hex or second palette', ['token:background', 'token:primary', 'token:muted', 'token:border'])
 rule('one-spacing-scale', 'One 8px spacing scale — no ad-hoc inline margins', ['radius:md'])
 rule('one-container', 'One container language — every panel is a real Card', ['component:card'])
-rule('light-only', 'Theme via ThemeProvider — light + audited dark, no hand-rolled palette', ['token:background'])
+rule('theming', 'Theme via ThemeProvider — light + audited dark, no hand-rolled palette', ['token:background'])
 rule('lucide-only', 'Icons: lucide only — no mixed icon libraries', ['component:button'])
 rule('width-by-content', 'Cap width by content type — reading cap for prose only; app layouts get a generous responsive cap or go fluid', [])
 rule('keep-tokens-alive', 'Reading a @theme token at runtime? Keep it alive — Tailwind tree-shakes unused ramp vars; safelist ramp utilities or prefer semantic tokens', ['token:accent', 'token:destructive', 'token:success'])
 rule('scan-what-you-render', 'Tailwind only keeps classes it can SEE — @source every folder you render; an arbitrary value (h-[250px]) used once is the canary', ['component:chart', 'component:card'])
-rule('fixed-vs-theme-color', 'Brand marks need a FIXED ground, not a theme token — the logo on bg-foreground vanishes in dark; make in-app marks theme-adaptive (.dark / currentColor)', ['component:logo'])
+rule('fixed-vs-theme-color', 'Brand marks need a FIXED ground, not a theme token — the logo on bg-foreground vanishes in dark; make in-app marks theme-adaptive (.dark / currentColor)', [compId('logo')])
 rule('multi-theme-audit', 'Dark is not invert-and-ship — audit every rendered pair in BOTH themes and keep component colours token-driven so the audit matches the render', ['token:destructive', 'token:border', 'token:muted'])
 
 // ---- CONTRAST facts + has_contrast ----

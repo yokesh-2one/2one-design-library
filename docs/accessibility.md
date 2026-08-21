@@ -104,3 +104,29 @@ All audited pairs pass in **both** light and dark. Earlier light fixes (2026-08-
 | `--border` / `--input` | `#e4e4e7` | `#dcdce0` | Hairlines were Lc 13.4 (< the 15 non-text floor). Now 18. |
 
 Re-run `npm run a11y` after **any** change to a colour token, in either theme.
+
+## Text over media — the audit cannot help you here
+
+`npm run a11y` audits **token pairs** (a text colour on a surface colour) parsed from
+`globals.css`. It can say nothing about **text placed over an image or video**: the
+pixels behind the text are arbitrary and unknown at build time, so there is *no
+guaranteed contrast*. A white caption is invisible over a bright frame — and the audit
+stays green the whole time.
+
+**Rule: never put text directly over media — always lay a scrim behind it.** Use the
+`--scrim` token (a translucent neutral overlay; also available as the `scrim` colour, so
+`bg-scrim` / `from-scrim` work) as a solid panel or a gradient behind the text:
+
+```tsx
+<figure className="relative">
+  <img src="…" alt="…" className="w-full" />
+  {/* gradient scrim: transparent → --scrim toward the caption edge */}
+  <figcaption className="absolute inset-x-0 bottom-0 bg-linear-to-t from-scrim to-transparent p-4 text-white">
+    Caption text stays readable over any frame.
+  </figcaption>
+</figure>
+```
+
+The scrim is theme-independent (media is media). Pair it with a **fixed** light text
+colour (`text-white`) — this is a fixed-ground case, the same exception as brand marks in
+[`building-with-the-dls.md`](building-with-the-dls.md) rule 14, not a theme token.

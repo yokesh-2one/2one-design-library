@@ -5,6 +5,9 @@
 // theming — light + audited dark (grayscale; no brand hue)
 export * from './theme-provider'
 
+// hooks — for the responsive-panel pattern (inline on md+, Sheet on mobile)
+export { useIsMobile } from './hooks/use-mobile'
+
 // shadcn primitives (2one-themed)
 export * from './components/ui/accordion'
 export * from './components/ui/alert-dialog'
@@ -59,6 +62,7 @@ export * from './components/ui/tabs'
 export * from './components/ui/textarea'
 export * from './components/ui/toggle-group'
 export * from './components/ui/toggle'
+export * from './components/ui/toolbar'
 export * from './components/ui/tooltip'
 
 // 2one-only components (no shadcn equivalent)

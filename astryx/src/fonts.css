@@ -1,0 +1,15 @@
+/* 2one typefaces for the Astryx theme: Satoshi (self-hosted, from the 2one DLS
+   repo) for headings, Inter Variable (npm @fontsource-variable/inter, imported
+   in the entry) for body. Family names match src/2oneTheme.ts. */
+@font-face { font-family: 'Satoshi'; src: url('/fonts/Satoshi-Light.woff2')   format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('/fonts/Satoshi-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('/fonts/Satoshi-Medium.woff2')  format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('/fonts/Satoshi-Bold.woff2')    format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('/fonts/Satoshi-Black.woff2')   format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* Base app font. Astryx's theme only sets font-family on h1–h6 and p, so
+   everything else (buttons, inputs, divs, spans) inherits the browser default
+   serif ("Times New Roman"). Set the 2one body face on the root so ALL text
+   uses Inter; headings still pick up Satoshi via --font-family-heading. */
+html { font-family: var(--font-family-body); }
+button, input, select, textarea { font-family: inherit; }

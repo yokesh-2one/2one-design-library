@@ -67,7 +67,7 @@
     },
     "components": {
       "tier": 2,
-      "count": 57,
+      "count": 58,
       "naming": "shadcn/ui",
       "path": "src/components/ui/",
       "formats_available": [
@@ -139,7 +139,8 @@
       "two_one_only": [
         "app-bar",
         "bottom-nav-item",
-        "logo"
+        "logo",
+        "toolbar"
       ]
     },
     "templates": {
@@ -161,6 +162,7 @@
       "marketing": {
         "path": "src/blocks/marketing/",
         "items": [
+          "client-faq",
           "cta-banner",
           "faq",
           "feature-grid",

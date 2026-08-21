@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>2one × Astryx</title>
+    <script>
+      /* Static-build fallback: Astryx demo assets (/template-assets/*) live on
+         Astryx's site and 404 here. In dev a Vite middleware serves a placeholder;
+         in the static build there is none, so swap any broken image to a neutral
+         2one-grayscale placeholder at runtime. */
+      (function () {
+        var PH = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="%23e5e5e5"/><g fill="%23a3a3a3"><circle cx="185" cy="150" r="30"/><path d="M120 280 l70-84 52 52 44-44 74 76z"/></g><rect x="1" y="1" width="478" height="358" fill="none" stroke="%23d4d4d4"/></svg>'.replace(/%23/g, '#'))
+        document.addEventListener('error', function (e) {
+          var t = e.target
+          if (t && t.tagName === 'IMG' && t.src.indexOf('data:') !== 0) { t.src = PH }
+        }, true)
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

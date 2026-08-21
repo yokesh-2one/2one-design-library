@@ -1,0 +1,37 @@
+/* Astryx's astryx.css bundles its own default (atmeta-blue) theme. For a few
+   component tokens it beats the 2one theme at their scope — the accent on
+   ProgressBar/StatusDot, and the blue/info status colour on Badge — leaking
+   #0074E2/#0064E0 blue. 2one is grayscale (danger/success only), so force those
+   tokens back to neutral. !important on the custom properties wins regardless of
+   Astryx's internal scope; loaded last, scoped to the 2one theme. */
+[data-astryx-theme='2one'] {
+  --color-accent: light-dark(#09090b, #fafafa) !important;
+  --color-text-accent: light-dark(#09090b, #fafafa) !important;
+  --color-icon-accent: light-dark(#09090b, #fafafa) !important;
+
+  /* blue categorical → neutral */
+  --color-background-blue: light-dark(#e5e5e5, var(--color-neutral)) !important;
+  --color-border-blue: light-dark(#d4d4d4, #262626) !important;
+  --color-icon-blue: light-dark(#525252, #a3a3a3) !important;
+  --color-text-blue: light-dark(#262626, #e5e5e5) !important;
+
+  /* info status → neutral (2one has no info hue) */
+  --color-background-info: light-dark(#e5e5e5, var(--color-neutral)) !important;
+  --color-border-info: light-dark(#d4d4d4, #262626) !important;
+  --color-icon-info: light-dark(#525252, #a3a3a3) !important;
+  --color-text-info: light-dark(#262626, #e5e5e5) !important;
+}
+
+/* Direct fallback for components that set the accent/info colour at a scope the
+   token override can't reach (Astryx's bundled default leaking through). */
+[data-astryx-theme='2one'] .astryx-progressbar-fill.accent,
+[data-astryx-theme='2one'] .astryx-statusdot.accent,
+[data-astryx-theme='2one'] .astryx-statusdot.info,
+[data-astryx-theme='2one'] .astryx-badge.info {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+[data-astryx-theme='2one'] .astryx-badge.info {
+  background-color: light-dark(#e5e5e5, #262626) !important;
+  color: var(--color-text-primary) !important;
+}

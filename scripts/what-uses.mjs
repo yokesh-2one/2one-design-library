@@ -50,7 +50,9 @@ if (!node) {
 }
 
 // ---- edges that mean "source depends on target" ----
-const DEP = new Set(['composed_of', 'uses'])
+// depends_on (component → npm package) is included so `what-uses recharts` reports
+// every component that pulls it — the flagship bundle-impact question.
+const DEP = new Set(['composed_of', 'uses', 'depends_on'])
 const dependEdges = graph.edges.filter((e) => DEP.has(e.type))
 
 // direct dependents = who points at `node`

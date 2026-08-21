@@ -25,6 +25,9 @@ jobs:
       - name: Public API is complete
         run: npm run check:exports
 
+      - name: No stale capability claims
+        run: npm run check:claims
+
       - name: Machine-readable data is valid
         run: npm run validate
 

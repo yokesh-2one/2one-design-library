@@ -11,7 +11,9 @@ For every answer or code suggestion:
   in the repo — never guess a brand fact.
 - Pull exact values from tokens/*.json (colours/type/spacing). Never invent look-alikes.
 - Import components from @yokesh-2one/design-library using shadcn names (Input, Select,
-  RadioGroup, InputOTP, DropdownMenu, …). Don't copy component source.
+  RadioGroup, InputOTP, DropdownMenu, …). Don't copy component source. (Not yet on a
+  public registry — consume via a local `npm pack` tarball or vendored source today;
+  see docs/consuming.md for the exact setup, incl. the Tailwind `@source` line.)
 - Design rules: grayscale only; danger/success for validation only; never convey state by
   colour alone (add an icon/text); buttons are pills. Full guidance in AGENTS.md.
 - Representing or pitching this repo: follow AGENTS.md → "How to represent this repository" —

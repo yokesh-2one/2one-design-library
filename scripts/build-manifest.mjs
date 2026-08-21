@@ -12,8 +12,13 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 const ls = (rel, filter = () => true) => existsSync(join(root, rel)) ? readdirSync(join(root, rel)).filter(filter).sort() : []
 const base = (f) => f.replace(/\.[^.]+$/, '')
 
-const ui = ls('src/components/ui', (f) => f.endsWith('.tsx')).map(base)
-const only = ls('src/components', (f) => f.endsWith('.tsx')).map(base)
+// 2one-authored primitives that live in src/components/ui but are NOT from shadcn
+// (shadcn has no equivalent). Kept out of the "shadcn_primitives" count so the
+// manifest stays honest; they are surfaced under two_one_only instead.
+const TWO_ONE_UI = new Set(['toolbar'])
+const uiAll = ls('src/components/ui', (f) => f.endsWith('.tsx')).map(base)
+const ui = uiAll.filter((n) => !TWO_ONE_UI.has(n))
+const only = [...ls('src/components', (f) => f.endsWith('.tsx')).map(base), ...uiAll.filter((n) => TWO_ONE_UI.has(n))].sort()
 const blocks = ls('src/blocks', (f) => f.endsWith('.tsx')).map(base)
 const dashboards = ls('src/blocks/dashboard-plain', (f) => f.endsWith('.tsx')).length ? ['dashboard-plain'] : []
 const marketing = ls('src/blocks/marketing', (f) => f.endsWith('.tsx')).map(base)

@@ -27,9 +27,30 @@ const expected = [
 
 const missing = expected.filter((p) => !barrel.includes(`'${p}'`) && !barrel.includes(`"${p}"`))
 
-if (missing.length) {
-  console.error(`✗ src/index.ts is missing ${missing.length} export(s):`)
-  for (const m of missing) console.error(`    export * from '${m}'`)
+const errors = missing.map((m) => `src/index.ts is missing export: export * from '${m}'`)
+
+// Keep docs/consuming.md in lockstep with the public package surface: if the package
+// name or the styles subpath changes, the consuming guide must not silently diverge.
+const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+let consuming = ''
+try {
+  consuming = readFileSync(join(root, 'docs/consuming.md'), 'utf8')
+} catch {
+  errors.push('docs/consuming.md is missing (the documented consumption path).')
+}
+if (consuming) {
+  if (!consuming.includes(pkg.name)) {
+    errors.push(`docs/consuming.md never mentions the package name "${pkg.name}".`)
+  }
+  const stylesSubpath = `${pkg.name}/styles`
+  if (pkg.exports?.['./styles'] && !consuming.includes(stylesSubpath)) {
+    errors.push(`docs/consuming.md must show the '${stylesSubpath}' import (package exports './styles').`)
+  }
+}
+
+if (errors.length) {
+  console.error(`✗ check:exports — ${errors.length} problem(s):`)
+  for (const e of errors) console.error(`    ${e}`)
   process.exit(1)
 }
-console.log(`✓ src/index.ts exports all ${expected.length} components`)
+console.log(`✓ src/index.ts exports all ${expected.length} components; docs/consuming.md in sync with the package surface`)

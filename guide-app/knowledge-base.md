@@ -34,7 +34,7 @@ human-understandable and AI-legible**, so any AI vendor can answer brand/design
 questions and generate on-brand output without hallucinating.
 
 It is delivered as a component library **built on shadcn/ui, re-skinned to the 2one
-tokens**. Identity in one line: **grayscale (no brand hue), light-only, pill buttons,
+tokens**. Identity in one line: **grayscale (no brand hue), light + audited dark, pill buttons,
 Satoshi headings + Inter body; danger/success are the only colours, used only for
 validation.**
 
@@ -63,7 +63,7 @@ destructive, link. Buttons are **pills** (`radius-full`) — the 2one signature.
 *Source: `src/components/ui/button.tsx`, `docs/` and `AGENTS.md`.*
 
 **How many components are there?**
-54 shadcn primitives + 3 2one-only (`Logo`, `AppBar`, `BottomNavItem`) = 57.
+54 shadcn primitives + 4 2one-authored (`Toolbar`, `Logo`, `AppBar`, `BottomNavItem`) = 58.
 Plus 9 block templates and 31 chart templates.
 *Source: `manifest.json → index`.*
 

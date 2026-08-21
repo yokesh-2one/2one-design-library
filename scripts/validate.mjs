@@ -8,6 +8,7 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { INTERACTIVE } from './interactive-components.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const load = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'))
@@ -79,14 +80,21 @@ try {
   // coverage — every component source file must have a node
   const uiDir = join(root, 'src/components/ui')
   const oneDir = join(root, 'src/components')
-  const compFiles = [
-    ...(existsSync(uiDir) ? readdirSync(uiDir) : []).filter((f) => f.endsWith('.tsx')),
-    ...(existsSync(oneDir) ? readdirSync(oneDir) : []).filter((f) => f.endsWith('.tsx')),
-  ].map((f) => f.replace(/\.tsx$/, ''))
-  for (const c of compFiles) check(ids.has(`component:${c}`), `graph: component "${c}" has no node — run npm run graph`)
+  const uiFiles = (existsSync(uiDir) ? readdirSync(uiDir) : []).filter((f) => f.endsWith('.tsx')).map((f) => f.replace(/\.tsx$/, ''))
+  const oneFiles = (existsSync(oneDir) ? readdirSync(oneDir) : []).filter((f) => f.endsWith('.tsx')).map((f) => f.replace(/\.tsx$/, ''))
+  // ids match type: ui → component:<name>, 2one-only → component-2one:<name>
+  for (const c of uiFiles) check(ids.has(`component:${c}`), `graph: component "${c}" has no node — run npm run graph`)
+  for (const c of oneFiles) check(ids.has(`component-2one:${c}`), `graph: 2one component "${c}" has no component-2one node — run npm run graph`)
   // sanity: the composition layer is actually populated
   const compToComp = g.edges.filter((e) => e.source.startsWith('component:') && e.target.startsWith('component:'))
   check(compToComp.length > 0, 'graph: no component→component composed_of edges (Graph #1 regressed)')
+  // governance coverage — every interactive component must be governed_by no-color-alone
+  const nodeType = new Map(g.nodes.map((n) => [n.id, n.type]))
+  const compIdOf = (name) => (nodeType.get(`component-2one:${name}`) ? `component-2one:${name}` : `component:${name}`)
+  const governed = new Set(g.edges.filter((e) => e.type === 'governed_by' && e.target === 'rule:no-color-alone').map((e) => e.source))
+  for (const name of INTERACTIVE) {
+    check(governed.has(compIdOf(name)), `graph: interactive component "${name}" is not governed_by rule:no-color-alone — every state-bearing control must be (see scripts/interactive-components.mjs)`)
+  }
 } catch (e) { errors.push('graph.json: ' + e.message) }
 
 // ---- report ----

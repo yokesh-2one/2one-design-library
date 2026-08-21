@@ -1,0 +1,32 @@
+/* Showcase chrome for the 2one × Astryx catalog — mirrors the shadcn showcase
+   layout (section rhythm · eyebrow · heading · lede · card grid) using Astryx
+   tokens. Demos inside the cards are real Astryx components. */
+
+.g-content { max-width: 1180px; margin: 0 auto; padding: 4px 28px 96px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.g-section { padding: 48px 0; border-top: 1px solid var(--color-border); scroll-margin-top: 88px; }
+.g-section:first-of-type { border-top: 0; }
+.g-eyebrow { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.g-h1 { font-family: var(--font-family-heading); font-size: clamp(40px, 7vw, 64px); font-weight: 700; line-height: .98; letter-spacing: -.02em; margin: 0 0 18px; color: var(--color-text-primary); }
+.g-h2 { font-family: var(--font-family-heading); font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; margin: 0 0 8px; color: var(--color-text-primary); }
+.g-lede { color: var(--color-text-secondary); max-width: 62ch; font-size: 15px; line-height: 1.6; margin: 0; }
+.g-hero { padding: 48px 0 32px; border-top: 0; }
+
+.g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 24px; margin-top: 24px; align-items: start; }
+.g-card { border: 1px solid var(--color-border); border-radius: var(--radius-container, 12px); background: var(--color-background-card); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.g-card-h { font-family: var(--font-family-heading); font-weight: 600; font-size: 14.5px; padding: 13px 18px; border-bottom: 1px solid var(--color-border); color: var(--color-text-primary); }
+/* Demos vary a lot in size (Astryx blocks are auto-generated: a single Button vs
+   a whole AppShell). Fix a consistent demo viewport so the grid stays tidy like
+   the shadcn showcase — wide content wraps/scrolls, tall content scrolls. */
+.g-card-b { padding: 22px 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 14px; height: 220px; min-width: 0; overflow: auto; }
+.g-card-b > * { max-width: 100%; }
+
+/* hero stat tiles (mirrors the shadcn overview stats) */
+.g-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--color-border); border: 1px solid var(--color-border); border-radius: var(--radius-container, 12px); overflow: hidden; margin-top: 36px; }
+.g-stat { background: var(--color-background-card); padding: 20px 20px; }
+.g-stat-n { font-family: var(--font-family-heading); font-size: 28px; font-weight: 700; letter-spacing: -.02em; color: var(--color-text-primary); }
+.g-stat-l { font-family: var(--mono, ui-monospace, monospace); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-secondary); margin-top: 6px; }
+
+.g-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; padding: 0 20px; height: 56px; }
+.g-topbar .repo { font-family: var(--mono, ui-monospace, monospace); font-size: 12px; color: var(--color-text-secondary); }

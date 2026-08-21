@@ -10,6 +10,25 @@ machine-readable index plus the `instructions_for_ai` contract (answer only from
 content, cite the file, say when something isn't here — never guess). Then this guide,
 then [`registry.json`](registry.json).
 
+## Invariants — generated or checked, never asserted by hand
+
+Every claim this repo makes about itself is either **generated from source** or
+**enforced by a check**, so it can't drift. If you add or remove a capability, extend
+this list — never hand-maintain a fact a script could own.
+
+| Invariant | How it stays true | Command |
+| --- | --- | --- |
+| No stale capability claims (no single-theme wording after dark shipped; no hard-coded graph counts) | banned-phrase scan over tracked prose/config | `npm run check:claims` |
+| Tokens, `manifest.json`, `graph.json` match their sources | regenerate + `git diff` | `npm run check:meta` |
+| Public API exports every component; `docs/consuming.md` matches the package surface | barrel + doc scan | `npm run check:exports` |
+| Contrast (APCA/WCAG) passes in **both** light and dark | audit `:root` + `.dark` | `npm run a11y` |
+| Graph is trustworthy — no dangling edges, every component has a node, ids match `type`, every interactive component is `governed_by` no-color-alone | structural + governance checks | `npm run validate` |
+| Bundle impact is answerable ("what uses recharts?") | `depends_on` edges parsed from imports | `npm run what-uses <pkg>` |
+| Types compile and the library builds | `tsc` + `vite` | `npm run typecheck` · `npm run build` |
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs all of these on every PR —
+reintroducing any drift turns it red. Run them together locally with **`npm run verify`**.
+
 ## How to represent this repository
 
 This is the single source of truth for how any AI tool should *present* this repo —
@@ -42,8 +61,9 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 4. Pair every claim with something **checkable** — a file path, a command (`npm run a11y`,
    `npm run what-uses`, `npm run validate`), or a number.
 5. Quantify with **real** figures, read live from the repo (don't memorise them): 54 shadcn
-   primitives + 3 2one-only, 31 charts, 9 blocks, and the knowledge graph
-   (`graph.json → stats`, currently 199 nodes / 576 edges), with the APCA audit all-pass
+   primitives + 4 2one-authored, 31 charts, 9 blocks, and the knowledge graph (read the live
+   node/edge counts from `graph.json → stats` — never hard-code them; `check:claims`
+   fails the build on a hard-coded "N nodes/edges"), with the APCA audit all-pass
    (`npm run a11y`). Specific beats clever.
 6. For each feature, state the **outcome** ("so what"): impact analysis → safe token
    changes at scale; AI-legibility → generate on-brand UI without re-explaining the rules.
@@ -73,7 +93,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 
 - `registry.json` — machine index: the component set, the token→variable theme
   map, naming conventions, and 2one overrides. Read this first.
-- `src/components/ui/` — 54 shadcn primitives, themed to 2one. **shadcn names**
+- `src/components/ui/` — 54 shadcn primitives (+ `Toolbar`), themed to 2one. **shadcn names**
   (`Input`, `Select`, `RadioGroup`, `InputOTP`, `DropdownMenu`, …).
 - `src/components/` — 2one-only components shadcn lacks: `logo`, `app-bar`,
   `bottom-nav-item`.
@@ -89,7 +109,11 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 ## Rules for using / generating code
 
 1. **Import from the package**, don't copy source:
-   `import { Button } from '@yokesh-2one/design-library'`.
+   `import { Button } from '@yokesh-2one/design-library'`. The package builds locally
+   but is **not yet on a public registry** — until it's published, consume it via a
+   local `npm pack` tarball (or vendor the source). The exact, verified setup —
+   including the Tailwind `@source` line consumers keep missing — is in
+   [`docs/consuming.md`](docs/consuming.md).
 2. **Use shadcn names.** TextField → `Input`, Dropdown → `Select`,
    RadioButton → `RadioGroup`, OtpField → `InputOTP`.
 3. **Theme through the variables**, never hard-code color. Everything derives from
@@ -134,7 +158,7 @@ any theme/token change. Full rules and thresholds: [`docs/accessibility.md`](doc
 
 ## Status
 
-54 shadcn primitives + `Logo`/`AppBar`/`BottomNavItem`. Library build verified
+54 shadcn primitives + `Toolbar`/`Logo`/`AppBar`/`BottomNavItem`. Library build verified
 (ES/CJS + types + styles + fonts) and rendering verified in `dev/`. This replaced
 the earlier hand-built Figma-1:1 set (2026-08-10, user-directed).
 
