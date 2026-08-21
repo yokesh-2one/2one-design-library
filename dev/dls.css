@@ -1,0 +1,59 @@
+/* =========================================================
+   2one DLS — "What is a Design Language System" explainer.
+   Layout + diagram helpers only. Uses the real DLS tokens
+   (--background/--foreground/--border/--muted/--radius…) —
+   no parallel token system, no bespoke component chrome.
+   Every content container on the page is a real <Card>.
+   ========================================================= */
+
+/* Pyramid band fills — grayscale, derived from the live tokens so the
+   diagram recolors with the theme and never drifts from the system. */
+:root {
+  --tier-1: var(--foreground);
+  --tier-1-ink: var(--background);
+  --tier-2: color-mix(in srgb, var(--foreground) 60%, var(--background));
+  --tier-2-ink: var(--background);
+  --tier-3: var(--muted);
+  --tier-3-ink: var(--foreground);
+}
+
+/* the three-tiers "at a glance" split: diagram + explanation rows */
+.dls-glance { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: center; margin-top: 8px; }
+@media (max-width: 860px) { .dls-glance { grid-template-columns: 1fr; gap: 24px; } }
+
+.dls-pyramid { width: 100%; height: auto; display: block; }
+.dls-pyramid text { font-family: ui-sans-serif, system-ui, sans-serif; }
+.dls-pyramid .t-title { font-weight: 700; letter-spacing: -.01em; }
+.dls-pyramid .t-tag { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .14em; }
+
+/* explanation rows next to the pyramid */
+.dls-rows { display: flex; flex-direction: column; gap: 12px; }
+.dls-row { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+.dls-row .swatch { width: 10px; align-self: stretch; border-radius: 999px; flex-shrink: 0; }
+.dls-row .body { min-width: 0; }
+.dls-row .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dls-row .tier { font-size: 11px; font-family: ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
+.dls-row .name { font-weight: 600; letter-spacing: -.01em; }
+.dls-row p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--muted-foreground); }
+
+/* generic module/category grid — each cell is a Card, so only spacing here */
+.dls-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; }
+.dls-grid.two { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.dls-grid.three { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+.dls-ico { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; background: var(--muted); color: var(--foreground); flex-shrink: 0; }
+.dls-ico svg { width: 19px; height: 19px; }
+
+/* sub-item pills inside a foundation card */
+.dls-subs { display: flex; flex-wrap: wrap; gap: 6px; }
+.dls-subs .sub { font-size: 12px; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; line-height: 1.4; }
+
+/* "where it lives here" mapping */
+.dls-map { display: flex; flex-direction: column; gap: 0; margin-top: 20px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.dls-map-row { display: grid; grid-template-columns: 132px 1fr; gap: 16px; padding: 16px; border-top: 1px solid var(--border); }
+.dls-map-row:first-child { border-top: 0; }
+.dls-map-row .k { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); }
+.dls-map-row .v { min-width: 0; }
+.dls-map-row .v p { margin: 0 0 8px; font-size: 14px; line-height: 1.55; }
+.dls-map-row code { font-family: ui-monospace, monospace; font-size: 12px; background: var(--muted); border-radius: 6px; padding: 2px 6px; }
+@media (max-width: 640px) { .dls-map-row { grid-template-columns: 1fr; gap: 8px; } }

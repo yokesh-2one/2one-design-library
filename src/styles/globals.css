@@ -50,6 +50,8 @@
    the `.dark` block below is the audited dark theme. Same grayscale system,
    no brand hue in either. -------- */
 :root {
+  color-scheme: light;   /* native controls (scrollbars, form fields, autofill) match the theme */
+
   --radius: 0.375rem; /* 6px — 2one radius-md; Button overrides to pill */
 
   --background: #ffffff;                 /* neutral / surface */
@@ -107,6 +109,8 @@
    (both light AND dark must clear their APCA thresholds). Toggle via a `.dark`
    ancestor (ThemeProvider adds it) — the shadcn `dark:` utilities activate. -------- */
 .dark {
+  color-scheme: dark;    /* native controls follow the dark palette */
+
   --background: #09090b;                 /* neutral-950 ground */
   --foreground: #fafafa;                 /* neutral-50 */
 
@@ -218,8 +222,9 @@
   }
 }
 
-/* Light-only system: no .dark palette is defined, so every `dark:` utility
-   the shadcn components carry stays inert (there is never a .dark ancestor). */
+/* Both themes ship: the `.dark` palette above activates whenever a `.dark`
+   ancestor is present (ThemeProvider adds it), and the shadcn `dark:` utilities
+   activate with it. Both light and dark are contrast-audited by `npm run a11y`. */
 
 /* 2one signature — buttons are pills. Applied via the component's data-slot
    (unlayered, so it beats Tailwind's rounded-* utility) which means it survives
