@@ -66,9 +66,9 @@ import { ChartRadialStacked } from '@/blocks/charts/chart-radial-stacked'
 // Foundation swatches derive colour + label from the live @theme tokens
 // (--color-<ramp>-<step> in tokens/colors.css), so this section can never
 // drift from the real theme — change a token and the swatch follows.
-const NEUTRAL = ['50', '100', '200', '300', '400', '600', '700', '800', '950']
+const NEUTRAL = ['50', '100', '200', '250', '300', '400', '600', '700', '800', '950']
 const ACCENT = ['50', '100', '200', '300', '600', '700', '800', '950']
-const SEM = ['danger-500', 'danger-600', 'success-600']
+const SEM = ['danger-500', 'danger-600', 'danger-700', 'success-600']
 const TYPE: [string, string, string][] = [['display', 'text-display', '76 / 103'], ['h1', 'text-h1', '62 / 84'], ['h2', 'text-h2', '48 / 65'], ['h3', 'text-h3', '40 / 54'], ['h4', 'text-h4', '32 / 43'], ['h5', 'text-h5', '26 / 35'], ['h6', 'text-h6', '20 / 27'], ['base', 'text-base', '16 · body'], ['sm', 'text-sm', '14 · UI'], ['xs', 'text-xs', '12 · small']]
 const RADII = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', 'full']
 
@@ -267,7 +267,7 @@ export function Showcase() {
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-1 !h-5" />
             <span className="font-mono text-xs text-muted-foreground">
-              <b className="font-semibold text-foreground">@yokesh-2one/design-library</b> · shadcn · 2one-themed
+              <b className="font-semibold text-foreground">@2one/design-library</b> · shadcn · 2one-themed
             </span>
             <ThemeToggle className="ml-auto" />
           </header>
@@ -277,7 +277,7 @@ export function Showcase() {
             <section id="overview" className="g-section g-hero">
               <div className="g-eyebrow">2one · design language system</div>
               <h1>The 2one system, <span className="thin">built on shadcn/ui.</span></h1>
-              <p>Every component on this page is the real <span className="mono">@yokesh-2one/design-library</span> — the shadcn/ui set re-skinned to the 2one tokens. Grayscale, light + dark, pill buttons, Satoshi headings, Inter body.</p>
+              <p>Every component on this page is the real <span className="mono">@2one/design-library</span> — the shadcn/ui set re-skinned to the 2one tokens. Grayscale, light + dark, pill buttons, Satoshi headings, Inter body.</p>
               <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {([['57', 'Components'], ['54', 'shadcn primitives'], ['3', '2one-only'], ['1', 'Hue-free system']] as const).map(([k, l]) => (
                   <Card key={l}>
@@ -304,7 +304,7 @@ export function Showcase() {
                     <CardDescription>React 19 · Tailwind v4.</CardDescription>
                   </CardHeader>
                   <CardContent className="min-w-0">
-                    <CodeBlock code={"import { Button } from '@yokesh-2one/design-library'\nimport '@yokesh-2one/design-library/styles'"} />
+                    <CodeBlock code={"import { Button } from '@2one/design-library'\nimport '@2one/design-library/styles'"} />
                   </CardContent>
                 </Card>
               </div>
@@ -327,7 +327,7 @@ export function Showcase() {
                       <span className="mr-1 text-xs text-muted-foreground">It reads</span>
                       <Badge variant="secondary">manifest.json</Badge>
                       <Badge variant="secondary">brand/brand.json</Badge>
-                      <Badge variant="secondary">registry.json</Badge>
+                      <Badge variant="secondary">graph.json</Badge>
                     </div>
                     <Button asChild variant="outline" size="sm" className="w-fit">
                       <a href="https://github.com/yokesh-2one/2one-design-library" target="_blank" rel="noreferrer">Open the repo</a>
@@ -397,7 +397,7 @@ export function Showcase() {
                   The swatches read var(--color-<ramp>-<step>) at runtime, so we force
                   those vars into :root by naming every ramp utility here (literal names
                   only — Tailwind can't see interpolated class names). Kept hidden. */}
-              <div className="hidden bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-300 bg-neutral-400 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-950 bg-accent-50 bg-accent-100 bg-accent-200 bg-accent-300 bg-accent-600 bg-accent-700 bg-accent-800 bg-accent-950 bg-danger-500 bg-danger-600 bg-success-600" aria-hidden />
+              <div className="hidden bg-neutral-50 bg-neutral-100 bg-neutral-200 bg-neutral-250 bg-neutral-300 bg-neutral-400 bg-neutral-600 bg-neutral-700 bg-neutral-800 bg-neutral-950 bg-accent-50 bg-accent-100 bg-accent-200 bg-accent-300 bg-accent-600 bg-accent-700 bg-accent-800 bg-accent-950 bg-danger-500 bg-danger-600 bg-danger-700 bg-success-600" aria-hidden />
               <div className="g-scale-label">neutral</div>
               <Swatches items={NEUTRAL} prefix="neutral-" />
               <div className="g-scale-label">accent</div>
@@ -670,7 +670,7 @@ export function Showcase() {
               </div>
             </section>
 
-            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@yokesh-2one/design-library · shadcn/ui re-skinned to the 2one tokens · light + audited dark · rendered live from the real components.</footer>
+            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@2one/design-library · shadcn/ui re-skinned to the 2one tokens · light + audited dark · rendered live from the real components.</footer>
           </div>
         </SidebarInset>
       </SidebarProvider>

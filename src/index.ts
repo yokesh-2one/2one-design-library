@@ -1,6 +1,6 @@
-/* Public API — @yokesh-2one/design-library
+/* Public API — @2one/design-library
    2one Design Language System: shadcn/ui components re-skinned to 2one tokens.
-   Import styles once at your app root: '@yokesh-2one/design-library/styles' */
+   Import styles once at your app root: '@2one/design-library/styles' */
 
 // theming — light + audited dark (grayscale; no brand hue)
 export * from './theme-provider'

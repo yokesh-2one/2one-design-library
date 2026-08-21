@@ -16,7 +16,9 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+const root = cfg.root
 const graph = JSON.parse(readFileSync(join(root, 'graph.json'), 'utf8'))
 const byId = new Map(graph.nodes.map((n) => [n.id, n]))
 const label = (id) => (byId.get(id) ? byId.get(id).label : id)

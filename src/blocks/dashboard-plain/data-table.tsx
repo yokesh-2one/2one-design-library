@@ -209,7 +209,7 @@ const columns = columnHelper.columns([
     cell: ({ row }) => (
       <Badge variant="outline" className="px-1.5 text-muted-foreground">
         {row.original.status === "Done" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          <IconCircleCheckFilled className="fill-current" />
         ) : (
           <IconLoader />
         )}

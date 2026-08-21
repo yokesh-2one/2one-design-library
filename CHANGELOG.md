@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@yokesh-2one/design-library` are recorded here.
+All notable changes to `@2one/design-library` are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); this project
 uses [Semantic Versioning](https://semver.org/).
 

@@ -28,11 +28,23 @@ jobs:
       - name: Machine-readable data is valid
         run: npm run validate
 
+      # Audits OUTPUT (the blocks clients copy) against the 2one rules, rather
+      # than the system itself. Errors fail; warnings are advisory.
+      - name: Blocks obey the design rules
+        run: npm run check:usage
+
       - name: Accessibility (APCA/WCAG) thresholds
         run: npm run a11y
 
       - name: Generated files are in sync with sources
         run: npm run check:meta
+
+      # Runs the engine against a second, deliberately unlike-2one payload and
+      # asserts none of 2one's data appears in its output. Running against 2one
+      # alone cannot detect a 2one-shaped assumption — the run succeeds either
+      # way. Temporary: moves with the engine when it leaves this repo.
+      - name: Engine works against a payload that is not 2one
+        run: npm run test:fixture
 
       - name: Library build
         run: npm run build

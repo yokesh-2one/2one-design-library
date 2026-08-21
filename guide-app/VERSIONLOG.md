@@ -15,7 +15,7 @@ flagged with **⚠ BREAKING** and migration guidance.
 - ✅ Colour tokens (grayscale ramps + semantic) with WCAG + APCA contrast data — `tokens/colors.json`
 - ✅ Typography tokens (Satoshi/Inter, full scale) — `tokens/typography.json`
 - ✅ Spacing + radius tokens — `tokens/spacing.json`
-- ✅ Theme (tokens → shadcn variables, light-only) — `src/styles/globals.css`
+- ✅ Theme (tokens → shadcn variables; light `:root` + audited dark `.dark`) — `src/styles/globals.css`, switched via the exported `ThemeProvider`
 - 🔲 Iconography, illustration, photography, patterns, moodboard — *not in the current
   Figma scope yet; will arrive as those are added to Figma (future content)*
 
@@ -49,7 +49,7 @@ flagged with **⚠ BREAKING** and migration guidance.
 | MCP query server / API | Planned (stretch) | Structured queries; JSON index ships first (PRD FR-12) |
 | Canva integration | **Repo accessible now** | Export + docs in `integrations/canva/`; the integration itself is **user-built**. Needs the repo reachable by Canva (public, or a PAT) |
 | Tier 2 visual categories (icons/illustration/photo/moodboard) | Future content | Arrive as added to Figma |
-| Dark theme | Not planned | System is intentionally light-only |
+| Dark theme | **Shipped** | Grayscale dark palette on `.dark`, APCA-audited alongside light; switch via `ThemeProvider` |
 
 ---
 

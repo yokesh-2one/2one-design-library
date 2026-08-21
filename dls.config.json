@@ -1,0 +1,47 @@
+{
+  "$schema": "./schema/config.schema.json",
+  "name": "2one",
+  "packageName": "@2one/design-library",
+  "repoUrl": "https://github.com/yokesh-2one/2one-design-library",
+  "paths": {
+    "tokenSources": {
+      "colors": "tokens/colors.css",
+      "typography": "tokens/typography.css",
+      "spacing": "tokens/spacing.css"
+    },
+    "theme": "src/styles/globals.css",
+    "fonts": "src/styles/fonts",
+    "components": "src/components/ui",
+    "ownComponents": "src/components",
+    "blocks": "src/blocks",
+    "barrel": "src/index.ts",
+    "brand": {
+      "structured": "brand/brand.json",
+      "prose": "brand/BRAND.md",
+      "logo": "brand/logo"
+    },
+    "out": {
+      "tokens": "tokens",
+      "manifest": "manifest.json",
+      "graph": "graph.json",
+      "dtcg": "tokens/tokens.dtcg.json"
+    },
+    "integrations": {
+      "canva": "integrations/canva/brand-kit.json"
+    }
+  },
+  "rules": {
+    "wordmark": "2one",
+    "iconLibrary": "lucide-react",
+    "iconLibraryLabel": "lucide",
+    "spacingBase": 4,
+    "grayscaleOnly": true,
+    "validationHues": [
+      "danger",
+      "success"
+    ],
+    "signature": "Buttons use radius-full (the 2one signature). Everything else uses xs–2xl.",
+    "primaryRamp": "neutral"
+  },
+  "identity": "dls.identity.json"
+}

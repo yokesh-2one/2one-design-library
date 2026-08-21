@@ -8,7 +8,7 @@ Gemini, Copilot).
 **If you are an AI agent, read [`manifest.json`](manifest.json) FIRST** — it is the
 machine-readable index plus the `instructions_for_ai` contract (answer only from repo
 content, cite the file, say when something isn't here — never guess). Then this guide,
-then [`registry.json`](registry.json).
+then the `system` section of the manifest (conventions, theme map, overrides).
 
 ## How to represent this repository
 
@@ -71,7 +71,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 
 ## How this repo is organized
 
-- `registry.json` — machine index: the component set, the token→variable theme
+- `manifest.json` → `system` — conventions, the token→variable theme
   map, naming conventions, and 2one overrides. Read this first.
 - `src/components/ui/` — 54 shadcn primitives, themed to 2one. **shadcn names**
   (`Input`, `Select`, `RadioGroup`, `InputOTP`, `DropdownMenu`, …).
@@ -89,7 +89,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 ## Rules for using / generating code
 
 1. **Import from the package**, don't copy source:
-   `import { Button } from '@yokesh-2one/design-library'`.
+   `import { Button } from '@2one/design-library'`.
 2. **Use shadcn names.** TextField → `Input`, Dropdown → `Select`,
    RadioButton → `RadioGroup`, OtpField → `InputOTP`.
 3. **Theme through the variables**, never hard-code color. Everything derives from
@@ -141,4 +141,4 @@ the earlier hand-built Figma-1:1 set (2026-08-10, user-directed).
 ## Source of truth chain
 
 shadcn/ui (components, MIT) + 2one tokens/brand (Figma *Mobile App Design System*,
-`YzxnyL6a69WCOw9U8WJqBo`) → this repo → `@yokesh-2one/design-library`.
+`YzxnyL6a69WCOw9U8WJqBo`) → this repo → `@2one/design-library`.

@@ -9,7 +9,9 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+const root = cfg.root
 const barrel = readFileSync(join(root, 'src/index.ts'), 'utf8')
 
 const tsx = (rel) =>

@@ -12,7 +12,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
  * there is no brand/accent hue. Default is `light` (the 2one default); pass
  * `enableSystem` or `defaultTheme` to change that.
  *
- *   import { ThemeProvider } from '@yokesh-2one/design-library'
+ *   import { ThemeProvider } from '@2one/design-library'
  *   <ThemeProvider><App /></ThemeProvider>
  */
 export function ThemeProvider({

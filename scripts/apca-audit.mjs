@@ -18,7 +18,9 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+const root = cfg.root
 
 // ---- APCA-W3 0.1.9 reference ----
 function sRGBtoY([R, G, B]) { const f = (v) => Math.pow(v / 255, 2.4); return 0.2126729 * f(R) + 0.7151522 * f(G) + 0.0721750 * f(B) }

@@ -1,7 +1,8 @@
 {
   "name": "2one",
-  "source": "Generated from tokens/colors.json + tokens/typography.json. Do not edit by hand — run `npm run tokens`.",
+  "source": "Generated from the canonical tokens. Do not edit by hand — run `npm run tokens`.",
   "raw_url": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/integrations/canva/brand-kit.json",
+  "theme": "light — Canva designs sit on light grounds. The dark palette is in the token JSON under semantic_dark.",
   "colors": [
     {
       "name": "Ink",
@@ -36,47 +37,59 @@
       "hex": "#15803d"
     }
   ],
-  "neutral_ramp": [
+  "ramp": [
     {
-      "name": "Neutral 50",
+      "name": "neutral 50",
       "hex": "#fafafa"
     },
     {
-      "name": "Neutral 100",
+      "name": "neutral 100",
       "hex": "#f4f4f5"
     },
     {
-      "name": "Neutral 200",
+      "name": "neutral 200",
       "hex": "#e4e4e7"
     },
     {
-      "name": "Neutral 300",
+      "name": "neutral 250",
+      "hex": "#dcdce0"
+    },
+    {
+      "name": "neutral 300",
       "hex": "#d4d4d8"
     },
     {
-      "name": "Neutral 400",
+      "name": "neutral 400",
       "hex": "#a1a1aa"
     },
     {
-      "name": "Neutral 600",
+      "name": "neutral 600",
       "hex": "#52525b"
     },
     {
-      "name": "Neutral 700",
+      "name": "neutral 700",
       "hex": "#3f3f46"
     },
     {
-      "name": "Neutral 800",
+      "name": "neutral 800",
       "hex": "#27272a"
     },
     {
-      "name": "Neutral 950",
+      "name": "neutral 950",
       "hex": "#09090b"
     }
   ],
   "fonts": {
     "heading": "Satoshi",
-    "body": "Inter"
+    "body": "Inter",
+    "note": "The heading font ships as .woff2 in this repo. Canva brand-font upload may not accept .woff2; convert to .otf/.ttf if it refuses."
+  },
+  "logo": {
+    "svg": {
+      "black": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-black.svg",
+      "white": "https://raw.githubusercontent.com/yokesh-2one/2one-design-library/main/brand/logo/svg/2one-logo-white.svg"
+    },
+    "rules": "Never recolour, rotate, distort, or add effects. Never typeset the name as text in place of the mark."
   },
   "rules": [
     "Grayscale only — never introduce a brand hue.",

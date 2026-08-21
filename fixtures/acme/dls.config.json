@@ -1,0 +1,41 @@
+{
+  "name": "Acme",
+  "packageName": "@acme/design-system",
+  "repoUrl": "https://github.com/acme/design-system",
+  "paths": {
+    "tokenSources": {
+      "colors": "design/colour/hues.css",
+      "typography": "design/colour/type.css",
+      "spacing": "design/colour/space.css"
+    },
+    "theme": "ui/theme.css",
+    "fonts": "ui/fonts",
+    "components": "ui/parts",
+    "ownComponents": "ui",
+    "blocks": "ui/templates",
+    "barrel": "ui/index.ts",
+    "brand": {
+      "structured": "identity/brand.json",
+      "prose": "identity/BRAND.md",
+      "logo": "identity/mark"
+    },
+    "out": {
+      "tokens": "design/out",
+      "manifest": "acme-manifest.json",
+      "graph": "acme-graph.json",
+      "dtcg": "design/out/tokens.dtcg.json"
+    }
+  },
+  "rules": {
+    "wordmark": "acme",
+    "iconLibrary": "phosphor-react",
+    "iconLibraryLabel": "phosphor",
+    "spacingBase": 4,
+    "grayscaleOnly": false,
+    "validationHues": [
+      "alert",
+      "ok"
+    ],
+    "signature": "Acme buttons are square."
+  }
+}
