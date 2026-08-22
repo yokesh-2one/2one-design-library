@@ -178,7 +178,7 @@ function select(n: any) {
   // sync selection to the URL so a node is shareable / deep-linkable from the catalog
   history.replaceState(null, '', n ? '?node=' + encodeURIComponent(n.id) : location.pathname)
   const panel = document.getElementById('panel')!; panel.replaceChildren()
-  if (!n) { panel.className = 'empty'; panel.textContent = 'Click any node to see its context — what it’s composed of, what uses it, what governs it.'; return }
+  if (!n) { panel.className = 'empty'; panel.textContent = 'Select a node to see its context: what it is composed of, what uses it, and what governs it.'; return }
   panel.className = ''
   const meta = TYPES[n.type] || {}
   const col = meta.semantic ? (n.passes === false ? cvarv('--bad') : cvarv('--ok')) : nodeColor(n.type)

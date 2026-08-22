@@ -227,7 +227,7 @@ function ThemingPlayground() {
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Brand colour</CardTitle>
-        <CardDescription>Set <span className="mono">--primary</span> and the whole system recolors — buttons, links, focus, nav.</CardDescription>
+        <CardDescription>Set <span className="mono">--primary</span> and the whole system recolours: buttons, links, focus states, and navigation.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -246,7 +246,7 @@ function ThemingPlayground() {
           {pass
             ? <Badge variant="secondary" className="gap-1.5"><Check className="size-3.5" /> APCA Lc {lc.toFixed(1)} · pass</Badge>
             : <Badge variant="destructive" className="gap-1.5"><CircleAlert className="size-3.5" /> APCA Lc {lc.toFixed(1)} · fail</Badge>}
-          <span className="text-muted-foreground">{pass ? 'label clears the Lc 75 threshold for button text.' : 'label is unreadable on this colour — pick a darker/lighter hue.'}</span>
+          <span className="text-muted-foreground">{pass ? 'label clears the Lc 75 threshold for button text.' : 'label is unreadable on this colour; choose a darker or lighter hue.'}</span>
         </div>
         <div className="flex flex-wrap items-center gap-3 rounded-md border p-4">
           <Button>Primary</Button>
@@ -317,7 +317,7 @@ export function Showcase() {
             <section id="overview" className="g-section g-hero">
               <div className="g-eyebrow">2one · design language system</div>
               <h1>The 2one system, <span className="thin">built on shadcn/ui.</span></h1>
-              <p>Every component on this page is the real <span className="mono">@yokesh-2one/design-library</span> — the shadcn/ui set re-skinned to the 2one tokens. Grayscale, light + dark, pill buttons, Satoshi headings, Inter body.</p>
+              <p>Every component on this page is the real <span className="mono">@yokesh-2one/design-library</span>: the shadcn/ui set re-skinned to the 2one tokens. It ships in grayscale, in light and dark, with pill buttons, Satoshi headings, and Inter body text.</p>
               <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {([[String(COUNT.components), 'Components'], [String(COUNT.shadcn), 'shadcn primitives'], [String(COUNT.twoOne), '2one-authored'], ['1', 'Hue-free system']] as [string, string][]).map(([k, l]) => (
                   <Card key={l}>
@@ -332,7 +332,7 @@ export function Showcase() {
                 <Card className="min-w-0">
                   <CardHeader>
                     <CardTitle className="text-base">Run it locally</CardTitle>
-                    <CardDescription>Works today — no registry, no auth.</CardDescription>
+                    <CardDescription>No registry or authentication required.</CardDescription>
                   </CardHeader>
                   <CardContent className="min-w-0">
                     <CodeBlock code={'npm install\nnpm run dev'} />
@@ -352,14 +352,14 @@ export function Showcase() {
 
             {/* HOW TO USE — composed from the 2one library (Card / Badge / Button), token-driven, grayscale */}
             <section id="use" className="g-section">
-              <div className="g-eyebrow">Start here</div><h2>How to use — build with AI</h2>
-              <p className="g-lede">Built to be read by AI. Point your assistant — Claude Code, Cursor, Copilot, Gemini — at the repo and say what you want. It builds from the real 2one components, colours and rules. No code required.</p>
+              <div className="g-eyebrow">Start here</div><h2>Using the library with an AI assistant</h2>
+              <p className="g-lede">The library is structured to be read by AI assistants. Point Claude Code, Cursor, Copilot, or Gemini at the repository and describe what you need. The assistant builds from the real 2one components, colours, and rules, with no manual coding required.</p>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">1</Badge> Point your AI at the library</CardTitle>
-                    <CardDescription>One instruction sets the ground truth — read the manifest, then build only from here.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">1</Badge> Point the assistant at the library</CardTitle>
+                    <CardDescription>A single instruction establishes the ground truth: read the manifest, then build only from this library.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
                     <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">Read manifest.json first, then build only from this library — don’t invent colours, fonts or components.</p>
@@ -377,8 +377,8 @@ export function Showcase() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">2</Badge> Ask for what you want</CardTitle>
-                    <CardDescription>Plain English. It composes real components, on brand.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">2</Badge> Describe what you need</CardTitle>
+                    <CardDescription>Describe the outcome in plain English. The assistant composes real components, on brand.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
                     <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">Build a login screen with email, password and a Continue button.</p>
@@ -395,19 +395,19 @@ export function Showcase() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">3</Badge> Make it your colour</CardTitle>
-                    <CardDescription>Grayscale by design — one variable carries the brand: the primary.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><Badge variant="outline">3</Badge> Apply your brand colour</CardTitle>
+                    <CardDescription>Grayscale by default. A single variable carries the brand colour: the primary.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
-                    <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">In src/styles/globals.css set --primary to #0057FF and --primary-foreground to a contrasting label. Keep danger and success. Then run npm run a11y.</p>
-                    <p className="text-sm text-muted-foreground">Everything updates at once. <span className="font-medium text-foreground">npm run a11y</span> proves it stays readable — and fails if it doesn’t.</p>
+                    <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">In src/styles/globals.css, set --primary to #0057FF and --primary-foreground to a contrasting label. Keep danger and success. Then run npm run a11y.</p>
+                    <p className="text-sm text-muted-foreground">Everything updates at once. <span className="font-medium text-foreground">npm run a11y</span> verifies the result stays readable and fails the build if it does not.</p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Badge variant="outline">4</Badge> Stay on brand</CardTitle>
-                    <CardDescription>The system holds the line so you don’t have to.</CardDescription>
+                    <CardDescription>Built-in constraints keep output consistent with the brand.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -416,7 +416,7 @@ export function Showcase() {
                       <Badge variant="secondary">tokens/*.json</Badge>
                       <Badge variant="secondary">src/components/ui</Badge>
                     </div>
-                    <p className="rounded-md border border-border p-3 text-sm"><span className="font-medium">One hard rule:</span> never signal state by colour alone — an error needs an icon or text, not just red.</p>
+                    <p className="rounded-md border border-border p-3 text-sm"><span className="font-medium">One firm rule:</span> never signal state with colour alone. An error requires an icon or text, not only red.</p>
                   </CardContent>
                 </Card>
               </div>
@@ -439,14 +439,14 @@ export function Showcase() {
             {/* THEMING PLAYGROUND */}
             <section id="playground" className="g-section">
               <div className="g-eyebrow">Live</div><h2>Theming playground</h2>
-              <p className="g-lede">Try your company colour. One variable carries the brand, so the whole system recolors at once — and the APCA check runs live so you never ship an unreadable button. This is exactly the change an AI makes when you say “make it our colour”.</p>
+              <p className="g-lede">Enter your company colour. A single variable carries the brand, so the entire system recolours at once, and the APCA contrast check runs live so an unreadable button never ships. This is the same change an AI assistant makes when you ask it to apply your brand colour.</p>
               <div className="mt-6"><ThemingPlayground /></div>
             </section>
 
             {/* COLOUR */}
             <section id="color" className="g-section">
               <div className="g-eyebrow">Foundations</div><h2>Colour</h2>
-              <p className="g-lede">Grayscale by design — no brand hue. <b>danger</b> and <b>success</b> are the only colours, reserved for validation.</p>
+              <p className="g-lede">Grayscale by default, with no brand hue. <b>danger</b> and <b>success</b> are the only colours, reserved for validation.</p>
               {/* Safelist: Tailwind v4 tree-shakes @theme vars no utility references.
                   The swatches read var(--color-<ramp>-<step>) at runtime, so we force
                   those vars into :root by naming every ramp utility here (literal names
@@ -463,7 +463,7 @@ export function Showcase() {
             {/* TYPE */}
             <section id="type" className="g-section">
               <div className="g-eyebrow">Foundations</div><h2>Typography</h2>
-              <p className="g-lede"><b>Satoshi</b> for the heading scale, <b>Inter</b> for body &amp; UI. The scale below renders from the real tokens.</p>
+              <p className="g-lede"><b>Satoshi</b> for the heading scale, <b>Inter</b> for body and UI. The scale below is rendered from the real tokens.</p>
               <div className="mt-4">
                 {TYPE.map(([k, cls, spec]) => (
                   <div className="g-type-row" key={k}>
@@ -477,7 +477,7 @@ export function Showcase() {
             {/* RADIUS */}
             <section id="radius" className="g-section">
               <div className="g-eyebrow">Foundations</div><h2>Radius</h2>
-              <p className="g-lede">From hairline chips to fully-round pills. Buttons use <span className="mono">full</span> — the 2one signature.</p>
+              <p className="g-lede">From hairline chips to fully rounded pills. Buttons use <span className="mono">full</span>, the 2one signature.</p>
               <div className="g-radii">
                 {RADII.map((r) => <div className="g-rd" key={r} style={{ borderRadius: `var(--radius-${r})` }}>{r}</div>)}
               </div>
@@ -602,8 +602,8 @@ export function Showcase() {
                 </Block>
                 <Block title="Accordion" className="col">
                   <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="1"><AccordionTrigger>Is it themed to 2one?</AccordionTrigger><AccordionContent>Yes — every token maps to the 2one system.</AccordionContent></AccordionItem>
-                    <AccordionItem value="2"><AccordionTrigger>Light and dark?</AccordionTrigger><AccordionContent>Yes — both themes ship and both pass the APCA audit. Toggle with the ThemeProvider.</AccordionContent></AccordionItem>
+                    <AccordionItem value="1"><AccordionTrigger>Is it themed to 2one?</AccordionTrigger><AccordionContent>Yes. Every token maps to the 2one system.</AccordionContent></AccordionItem>
+                    <AccordionItem value="2"><AccordionTrigger>Light and dark?</AccordionTrigger><AccordionContent>Yes. Both themes ship and both pass the APCA audit; toggle with the ThemeProvider.</AccordionContent></AccordionItem>
                   </Accordion>
                 </Block>
                 <Block title="Table" className="col">
@@ -658,7 +658,7 @@ export function Showcase() {
             {/* MOBILE / 2ONE */}
             <section id="mobile" className="g-section">
               <div className="g-eyebrow">Components · 2one-only</div><h2>Mobile &amp; brand</h2>
-              <p className="g-lede">The three components shadcn has no equivalent for.</p>
+              <p className="g-lede">Three components that shadcn has no equivalent for.</p>
               <div className="g-grid2">
                 <Block title="AppBar" className="col">
                   <div className="w-80 rounded-xl border overflow-hidden"><AppBar title="Sign in" onBack={() => {}} trailingSlot={<Avatar className="size-7"><AvatarFallback>Y</AvatarFallback></Avatar>} /></div>
@@ -682,7 +682,7 @@ export function Showcase() {
             {/* BLOCKS */}
             <section id="blocks" className="g-section">
               <div className="g-eyebrow">Templates</div><h2>Blocks</h2>
-              <p className="g-lede">Pre-composed, auto-themed forms built from the 2one components — ready to drop into an app.</p>
+              <p className="g-lede">Pre-composed, auto-themed forms built from the 2one components, ready to drop into an app.</p>
               <div className="g-grid2">
                 <Block title="login-03" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Login03 /></div></Block>
                 <Block title="login-01" meta="block" className="col"><div className="w-full max-w-sm mx-auto"><Login01 /></div></Block>
@@ -708,7 +708,7 @@ export function Showcase() {
             {/* MARKETING */}
             <section id="marketing" className="g-section">
               <div className="g-eyebrow">Templates</div><h2>Marketing</h2>
-              <p className="g-lede">Landing-page sections, built entirely from the library — grayscale, light + dark. Each is a full-bleed section; <code>marketing/page.tsx</code> composes them into a complete page.</p>
+              <p className="g-lede">Landing-page sections, built entirely from the library in grayscale, light and dark. Each is a full-bleed section; <code>marketing/page.tsx</code> composes them into a complete page.</p>
               <div className="mt-6 flex flex-col gap-6">
                 {([
                   ['hero', <MarketingHero />],
@@ -763,7 +763,7 @@ export function Showcase() {
               </div>
             </section>
 
-            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@yokesh-2one/design-library · shadcn/ui re-skinned to the 2one tokens · light + audited dark · rendered live from the real components.</footer>
+            <footer className="mt-16 border-t pt-8 text-sm text-muted-foreground">@yokesh-2one/design-library · shadcn/ui re-skinned to the 2one tokens · light and audited dark · rendered live from the real components.</footer>
           </div>
         </SidebarInset>
       </SidebarProvider>
