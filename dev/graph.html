@@ -5,71 +5,159 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2one DLS — Knowledge Graph</title>
 <style>
+  /* Chrome consumes the 2one Design Library tokens directly (src/styles/globals.css,
+     imported by graph-main.ts). No hard-coded palette here — every colour, radius and
+     font is a DLS token, so light/dark and any token change flow through automatically.
+     The .dark class (toggled on <html>) drives the theme, exactly like the DLS apps.
+     Only the graph's node dots depart from grayscale — that's the data-viz layer. */
   :root{
-    --bg:#ffffff; --panel:#fafafa; --line:#e7e7ea; --line-2:#d4d4d8; --ink:#09090b; --ink-2:#52525b; --ink-3:#8a8a92;
-    --edge:#d4d4d8; --edge-hi:#09090b; --node-stroke:#ffffff; --chip:#f4f4f5; --sel:#09090b; --ok:#15803d; --bad:#dc2626;
+    --bg:var(--background,#fff); --panel:var(--card,#fff);
+    --line:var(--border,#dcdce0); --line-2:var(--ring,#a1a1aa);
+    --ink:var(--foreground,#09090b); --ink-2:var(--muted-foreground,#52525b); --ink-3:var(--ring,#a1a1aa);
+    --edge:var(--muted-foreground,#52525b); --edge-hi:var(--foreground,#09090b); --node-stroke:var(--background,#fff);
+    --chip:var(--muted,#f4f4f5); --sel:var(--primary,#09090b);
+    --ok:var(--success,#15803d); --bad:var(--destructive,#c81e1e);
+    --r-pill:var(--radius-full,999px); --r-card:var(--radius-xl,12px); --r-field:var(--radius-md,6px);
     --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,sans-serif;
+    --sans:var(--font-sans,"Inter Variable",Inter,system-ui,-apple-system,sans-serif);
+    --heading:var(--font-heading,"Satoshi","Inter Variable",Inter,system-ui,sans-serif);
   }
-  @media (prefers-color-scheme:dark){
-    :root{ --bg:#0a0a0b; --panel:#141416; --line:#26262a; --line-2:#3f3f46; --ink:#f4f4f5; --ink-2:#a1a1aa; --ink-3:#6b6b73;
-      --edge:#2c2c31; --edge-hi:#f4f4f5; --node-stroke:#0a0a0b; --chip:#1c1c20; --sel:#fafafa; --ok:#4ade80; --bad:#f87171; }
-  }
-  :root[data-theme="light"]{ --bg:#ffffff; --panel:#fafafa; --line:#e7e7ea; --line-2:#d4d4d8; --ink:#09090b; --ink-2:#52525b; --ink-3:#8a8a92; --edge:#d4d4d8; --edge-hi:#09090b; --node-stroke:#ffffff; --chip:#f4f4f5; --sel:#09090b; --ok:#15803d; --bad:#dc2626; }
-  :root[data-theme="dark"]{ --bg:#0a0a0b; --panel:#141416; --line:#26262a; --line-2:#3f3f46; --ink:#f4f4f5; --ink-2:#a1a1aa; --ink-3:#6b6b73; --edge:#2c2c31; --edge-hi:#f4f4f5; --node-stroke:#0a0a0b; --chip:#1c1c20; --sel:#fafafa; --ok:#4ade80; --bad:#f87171; }
+  /* Edges: light ground needs a darker hairline than --border (#dcdce0 vanishes under
+     the 0.35 line opacity); dark keeps its --border edge, which already reads well. */
+  .dark{ --edge:var(--border,#606069); }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
   body{display:grid;grid-template-rows:auto 1fr;height:100vh}
-  header{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--bg);z-index:5}
-  .back{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px}
-  .back:hover{border-color:var(--line-2);color:var(--ink)}
-  .title{font-weight:700;letter-spacing:-.02em;font-size:15px;white-space:nowrap}
-  .title .sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-left:8px}
-  .stats{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+  header{display:flex;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--bg);z-index:5}
+  .ic{width:15px;height:15px;flex:0 0 auto}
+  .back{font-family:var(--sans);font-size:12px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
+  .back:hover{border-color:var(--line-2);color:var(--ink);background:var(--chip)}
+  .title{font-family:var(--heading);font-weight:700;letter-spacing:-.02em;font-size:16px;white-space:nowrap}
+  .title .sub{font-family:var(--sans);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-left:8px}
+  .stats{font-family:var(--sans);font-size:12px;color:var(--ink-2)}
   .grow{flex:1}
-  input.search{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 11px;font-size:13px;font-family:var(--mono);width:170px}
-  input.search:focus{outline:2px solid var(--sel);outline-offset:1px}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);user-select:none}
-  .chip .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-  .chip.off{opacity:.32;text-decoration:line-through}
-  .btn{font-family:var(--mono);font-size:11px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 11px;cursor:pointer}
-  .btn:hover{border-color:var(--line-2)}
+  input.search{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:var(--r-field);padding:8px 12px;font-size:13px;font-family:var(--sans);width:100%}
+  input.search:focus{outline:2px solid var(--line-2);outline-offset:2px;border-color:var(--line-2)}
+  .chips{display:flex;flex-direction:column;gap:12px}
+  .chip-fam-title{font-family:var(--sans);font-weight:600;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:var(--sans);font-size:11px;border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);user-select:none}
+  .chip:hover{border-color:var(--line-2);color:var(--ink)}
+  .chip .dot{width:8px;height:8px;border-radius:var(--r-pill);flex-shrink:0}
+  .chip.off{opacity:.4;text-decoration:line-through}
+  .btn{font-family:var(--sans);font-weight:500;font-size:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer}
+  .btn:hover{border-color:var(--line-2);background:var(--chip)}
+  .btn:focus-visible{outline:2px solid var(--line-2);outline-offset:2px}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px;line-height:0;color:var(--ink)}
   main{position:relative;overflow:hidden}
   canvas{display:block;width:100%;height:100%;cursor:grab}
   canvas.drag{cursor:grabbing}
-  aside{position:absolute;top:14px;right:14px;width:330px;max-width:calc(100% - 28px);max-height:calc(100% - 28px);overflow-y:auto;
-    background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.12)}
-  aside.empty{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-3);font-size:13px;padding:22px}
-  .n-type{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:inline-flex;align-items:center;gap:7px}
-  .n-type .dot{width:9px;height:9px;border-radius:2px}
-  .n-label{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 4px;word-break:break-word}
-  .n-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-  .n-meta .sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);margin-right:5px;display:inline-block;vertical-align:-2px}
+
+  /* RIGHT RAIL — collapsible Graph Controls + Colors Inspiration panels (all controls live here) */
+  .rail{position:absolute;top:16px;right:16px;width:300px;max-width:calc(100% - 32px);max-height:calc(100% - 32px);overflow-y:auto;display:flex;flex-direction:column;gap:12px;z-index:4}
+  .pnl{background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:0 12px 40px rgba(0,0,0,.12);overflow:hidden;flex-shrink:0}
+  .pnl-head{width:100%;display:flex;align-items:center;gap:8px;padding:12px 16px;background:none;border:0;cursor:pointer;font-family:var(--heading);font-weight:700;font-size:14px;letter-spacing:-.01em;color:var(--ink);text-align:left}
+  .pnl-head:hover{color:var(--ink-2)}
+  .pnl-head .chev{color:var(--ink-3);transition:transform .15s ease}
+  .pnl.collapsed .chev{transform:rotate(-90deg)}
+  .pnl.collapsed .pnl-body{display:none}
+  .pnl-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+  .pnl-group{display:flex;flex-direction:column;gap:8px}
+  .pnl-label{font-family:var(--sans);font-weight:600;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mini-actions{display:inline-flex;gap:10px}
+  .link-btn{background:none;border:0;font-family:var(--sans);font-size:11px;font-weight:500;color:var(--ink-2);cursor:pointer;padding:0}
+  .link-btn:hover{color:var(--ink);text-decoration:underline}
+  .pnl-view{flex-direction:row;align-items:center;gap:8px}
+  .pnl-view .btn{flex:1}
+  .pnl-cues{margin:0;font-size:11px;color:var(--ink-3);line-height:1.55}
+  /* Inspiration */
+  .paint{margin:0}
+  .paint img{width:100%;border-radius:var(--r-field);border:1px solid var(--line);display:block}
+  .paint figcaption{margin-top:8px;font-size:11px;color:var(--ink-3);line-height:1.5}
+  .paint.missing{border:1px dashed var(--line);border-radius:var(--r-field);padding:16px;text-align:center;font-size:11px;color:var(--ink-3);line-height:1.6}
+  .insp-text{margin:0;font-size:12px;line-height:1.6;color:var(--ink-2)}
+  .insp-text b{color:var(--ink);font-weight:600}
+  .guide-legend{display:flex;flex-direction:column;gap:4px}
+  .g-fam-title{font-family:var(--sans);font-weight:600;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 2px}
+  .g-row{display:flex;align-items:center;gap:8px;padding:2px 0;font-size:12px}
+  .g-dot{width:11px;height:11px;border-radius:var(--r-pill);flex-shrink:0}
+  .g-name{color:var(--ink)}
+  .g-src{color:var(--ink-3);font-size:11px;font-style:italic;margin-left:auto;text-align:right}
+
+  /* LEFT — node context panel */
+  .ctx{position:absolute;top:16px;left:16px;width:330px;max-width:calc(100% - 32px);max-height:calc(100% - 32px);overflow-y:auto;
+    background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:var(--r-card);padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:4}
+  .ctx.empty{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-3);font-size:13px;padding:24px}
+  .n-type{font-family:var(--sans);font-weight:500;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);display:inline-flex;align-items:center;gap:8px}
+  .n-type .dot{width:9px;height:9px;border-radius:var(--r-pill)}
+  .n-label{font-family:var(--heading);font-size:20px;font-weight:700;letter-spacing:-.02em;margin:8px 0 4px;word-break:break-word}
+  .n-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .n-meta .sw{width:12px;height:12px;border-radius:var(--r-field);border:1px solid var(--line);margin-right:4px;display:inline-block;vertical-align:-2px}
+  .rel-cap{font-size:11px;color:var(--ink-3);line-height:1.55;margin:0 0 12px}
   .rel{border-top:1px solid var(--line);padding:12px 0 2px}
-  .rel h4{margin:0 0 9px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between}
+  .rel h4{margin:0 0 8px;font-family:var(--sans);font-weight:600;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+  .rel h4 .dir{display:inline-flex;align-items:center;justify-content:center;padding:3px;border-radius:var(--r-pill);border:1px solid var(--line);color:var(--ink-2)}
+  .rel h4 .dir .ic{width:12px;height:12px}
+  .rel h4 .dir.out{background:var(--chip)}
+  .rel h4 .cnt{margin-left:auto;color:var(--ink-2)}
   .rel ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-  .rel li{font-family:var(--mono);font-size:11.5px;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:4px 9px;cursor:pointer}
+  .rel li{font-family:var(--mono);font-size:11.5px;color:var(--ink);border:1px solid var(--line);border-radius:var(--r-field);padding:4px 8px;cursor:pointer}
   .rel li:hover{border-color:var(--sel);background:var(--chip)}
-  .hint{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);pointer-events:none}
-  .tip{position:absolute;pointer-events:none;font-family:var(--mono);font-size:11px;background:var(--ink);color:var(--bg);padding:3px 7px;border-radius:5px;transform:translate(-50%,-160%);white-space:nowrap;opacity:0}
+  .hint{position:absolute;left:16px;bottom:12px;font-family:var(--sans);font-size:11px;color:var(--ink-3);pointer-events:none}
+  .tip{position:absolute;pointer-events:none;font-family:var(--sans);font-size:11px;background:var(--ink);color:var(--bg);padding:4px 8px;border-radius:var(--r-field);transform:translate(-50%,-160%);white-space:nowrap;opacity:0}
 </style>
 </head>
 <body>
 <header>
-  <a class="back" href="/">← Catalog</a>
+  <a class="back" href="/"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Catalog</a>
   <div class="title">2one DLS<span class="sub">knowledge graph</span></div>
   <div class="stats" id="stats"></div>
   <div class="grow"></div>
-  <input class="search" id="search" placeholder="find element…" autocomplete="off" spellcheck="false" />
-  <div class="chips" id="chips"></div>
-  <button class="btn" id="reset">Reset</button>
-  <button class="btn" id="theme">◐</button>
+  <button class="btn icon-btn" id="theme" aria-label="Toggle light and dark"></button>
 </header>
 <main>
   <canvas id="c"></canvas>
-  <aside class="empty" id="panel">Select a node to see its context: what it is composed of, what uses it, and what governs it.</aside>
-  <div class="hint">drag to pan · scroll to zoom · select a node</div>
+
+  <aside class="rail">
+    <!-- INSPIRATION — where the palette comes from (closed by default) -->
+    <section class="pnl collapsed" id="pnl-inspiration">
+      <button class="pnl-head" data-target="pnl-inspiration" aria-expanded="false">
+        <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        <span>Colors Inspiration</span>
+      </button>
+      <div class="pnl-body">
+        <figure class="paint" id="paint">
+          <img id="paint-img" src="./assets/painting.avif" alt="Japanese ukiyo-e woodblock print — a bonsai pine on a sea cliff beneath a red sun" />
+          <figcaption>The source palette — a Japanese woodblock print.</figcaption>
+        </figure>
+        <p class="insp-text">The colors in this knowledge graph were <b>inspired by Japanese woodblock paintings</b> — a bonsai pine on a sea cliff beneath a red sun. Japanese prints are famous for their small and distinct palettes. every colour is already chosen to sit apart from the others.</p>
+        <div class="pnl-label">Each family, eyedropped from the print</div>
+        <div class="guide-legend" id="guide-legend"></div>
+      </div>
+    </section>
+
+    <!-- GRAPH CONTROLS — every control lives here, keeping the canvas clean (open by default) -->
+    <section class="pnl" id="pnl-selection">
+      <button class="pnl-head" data-target="pnl-selection" aria-expanded="true">
+        <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        <span>Graph Controls</span>
+      </button>
+      <div class="pnl-body">
+        <input class="search" id="search" placeholder="find element…" autocomplete="off" spellcheck="false" />
+        <div class="pnl-group">
+          <div class="pnl-label">Filter by type <span class="mini-actions"><button class="link-btn" id="selall">All</button><button class="link-btn" id="deselall">None</button></span></div>
+          <div class="chips" id="chips"></div>
+        </div>
+        <div class="pnl-group pnl-view">
+          <button class="btn" id="reset">Reset view</button>
+        </div>
+        <p class="pnl-cues">Dot size = number of connections · a ring marks a rule · select a node and the arrowheads point to whatever it uses.</p>
+      </div>
+    </section>
+  </aside>
+
+  <aside class="ctx empty" id="panel">Click any node to see its context — what it’s composed of, what uses it, what governs it.</aside>
+  <div class="hint">drag to pan · scroll to zoom · click a node · arrows point to what's used</div>
   <div class="tip" id="tip"></div>
 </main>
 <script type="module" src="./graph-main.ts"></script>

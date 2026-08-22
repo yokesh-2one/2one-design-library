@@ -125,7 +125,7 @@ const NAV = [
   { grp: 'Components', items: [['actions', 'Actions', ''], ['forms', 'Forms', ''], ['overlays', 'Overlays', ''], ['data', 'Data display', ''], ['feedback', 'Feedback', ''], ['navigation', 'Navigation', ''], ['mobile', 'Mobile · 2one', '']] },
   { grp: 'Templates', items: [['blocks', 'Blocks', String(COUNT.blocks)], ['marketing', 'Marketing', String(COUNT.marketing)], ['charts', 'Charts', String(COUNT.charts)]] },
   { grp: 'Reference', items: [['index', 'All components', String(COUNT.components)]] },
-  { grp: 'Explore', items: [['/graph.html', 'Knowledge graph', String(COUNT.graphNodes)]] },
+  { grp: 'Explore', items: [['/dls.html', 'What is a DLS?', ''], ['/graph.html', 'Knowledge graph', String(COUNT.graphNodes)]] },
 ]
 
 

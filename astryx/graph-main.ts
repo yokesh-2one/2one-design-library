@@ -1,33 +1,61 @@
 // @ts-nocheck
 // Knowledge-graph explorer, loaded as a Vite module (data imported directly).
+import '../src/styles/globals.css' // DLS tokens + audited dark theme + Inter/Satoshi — single source, no hard-coded palette
 import graph from './graph.json'
 const GRAPH = graph as any
 
+// lucide icons only (no mixed icon set): raw path data → an inline SVG string
+const IC: Record<string, string> = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  arrowRight: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  arrowLeft: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  externalLink: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/>',
+}
+const lucide = (name: string, size = 15) => `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[name]}</svg>`
+
+// Node families — the ordered grouping shared by the filter chips AND the legend
+const FAMILY_ORDER = ['Identity', 'Governance', 'Renders on screen', 'Templates', 'Raw token values', 'External', 'Accessibility', 'Other']
+
+// Categorical palette drawn from a Japanese ukiyo-e woodblock print (bonsai pine on a
+// sea cliff under a red sun). Each node family borrows a colour eyedropped from a region
+// of that painting — see the guide's "Why these colours?" note. `src` names the region.
+// (The DLS *product* is grayscale; this explorer is an internal wayfinding tool, so it may
+//  use hue to separate the node families — nothing here ships as a token.)
 const TYPES: Record<string, any> = {
-  'brand': { label: 'Brand', light: '#09090b', dark: '#f4f4f5' },
-  'component': { label: 'Component', light: '#27272a', dark: '#e4e4e7' },
-  'component-2one': { label: '2one-only', light: '#000000', dark: '#ffffff' },
-  'token-color': { label: 'Colour token', light: '#52525b', dark: '#a1a1aa' },
-  'ramp': { label: 'Ramp step', light: '#a1a1aa', dark: '#71717a' },
-  'token-radius': { label: 'Radius', light: '#6b6b73', dark: '#8a8a92' },
-  'token-type': { label: 'Type', light: '#6b6b73', dark: '#8a8a92' },
-  'template-block': { label: 'Block', light: '#3f3f46', dark: '#c4c4cc' },
-  'template-chart': { label: 'Chart', light: '#71717a', dark: '#9a9aa2' },
-  'rule': { label: 'Rule', light: '#111113', dark: '#fafafa', ring: true },
-  'contrast': { label: 'Contrast', light: '#15803d', dark: '#4ade80', semantic: true },
+  'brand': { label: 'Brand', light: '#e8431c', dark: '#ff6b47', family: 'Identity', src: 'the setting sun' },
+  'rule': { label: 'Rule', light: '#c0341a', dark: '#f26a4e', ring: true, family: 'Governance', src: "the sun's deep-red band" },
+  'component': { label: 'Component', light: '#2e5f86', dark: '#6ba0cc', family: 'Renders on screen', src: 'the ocean waves' },
+  'component-2one': { label: '2one-only', light: '#16324f', dark: '#4e80b0', family: 'Renders on screen', src: 'the bonsai pine' },
+  'template-block': { label: 'Block', light: '#e8822f', dark: '#f4a65c', family: 'Templates', src: 'the sunset clouds' },
+  'template-chart': { label: 'Chart', light: '#c98a3f', dark: '#e3b079', family: 'Templates', src: 'the pale horizon glow' },
+  'token-color': { label: 'Colour token', light: '#8a5a2b', dark: '#c08a50', family: 'Raw token values', src: 'the cliff rock' },
+  'ramp': { label: 'Ramp step', light: '#5a3d28', dark: '#9a6e4a', family: 'Raw token values', src: "the rock's shadow" },
+  'token-radius': { label: 'Radius', light: '#5a87a6', dark: '#8fb4ce', family: 'Raw token values', src: 'the mid-tone swell' },
+  'token-type': { label: 'Type', light: '#6e97a3', dark: '#a6c4cd', family: 'Raw token values', src: 'the sea-foam' },
+  'package': { label: 'Package', light: '#77736c', dark: '#a8a199', family: 'External', src: 'the weathered stone' },
+  'contrast': { label: 'Contrast', light: '#15803d', dark: '#4ade80', semantic: true, family: 'Accessibility', src: 'kept green — it flags pass / fail' },
 }
 const REL: Record<string, any> = {
   composed_of: { out: 'Composed of', in: 'Used by' }, uses: { out: 'Uses', in: 'Used by' },
   derived_from: { out: 'Derived from', in: 'Source of' }, governed_by: { out: 'Governed by', in: 'Governs' },
   has_contrast: { out: 'Contrast', in: 'Contrast of' }, embodies: { out: 'Embodies', in: 'Embodied by' },
-  serves: { out: 'Serves', in: 'Served by' },
+  serves: { out: 'Serves', in: 'Served by' }, depends_on: { out: 'Depends on', in: 'Depended on by' },
 }
 
 const root = document.documentElement
 const cvarv = (n: string) => getComputedStyle(root).getPropertyValue(n).trim()
-const theme = () => root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')
+const theme = () => (root.classList.contains('dark') ? 'dark' : 'light') // DLS drives dark via the .dark class
 const nodeColor = (t: string) => { const m = TYPES[t] || { light: '#888', dark: '#888' }; return theme() === 'dark' ? m.dark : m.light }
 const el = (tag: string, cls?: string) => { const e = document.createElement(tag); if (cls) e.className = cls; return e }
+// Paint a legend/chip swatch so it matches how the node renders on the canvas:
+// ring types (Rule) are a hollow ring (transparent + coloured border), everything
+// else is a solid fill. Keeps the key and the graph in sync.
+const paintSwatch = (dot: any, t: string) => {
+  const m = TYPES[t] || {}
+  if (m.ring) { dot.style.background = 'transparent'; dot.style.border = '2px solid ' + nodeColor(t) }
+  else { dot.style.background = m.semantic ? cvarv('--ok') : nodeColor(t); dot.style.border = '0' }
+}
 
 const nodes = GRAPH.nodes.map((n: any) => ({ ...n }))
 const byId = new Map(nodes.map((n: any) => [n.id, n]))
@@ -83,7 +111,23 @@ function draw() {
     const on = selected && (e.source === selected.id || e.target === selected.id)
     ctx.globalAlpha = selected ? (on ? 0.9 : 0.06) : 0.35
     ctx.strokeStyle = on ? cvarv('--edge-hi') : cvarv('--edge')
-    ctx.beginPath(); ctx.moveTo(screenX(e.s.x), screenY(e.s.y)); ctx.lineTo(screenX(e.t.x), screenY(e.t.y)); ctx.stroke()
+    const sx = screenX(e.s.x), sy = screenY(e.s.y), tx = screenX(e.t.x), ty = screenY(e.t.y)
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(tx, ty); ctx.stroke()
+    // Direction: draw an arrowhead near the TARGET end. The edge reads source → target
+    // = "user → used", so the arrow always points at the thing being used. On a selected
+    // node: arrows pointing OUT of it = what it uses; arrows pointing INTO it = who uses it.
+    if (on) {
+      const ang = Math.atan2(ty - sy, tx - sx)
+      const tr = e.t.r * Math.min(scale, 1.4) + 2.5           // sit just outside the target node
+      const ax = tx - Math.cos(ang) * tr, ay = ty - Math.sin(ang) * tr
+      const h = 7, w = 0.42
+      ctx.fillStyle = cvarv('--edge-hi')
+      ctx.beginPath()
+      ctx.moveTo(ax, ay)
+      ctx.lineTo(ax - Math.cos(ang - w) * h, ay - Math.sin(ang - w) * h)
+      ctx.lineTo(ax - Math.cos(ang + w) * h, ay - Math.sin(ang + w) * h)
+      ctx.closePath(); ctx.fill()
+    }
   })
   ctx.globalAlpha = 1
   nodes.forEach((n: any) => {
@@ -101,7 +145,7 @@ function draw() {
     ctx.strokeStyle = n === selected ? cvarv('--sel') : (meta.ring ? nodeColor(n.type) : cvarv('--node-stroke'))
     ctx.stroke()
     if (!dim && (n === selected || n === hover || (neigh && neigh.has(n.id)) || n.deg >= 14)) {
-      ctx.fillStyle = cvarv('--ink'); ctx.font = (n === selected ? 12 : 10.5) + 'px ui-monospace,monospace'; ctx.textAlign = 'center'
+      ctx.fillStyle = cvarv('--ink'); ctx.font = (n === selected ? '600 12px' : '500 10.5px') + ' "Inter Variable",Inter,system-ui,sans-serif'; ctx.textAlign = 'center'
       ctx.fillText(n.label, px, py - r - 5)
     }
   })
@@ -152,16 +196,29 @@ function select(n: any) {
   // back-link to the live catalog for components (closes the app ↔ graph loop)
   if (n.type === 'component' || n.type === 'component-2one') {
     const a = el('a') as HTMLAnchorElement
-    a.href = '/#index'; a.textContent = 'View in catalog ↗'
-    a.style.cssText = 'display:inline-block;margin:0 0 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px'
+    a.href = '/#index'; a.innerHTML = 'View in catalog ' + lucide('externalLink', 13)
+    a.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;font-family:var(--sans);font-size:12px;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 12px'
     panel.appendChild(a)
   }
   const groups: Record<string, any[]> = {}
+  const outNames = new Set<string>()
   edges.forEach((e: any) => { if (e.source !== n.id && e.target !== n.id) return; const out = e.source === n.id, other = out ? e.t : e.s
-    const name = (REL[e.type] || {})[out ? 'out' : 'in'] || e.type; (groups[name] = groups[name] || []).push(other) })
-  Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length).forEach((name) => {
-    const arr = groups[name]; const rel = el('div', 'rel'); const h = el('h4'); h.appendChild(document.createTextNode(name))
-    const cnt = el('span'); cnt.textContent = String(arr.length); h.appendChild(cnt); rel.appendChild(h)
+    const name = (REL[e.type] || {})[out ? 'out' : 'in'] || e.type; if (out) outNames.add(name); (groups[name] = groups[name] || []).push(other) })
+  if (Object.keys(groups).length) {
+    const cap = el('div', 'rel-cap')
+    cap.textContent = 'Arrowheads on the canvas point to whatever is being used. Each group below is tagged with an outward arrow (what this element uses) or an inward arrow (what uses it).'
+    panel.appendChild(cap)
+  }
+  // Show outgoing (this element → others) first, then incoming — so "what it uses" and
+  // "what uses it" never blur together. A direction tag makes each group unambiguous.
+  Object.keys(groups).sort((a, b) => (outNames.has(b) ? 1 : 0) - (outNames.has(a) ? 1 : 0) || groups[b].length - groups[a].length).forEach((name) => {
+    const isOut = outNames.has(name)
+    const arr = groups[name]; const rel = el('div', 'rel'); const h = el('h4')
+    const tag = el('span', 'dir ' + (isOut ? 'out' : 'in')); tag.innerHTML = lucide(isOut ? 'arrowRight' : 'arrowLeft', 12)
+    tag.setAttribute('aria-label', isOut ? 'outgoing — this element uses these' : 'incoming — these use this element')
+    tag.title = isOut ? 'this element → uses these' : 'these → use this element'
+    h.appendChild(tag); h.appendChild(document.createTextNode(name))
+    const cnt = el('span', 'cnt'); cnt.textContent = String(arr.length); h.appendChild(cnt); rel.appendChild(h)
     const ul = el('ul'); arr.forEach((o: any) => { const li = el('li'); li.textContent = o.label; li.addEventListener('click', () => { select(o); centerOn(o) }); ul.appendChild(li) })
     rel.appendChild(ul); panel.appendChild(rel)
   })
@@ -169,12 +226,68 @@ function select(n: any) {
 
 const chipsEl = document.getElementById('chips')!
 const types = Array.from(new Set(nodes.map((n: any) => n.type))) as string[]
-types.sort((a, b) => (TYPES[a] ? TYPES[a].label : a).localeCompare(TYPES[b] ? TYPES[b].label : b)).forEach((t) => {
+const chipByType = new Map<string, HTMLElement>()
+const makeChip = (t: string) => {
   const meta = TYPES[t] || { label: t }; const chip = el('div', 'chip'); chip.dataset.t = t
-  const dot = el('span', 'dot'); dot.style.background = meta.semantic ? cvarv('--ok') : nodeColor(t)
+  const dot = el('span', 'dot'); paintSwatch(dot, t)
   chip.appendChild(dot); chip.appendChild(document.createTextNode(meta.label || t))
   chip.addEventListener('click', () => { if (hidden.has(t)) { hidden.delete(t); chip.classList.remove('off') } else { hidden.add(t); chip.classList.add('off') } })
-  chipsEl.appendChild(chip)
+  chipByType.set(t, chip); return chip
+}
+// Group the type filters by family — same grouping as the Colors Inspiration legend
+const chipFamilies: Record<string, string[]> = {}
+types.forEach((t) => { const f = (TYPES[t] || {}).family || 'Other'; (chipFamilies[f] = chipFamilies[f] || []).push(t) })
+FAMILY_ORDER.filter((f) => chipFamilies[f]).forEach((f) => {
+  const grp = el('div', 'chip-fam'); const ft = el('div', 'chip-fam-title'); ft.textContent = f; grp.appendChild(ft)
+  const row = el('div', 'chip-row')
+  chipFamilies[f].sort((a, b) => (TYPES[a] ? TYPES[a].label : a).localeCompare(TYPES[b] ? TYPES[b].label : b)).forEach((t) => row.appendChild(makeChip(t)))
+  grp.appendChild(row); chipsEl.appendChild(grp)
+})
+
+// Select all / Deselect all — toggle every type filter at once
+document.getElementById('selall')!.addEventListener('click', () => {
+  hidden.clear(); chipByType.forEach((chip) => chip.classList.remove('off'))
+})
+document.getElementById('deselall')!.addEventListener('click', () => {
+  types.forEach((t) => hidden.add(t)); chipByType.forEach((chip) => chip.classList.add('off')); select(null)
+})
+
+// Collapsible rail panels (Selection, Inspiration) — click a header to fold/unfold
+Array.prototype.forEach.call(document.querySelectorAll('.pnl-head'), (head: any) => {
+  head.addEventListener('click', () => {
+    const pnl = head.closest('.pnl'); const open = !pnl.classList.toggle('collapsed')
+    head.setAttribute('aria-expanded', String(open))
+  })
+})
+
+// Inspiration image lives at dev/assets/painting.avif — degrade gracefully if absent
+const paintImg = document.getElementById('paint-img') as HTMLImageElement | null
+const paintMissing = () => {
+  const fig = document.getElementById('paint')!
+  fig.classList.add('missing')
+  fig.textContent = 'Add the painting at dev/assets/painting.avif to show it here.'
+}
+if (paintImg) {
+  paintImg.addEventListener('error', paintMissing)
+  // the error event may have already fired before this handler attached — catch that case
+  if (paintImg.complete && paintImg.naturalWidth === 0) paintMissing()
+}
+
+// Build the Inspiration colour legend from the same TYPES map (single source of truth)
+const guideLegend = document.getElementById('guide-legend')!
+const families: Record<string, string[]> = {}
+types.forEach((t) => { const f = (TYPES[t] || {}).family || 'Other'; (families[f] = families[f] || []).push(t) })
+FAMILY_ORDER.filter((f) => families[f]).forEach((f) => {
+  const grp = el('div', 'g-fam'); const ft = el('div', 'g-fam-title'); ft.textContent = f; grp.appendChild(ft)
+  families[f].forEach((t) => {
+    const meta = TYPES[t] || { label: t }; const row = el('div', 'g-row'); row.dataset.t = t
+    const dot = el('span', 'g-dot'); paintSwatch(dot, t)
+    const name = el('span', 'g-name'); name.textContent = meta.label || t
+    row.appendChild(dot); row.appendChild(name)
+    if (meta.src) { const s = el('span', 'g-src'); s.textContent = meta.src; row.appendChild(s) }
+    grp.appendChild(row)
+  })
+  guideLegend.appendChild(grp)
 })
 
 document.getElementById('search')!.addEventListener('input', (e: any) => {
@@ -185,8 +298,9 @@ document.getElementById('search')!.addEventListener('input', (e: any) => {
 document.getElementById('reset')!.addEventListener('click', () => { scale = 1; ox = 0; oy = 0; select(null); alpha = 0.6 })
 
 const tb = document.getElementById('theme')!
-function setT(t: string) { root.setAttribute('data-theme', t); tb.textContent = t === 'dark' ? '☾' : '☀'
-  Array.prototype.forEach.call(document.querySelectorAll('.chip'), (c: any) => { const m = TYPES[c.dataset.t] || {}; c.querySelector('.dot').style.background = m.semantic ? cvarv('--ok') : nodeColor(c.dataset.t) })
+function setT(t: string) { root.classList.toggle('dark', t === 'dark'); tb.innerHTML = lucide(t === 'dark' ? 'moon' : 'sun')
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), (c: any) => paintSwatch(c.querySelector('.dot'), c.dataset.t))
+  Array.prototype.forEach.call(document.querySelectorAll('.g-row'), (row: any) => { const t2 = row.dataset.t; if (t2) paintSwatch(row.querySelector('.g-dot'), t2) })
   if (selected) select(selected) }
 setT(matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')
 tb.addEventListener('click', () => setT(theme() === 'dark' ? 'light' : 'dark'))

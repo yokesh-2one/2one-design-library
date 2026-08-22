@@ -4,7 +4,7 @@ import {
   // Tier 1 — brand modules
   Target, Gem, Drama, Users, Crown, Tag,
   // Tier 2 — design foundation
-  Palette, Type, Shapes, Brush, Camera, LayoutGrid, MessageSquareQuote, Images, Play, Volume2,
+  Palette, Type, Shapes, Brush, Camera, LayoutGrid, MessageSquareQuote, Images,
   // Tier 3 — output
   Monitor, Megaphone, FileText,
   // guiding principle
@@ -66,11 +66,6 @@ const TIER2_FOUNDATIONS: [React.ReactNode, string, string, string[]][] = [
     ['Voice principles', 'Tone by context', 'Vocabulary do’s & don’ts', 'Writing examples', 'Localisation']],
   [<Images />, 'Moodboard', 'Reference material that anchors abstract style in concrete examples.',
     ['Inspiration boards', 'Aspirational references', 'Look-and-feel keywords', 'Texture & lighting refs']],
-]
-
-const TIER2_SOON: [React.ReactNode, string, string][] = [
-  [<Play />, 'Motion & Animation', 'Easing, duration and transition patterns for how elements move.'],
-  [<Volume2 />, 'Sound Design', 'Sonic logos, UI sounds and notification tones — how the brand sounds.'],
 ]
 
 const TIER3_OUTPUTS: [React.ReactNode, string, string, string[]][] = [
@@ -141,7 +136,7 @@ function ModuleCard({ icon, title, desc, subs }: { icon: React.ReactNode; title:
       </CardHeader>
       {subs && (
         <CardContent>
-          <div className="dls-subs">{subs.map((s) => <span key={s} className="sub">{s}</span>)}</div>
+          <div className="flex flex-wrap gap-2">{subs.map((s) => <Badge key={s} variant="outline" className="font-normal">{s}</Badge>)}</div>
         </CardContent>
       )}
     </Card>
@@ -242,15 +237,20 @@ export function Dls() {
                   <span className="flex items-center gap-1.5"><ArrowUp className="size-3.5" /> output traces up</span>
                 </div>
               </div>
-              <div className="dls-rows">
+              <div className="flex flex-col gap-3">
                 {ROWS.map(([tier, name, color, desc]) => (
-                  <div className="dls-row" key={tier}>
-                    <span className="swatch" style={{ background: color }} aria-hidden />
-                    <div className="body">
-                      <div className="head"><span className="tier">{tier}</span><span className="name">{name}</span></div>
-                      <p>{desc}</p>
-                    </div>
-                  </div>
+                  <Card key={tier}>
+                    <CardHeader className="flex-row items-stretch gap-3 space-y-0">
+                      <span className="w-1.5 shrink-0 self-stretch rounded-full" style={{ background: color }} aria-hidden />
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{tier}</span>
+                          <CardTitle className="text-base">{name}</CardTitle>
+                        </div>
+                        <CardDescription className="mt-1">{desc}</CardDescription>
+                      </div>
+                    </CardHeader>
+                  </Card>
                 ))}
               </div>
             </div>
@@ -318,21 +318,6 @@ export function Dls() {
             <div className="dls-grid two">
               {TIER2_FOUNDATIONS.map(([icon, title, desc, subs]) => (
                 <ModuleCard key={title} icon={icon} title={title} desc={desc} subs={subs} />
-              ))}
-            </div>
-            <div className="g-scale-label">Coming soon</div>
-            <div className="dls-grid two">
-              {TIER2_SOON.map(([icon, title, desc]) => (
-                <Card key={title} className="gap-3 opacity-80">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="dls-ico" aria-hidden>{icon}</div>
-                      <Badge variant="secondary">Coming soon</Badge>
-                    </div>
-                    <CardTitle className="text-base">{title}</CardTitle>
-                    <CardDescription>{desc}</CardDescription>
-                  </CardHeader>
-                </Card>
               ))}
             </div>
           </section>
