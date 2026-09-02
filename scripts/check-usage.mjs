@@ -213,6 +213,47 @@ const stripComments = (s) => {
     .replace(/(^|[^:])\/\/[^\n]*/g, (m, p) => p + blank(m.slice(p.length)))
 }
 
+/*
+  A JSX open tag is not `<tag[^>]*>`. An attribute value is an expression
+  container, and `onClick={() => fn()}` puts a `>` inside one, so a character
+  class stops mid-tag and every attribute after the arrow becomes invisible.
+  That made `handrolled-control` report all four states missing on a control
+  that defined all four, and a downstream build restructured working code to
+  become visible to the regex. A false positive in a "must" rule is worse than
+  a missing rule, so tags get walked rather than matched.
+
+  Walk from the end of the tag name tracking brace depth and string state, and
+  close only on a `>` that sits at depth 0 outside a string. Nested containers,
+  a quoted `>` in an aria-label, and JSX passed as a prop all survive that. A
+  tag with no closing `>` (unbalanced braces, or a `<` that was a comparison)
+  yields nothing rather than swallowing the rest of the file.
+*/
+const jsxOpenTags = (code, tags) => {
+  const out = []
+  for (const m of code.matchAll(new RegExp(`<(${tags.join('|')})\\b`, 'g'))) {
+    const from = m.index + m[0].length
+    let depth = 0
+    let quote = null
+    let end = -1
+    for (let i = from; i < code.length; i++) {
+      const c = code[i]
+      if (quote) {
+        if (c === '\\') i++
+        else if (c === quote) quote = null
+      } else if (c === '"' || c === "'" || c === '`') quote = c
+      else if (c === '{') depth++
+      else if (c === '}') depth--
+      else if (c === '>' && depth === 0) {
+        end = i
+        break
+      }
+    }
+    if (end === -1) continue
+    out.push({ tag: m[1], attrs: code.slice(from, end), index: m.index })
+  }
+  return out
+}
+
 /** @type {{id:string,severity:'error'|'warn',test:(ctx:any)=>{line:number,detail:string}[]}[]} */
 const RULES = [
   {
@@ -693,15 +734,14 @@ const RULES = [
         <button> — the two shapes that ship with a resting state and nothing
         else.
       */
-      for (const m of code.matchAll(/<(button|div|span|li)\b([^>]*)>/g)) {
-        const attrs = m[2]
-        const clickable = m[1] === 'button' || /\bonClick\s*=/.test(attrs)
+      for (const t of jsxOpenTags(code, ['button', 'div', 'span', 'li'])) {
+        const clickable = t.tag === 'button' || /\bonClick\s*=/.test(t.attrs)
         if (!clickable) return out
-        const missing = ['hover:', 'focus-visible:', 'active:', 'disabled'].filter((s) => !attrs.includes(s))
+        const missing = ['hover:', 'focus-visible:', 'active:', 'disabled'].filter((s) => !t.attrs.includes(s))
         if (missing.length < 2) continue
         out.push({
-          line: code.slice(0, m.index).split('\n').length,
-          detail: `hand-rolled <${m[1]}> control missing ${missing.join(', ')} — use the library Button`,
+          line: code.slice(0, t.index).split('\n').length,
+          detail: `hand-rolled <${t.tag}> control missing ${missing.join(', ')} — use the library Button`,
         })
       }
       return out
