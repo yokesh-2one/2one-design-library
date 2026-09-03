@@ -90,6 +90,19 @@ If you can't install a package at all, copy `src/components/`, `src/lib/`,
 `src/styles/globals.css`, and `tokens/` into your app and import from your local
 path instead of the package name. You then own the copies (shadcn-style).
 
+### D · Prebuilt release tarball (no build on install)
+
+Every version tag publishes a **prebuilt** `.tgz` on the
+[Releases page](https://github.com/yokesh-2one/2one-design-library/releases) — `dist/`
+is already compiled, so installing it runs **no library build** (path A's `github:`
+install compiles during `prepare`; a tarball install does not):
+
+```bash
+npm install https://github.com/yokesh-2one/2one-design-library/releases/download/v0.2.0/2one-design-library-0.2.0.tgz react react-dom
+```
+
+Fastest install, pinned to that exact version.
+
 ## 2 · Wire the theme + Tailwind  ← the #1 silent failure
 
 The components are plain React + Tailwind classes. **Your app's Tailwind has to _see_
@@ -140,6 +153,19 @@ import { Button } from '@2one/design-library'
 export function Example() {
   return <Button>Continue</Button>   // renders as a pill (radius-full), 2one-themed
 }
+```
+
+### The whole barrel, or a single subpath
+
+The import above is from the package root — simple, and a tree-shaking bundler drops
+what you don't use. To be **deterministic** about bundle size (or on a bundler that
+tree-shakes poorly), import the exact module by subpath — it can only pull what that
+component itself needs. Importing `Button` this way, for instance, never reaches
+`recharts` (only `Chart` uses it). Page patterns are importable the same way:
+
+```tsx
+import { Button } from '@2one/design-library/components/ui/button'
+import { AppShell } from '@2one/design-library/patterns/app-shell'
 ```
 
 ## Verify it worked

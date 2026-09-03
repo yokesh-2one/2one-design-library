@@ -53,6 +53,12 @@ for (const { label, dirKey } of [{ label: 'pattern', dirKey: 'patternSpecs' }, {
     if (spec.file && !existsSync(join(root, spec.file))) errors.push(`${where}: declared file "${spec.file}" does not exist`)
     if (node.source && !existsSync(join(root, node.source))) errors.push(`${where}: node source "${node.source}" does not exist`)
 
+    // Every spec is marked implementation: "tsx" (ships a component) or "spec-only"
+    // (documentation composition), and the mark must agree with whether it has a file.
+    const expectImpl = spec.file ? 'tsx' : 'spec-only'
+    if (!spec.implementation) errors.push(`${where}: missing "implementation" — mark it "tsx" or "spec-only"`)
+    else if (spec.implementation !== expectImpl) errors.push(`${where}: implementation "${spec.implementation}" disagrees with file presence (has file: ${!!spec.file} → expected "${expectImpl}")`)
+
     for (const c of spec.composes?.components ?? []) {
       const cid = compId(c)
       if (!byId.has(cid)) errors.push(`${where}: composes component "${c}" but there is no graph node (${cid})`)
