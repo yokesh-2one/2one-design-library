@@ -250,6 +250,37 @@ for (const e of decisions.edges ?? []) {
   addEdge(e.source, e.target, e.type, 'explicit', extra)
 }
 
+// ---- PATTERN + AI-COMPONENT nodes from their SPEC files (single source of truth) ----
+// A spec in rules/patterns or rules/ai-components is now SUFFICIENT: its node, plus its
+// composed_of (components/blocks) and governed_by (rules) edges, are derived here — so a
+// pattern no longer needs a second, hand-maintained declaration in graph/decisions.json
+// (the gap that let pattern:app-shell exist in the manifest but not the graph).
+// Placed after the decision layer so a spec ENRICHES a hand-authored node (addNode
+// de-dupes) and never double-adds an edge the decision layer already stated.
+const edgeExists = (s, t, ty) => edges.some((e) => e.source === s && e.target === t && e.type === ty)
+const resolveComp = (name) => (nodes.has(`${OWN_TYPE}:${name}`) ? `${OWN_TYPE}:${name}` : `component:${name}`)
+for (const [dirKey, ntype] of [['patternSpecs', 'pattern'], ['aiComponentSpecs', 'ai-component']]) {
+  let dir
+  try { dir = cfg.rel(dirKey) } catch { continue }
+  for (const f of ls(dir, (x) => x.endsWith('.json'))) {
+    let spec
+    try { spec = J(`${dir}/${f}`) } catch { warnings.push(`spec: invalid JSON ${dir}/${f}`); continue }
+    if (!spec.id) { warnings.push(`spec: no id in ${dir}/${f}`); continue }
+    addNode(spec.id, ntype, spec.label ?? spec.id, { source: spec.file ?? `${dir}/${f}` })
+    for (const c of spec.composes?.components ?? []) {
+      const id = resolveComp(c)
+      if (nodes.has(id) && !edgeExists(spec.id, id, 'composed_of')) addEdge(spec.id, id, 'composed_of', 'derived')
+    }
+    // NOTE: composes.blocks is intentionally NOT edged — a block is ontology class
+    // Pattern, and neither composed_of (range Component/Foundation) nor uses (range
+    // Component) permits a Pattern→block edge. The composition is documented in the spec.
+    for (const r of spec.governed_by ?? []) {
+      const id = `rule:${r}`
+      if (nodes.has(id) && !edgeExists(spec.id, id, 'governed_by')) addEdge(spec.id, id, 'governed_by', 'derived')
+    }
+  }
+}
+
 // ================= ONTOLOGY CONFORMANCE (deterministic warnings) =================
 /*
   Skipped entirely when the payload has authored no ontology. Validating against

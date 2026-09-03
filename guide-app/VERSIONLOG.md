@@ -6,7 +6,7 @@ flagged with **⚠ BREAKING** and migration guidance.
 
 ---
 
-## Available now — `dls-v0.1.0` (draft)
+## Available now — `v0.2.0`
 
 **Tier 1 — Brand Foundation**
 - ✅ Mission, vision, tagline, voice, tone, personality, archetype, personas — `brand/brand.json` + `brand/BRAND.md`
@@ -25,7 +25,7 @@ flagged with **⚠ BREAKING** and migration guidance.
 
 **Tier 3 — Design System (applied)**
 - ✅ 54 shadcn primitives, re-skinned to 2one — `src/components/ui/`
-- ✅ 3 2one-only components (`Logo`, `AppBar`, `BottomNavItem`) — `src/components/`
+- ✅ 5 2one-authored components (`Logo`, `AppBar`, `BottomNavItem`, `MediaPlaceholder` — `src/components/`; `Toolbar` — `src/components/ui/`)
 - ✅ 9 block templates (auth + menu-less dashboard) — `src/blocks/`
 - ✅ 31 chart templates (grayscale) — `src/blocks/charts/`
 - ✅ Recipes (app / website / marketing / deck) — `recipes/`
