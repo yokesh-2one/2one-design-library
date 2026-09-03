@@ -438,14 +438,36 @@ const RULES = [
     severity: 'error',
     why: 'One primary action per view. Pair a secondary/outline with it for lesser actions.',
     test: ({ src }) => {
-      const opens = [...src.matchAll(/<Button\b([^>]*)>/g)]
-      const primaries = opens.filter((m) => !/variant\s*=/.test(m[1]) || /variant\s*=\s*["{]?['"]?default/.test(m[1]))
-      if (primaries.length <= 1) return []
-      const line = (idx) => src.slice(0, idx).split('\n').length
-      return primaries.slice(1).map((m) => ({
-        line: line(m.index),
-        detail: `${primaries.length} primary Buttons in this view — only one may be primary`,
-      }))
+      const isPrimary = (attrs) => !/variant\s*=/.test(attrs) || /variant\s*=\s*["{]?['"]?default/.test(attrs)
+      // Partition the file into rendered VIEWS, then count primaries per view — not
+      // per file. Each top-level component is a view, and inside it each overlay/tab
+      // content (Dialog/Sheet/Popover/Drawer/AlertDialog/HoverCard/Tabs) is its own
+      // rendered view. Two route components (or two dialogs) with one primary each is
+      // correct; two primaries in ONE view is the violation.
+      const starts = []
+      const decl = /(?:^|\n)(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function\s+([A-Z]\w*)|const\s+([A-Z]\w*)\s*(?::[^=\n]+)?=)/g
+      let d
+      while ((d = decl.exec(src))) starts.push(d.index + (src[d.index] === '\n' ? 1 : 0))
+      if (!starts.length || starts[0] > 0) starts.unshift(0)
+      const OVERLAY = /<(?:Dialog|AlertDialog|Sheet|Drawer|Popover|HoverCard|Tabs)Content\b/g
+      const out = []
+      for (let k = 0; k < starts.length; k++) {
+        const from = starts[k]
+        const to = k + 1 < starts.length ? starts[k + 1] : src.length
+        const body = src.slice(from, to)
+        const cuts = [0, ...[...body.matchAll(OVERLAY)].map((m) => m.index)].sort((a, b) => a - b)
+        for (let j = 0; j < cuts.length; j++) {
+          const seg = body.slice(cuts[j], j + 1 < cuts.length ? cuts[j + 1] : body.length)
+          const prims = [...seg.matchAll(/<Button\b([^>]*)>/g)].filter((m) => isPrimary(m[1]))
+          if (prims.length > 1) {
+            for (const m of prims.slice(1)) {
+              const abs = from + cuts[j] + m.index
+              out.push({ line: src.slice(0, abs).split('\n').length, detail: `${prims.length} primary Buttons in one view — only one may be primary` })
+            }
+          }
+        }
+      }
+      return out
     },
   },
   {
@@ -601,6 +623,21 @@ const RULES = [
         const records = (body.match(/\{/g) ?? []).length
         if (records < 2) continue
         if (!new RegExp(`\\b${name}\\s*(?:\\?\\.)?\\.map\\s*\\(`).test(src)) continue
+        // Distinguish CONFIG/structure from CONTENT. Skip: config-shaped names
+        // (NAV / TABS / ROUTES / COLUMNS / …); arrays whose records carry structure —
+        // an icon or component reference, an event handler, or a route/id/key field;
+        // and an explicit `2one-allow` / `content-allow` comment above the array. What
+        // stays flagged is inline records of pure content strings — the fake product
+        // data this rule exists to catch (a testimonial list, priced plans, etc.).
+        const CONFIG_NAME = /^(NAV\w*|TABS?|ROUTES?|MENUS?|LINKS?|STEPS?|COLUMNS?|FIELDS?|DESTINATIONS?|SECTIONS?|FILTERS?|BREADCRUMBS?|NAVIGATION|SOCIALS?)$/i
+        // Structural signals = navigation/interaction, NOT "any data list". Note `id`
+        // and `key` are deliberately excluded — every list of records has them, so
+        // they say nothing about config-vs-content (a plans/testimonials array has ids too).
+        const structural =
+          /\bicon\s*:/.test(body) || /:\s*<[A-Z]/.test(body) || /:\s*[A-Z][\w.]*\s*[,}\n]/.test(body) ||
+          /\bon[A-Z]\w*\s*:/.test(body) || /\b(href|to|route|component|Icon)\s*:/.test(body)
+        const allowed = /(?:2one-allow|content-allow)/i.test(src.slice(Math.max(0, m.index - 160), m.index))
+        if (CONFIG_NAME.test(name) || structural || allowed) continue
         out.push({
           line: src.slice(0, m.index).split('\n').length,
           detail: `${name} — ${records} records of UI content hardcoded in the view`,
@@ -851,34 +888,74 @@ const coverage = authored
 
 // ---- collect files ----
 const CODE = new Set(['.tsx', '.jsx', '.ts', '.js', '.html'])
-const walk = (p, acc = []) => {
+
+/*
+  Build output and dependencies are never source, and scanning them is both slow
+  and WRONG: a compiled bundle trips every regex, and a clean scan of dist/ or
+  node_modules is a false "audit passed". Skipped by default; a consumer adds more
+  via .2oneignore, .gitignore, or repeatable `--ignore <glob>`.
+*/
+const IGNORE_DIRS = new Set(['node_modules', 'dist', 'build', 'coverage', 'out', '.next', '.nuxt', '.svelte-kit', '.vite', '.turbo', '.cache', '.git', '.vercel', '.output', '.parcel-cache'])
+const ignoreGlobs = []
+for (let i = 0; i < args.length; i++) if (args[i] === '--ignore' && args[i + 1]) ignoreGlobs.push(args[i + 1])
+for (const f of ['.2oneignore', '.gitignore']) {
+  try {
+    for (const l of readFileSync(join(process.cwd(), f), 'utf8').split('\n')) {
+      const t = l.trim()
+      if (t && !t.startsWith('#') && !t.startsWith('!')) ignoreGlobs.push(t.replace(/^\/+/, '').replace(/\/+$/, ''))
+    }
+  } catch { /* file absent — fine */ }
+}
+const globToRe = (g) => new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, ' ').replace(/\*/g, '[^/]*').replace(/ /g, '.*').replace(/\?/g, '.') + '$')
+const ignoreRes = ignoreGlobs.map(globToRe)
+const isIgnored = (name, rel) => IGNORE_DIRS.has(name) || ignoreRes.some((re) => re.test(name) || re.test(rel))
+
+const walk = (p, base = p, acc = []) => {
   const s = statSync(p)
   if (s.isDirectory()) {
-    for (const f of readdirSync(p)) if (f !== 'node_modules' && !f.startsWith('.')) walk(join(p, f), acc)
-  } else if (CODE.has(extname(p))) acc.push(p)
+    for (const f of readdirSync(p)) {
+      if (f.startsWith('.')) continue // dotfiles/-dirs skipped (as before)
+      const abs = join(p, f)
+      const rel = relative(base, abs).replace(/\\/g, '/')
+      if (isIgnored(f, rel)) continue
+      const st = statSync(abs)
+      if (st.isDirectory()) walk(abs, base, acc)
+      else if (CODE.has(extname(abs))) acc.push(abs)
+    }
+  } else if (CODE.has(extname(p))) acc.push(p) // an explicitly-named file target is always scanned
   return acc
 }
 
 /*
-  A user-supplied target ("npx 2one check src") is a CLI path argument, like
-  eslint's or tsc's — relative to where the command was RUN, not to the
-  resolved payload root. The two are the same directory in every scenario this
-  engine was tested against: inside the 2one repo, and inside the Acme fixture
-  (spawned with cwd === the fixture's own root, which owns a dls.config.json).
-  Neither exercises the actual distributed case — a consumer with no
-  dls.config.json of their own, where `root` silently falls back to the
-  installed package's directory inside node_modules — so `check src` resolved
-  to node_modules/@2one/design-library/src, which is never shipped, and died
-  with a raw ENOENT instead of the checker ever running.
-  The unconfigured default (no target given) is the one exception: it names
-  the payload's OWN blocks directory, so it belongs against `root`.
+  A user-supplied target ("2one check src") is a CLI path, resolved from where the
+  command was RUN (like eslint/tsc). With NO target, the default depends on where the
+  checker lives: in the design-system repo it audits the payload's own template tiers
+  (blocks / patterns / assistant elements); in a CONSUMER project — where `root`
+  falls back to the installed package inside node_modules — it must NEVER scan that
+  unshipped package, so it audits the consumer's OWN src/ instead. And zero scannable
+  files is an ACTIONABLE failure, never a silent "audit passed".
 */
 const resolveTarget = (t) => (t.startsWith('/') || /^[A-Za-z]:/.test(t) ? t : join(process.cwd(), t))
-// Default scan: the payload's own blocks AND its shipped template tiers (page
-// patterns + assistant elements) — all must obey the rules, so anything invented
-// there is audited too.
-const defaultDirs = [join(root, cfg.rel('blocks')), join(root, cfg.rel('patterns')), join(root, cfg.rel('aiComponents'))].filter((d) => existsSync(d))
-const inputs = targets.length ? targets.map(resolveTarget) : defaultDirs
+const inNodeModules = (p) => p.replace(/\\/g, '/').includes('/node_modules/')
+const positional = []
+for (let i = 0; i < args.length; i++) { if (args[i] === '--ignore') { i++; continue } if (!args[i].startsWith('--')) positional.push(args[i]) }
+
+let inputs
+let scannedLabel
+if (positional.length) {
+  inputs = positional.map(resolveTarget)
+  scannedLabel = positional.join(', ')
+} else {
+  const payloadDirs = ['blocks', 'patterns', 'aiComponents']
+    .map((k) => { try { return join(root, cfg.rel(k)) } catch { return null } })
+    .filter((d) => d && existsSync(d) && !inNodeModules(d))
+  if (payloadDirs.length) { inputs = payloadDirs; scannedLabel = 'the design system’s own templates' }
+  else {
+    const cwdSrc = join(process.cwd(), 'src')
+    inputs = [existsSync(cwdSrc) ? cwdSrc : process.cwd()]
+    scannedLabel = existsSync(cwdSrc) ? 'src' : 'this project'
+  }
+}
 
 const files = inputs.flatMap((p) => {
   try {
@@ -891,6 +968,15 @@ const files = inputs.flatMap((p) => {
     throw e
   }
 })
+
+if (!files.length) {
+  console.error(
+    `\n  check-usage: no scannable files found in ${scannedLabel}.\n` +
+      `  Looked for ${[...CODE].join(' ')} files (skipping node_modules, dist, build, …).\n` +
+      `  ${positional.length ? 'Check the path you passed.' : 'Point it at your source, e.g. `npx 2one check src`.'}\n`,
+  )
+  process.exit(1)
+}
 
 // ---- run ----
 const findings = []
