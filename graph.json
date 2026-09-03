@@ -4,8 +4,8 @@
   "generated_for": "0.2.0",
   "ontology": "graph/ontology.json",
   "stats": {
-    "nodes": 325,
-    "edges": 964,
+    "nodes": 326,
+    "edges": 1007,
     "by_node_type": {
       "a11y": 8,
       "ai-component": 7,
@@ -17,7 +17,7 @@
       "context": 4,
       "contrast": 9,
       "intent": 23,
-      "pattern": 9,
+      "pattern": 10,
       "package": 13,
       "token-radius": 7,
       "ramp": 21,
@@ -29,7 +29,7 @@
     },
     "by_class": {
       "AccessibilityRequirement": 8,
-      "Pattern": 67,
+      "Pattern": 68,
       "Brand": 8,
       "Component": 65,
       "Context": 4,
@@ -44,13 +44,13 @@
       "alternative_to": 2,
       "applies_when": 1,
       "appropriate_for": 4,
-      "composed_of": 413,
+      "composed_of": 452,
       "demonstrates": 5,
       "depends_on": 79,
       "derived_from": 26,
       "embodies": 6,
       "forbidden_with": 1,
-      "governed_by": 171,
+      "governed_by": 175,
       "has_contrast": 18,
       "inappropriate_for": 4,
       "overrides": 1,
@@ -66,12 +66,12 @@
     },
     "by_provenance": {
       "nodes": {
-        "explicit": 119,
+        "explicit": 120,
         "derived": 206
       },
       "edges": {
         "explicit": 307,
-        "derived": 657
+        "derived": 700
       }
     },
     "ontology_violations": 0
@@ -1395,6 +1395,14 @@
       "label": "Show supplementary info",
       "description": "Reveal optional, non-essential helper information.",
       "source": "graph/decisions.json"
+    },
+    {
+      "id": "pattern:app-shell",
+      "type": "pattern",
+      "class": "Pattern",
+      "prov": "explicit",
+      "label": "App shell",
+      "source": "src/patterns/app-shell.tsx"
     },
     {
       "id": "pattern:authentication",
@@ -3051,6 +3059,60 @@
       "prov": "explicit",
       "priority": "ALTERNATIVE",
       "evidence": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "component:alert",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:loading-state",
+      "target": "component:skeleton",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "component:badge",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "component:progress",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:collapsible",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:separator",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "component:spinner",
+      "type": "composed_of",
+      "prov": "derived"
     },
     {
       "source": "component-2one:app-bar",
@@ -5531,6 +5593,186 @@
       "prov": "derived"
     },
     {
+      "source": "pattern:app-shell",
+      "target": "component-2one:app-bar",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "component-2one:bottom-nav-item",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "component-2one:logo",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "component:sidebar",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:avatar",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:item",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:separator",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:textarea",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:avatar",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:badge",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:card",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:item",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:separator",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:card",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:carousel",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:dialog",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:empty",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:badge",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:card",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:table",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:tabs",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:avatar",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:badge",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:card",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:separator",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
       "source": "block:login-01",
       "target": "intent:authenticate",
       "type": "demonstrates",
@@ -6995,6 +7237,30 @@
       "target": "rule:tooltip-not-essential",
       "type": "governed_by",
       "prov": "explicit"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "rule:logo-untouchable",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:app-shell",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "prov": "derived"
     },
     {
       "source": "pattern:comment-thread",
