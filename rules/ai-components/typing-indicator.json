@@ -1,5 +1,6 @@
 {
   "id": "ai-component:typing-indicator",
+  "implementation": "tsx",
   "label": "Typing indicator",
   "tier": 3,
   "kind": "assistant-element",
@@ -12,7 +13,10 @@
   "composition": [
     "Three grayscale dots on the spacing scale, pulsing on a stagger"
   ],
-  "composes": { "components": [], "blocks": [] },
+  "composes": {
+    "components": [],
+    "blocks": []
+  },
   "responsive": "Inline; fixed intrinsic size.",
   "accessibility": [
     "role=status with an aria-label describing the meaning of the dots",
@@ -23,7 +27,11 @@
     "colouring the dots — a coloured indicator reads as state",
     "using it in place of a named step when one is available"
   ],
-  "governed_by": ["reduced-motion", "grayscale", "tokens-only"],
+  "governed_by": [
+    "reduced-motion",
+    "grayscale",
+    "tokens-only"
+  ],
   "assumptions": [
     "Atomic ai-component: composed from tokens + the spacing scale, no shadcn primitive exists for it.",
     "Mount/unmount is driven by the caller to reflect the real composing window."

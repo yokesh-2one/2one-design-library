@@ -1,5 +1,6 @@
 {
   "id": "pattern:media-gallery",
+  "implementation": "spec-only",
   "label": "Media gallery",
   "tier": 3,
   "kind": "section-pattern",
@@ -12,7 +13,13 @@
     "Empty — the Empty component when the gallery has no items"
   ],
   "composes": {
-    "components": ["card", "carousel", "dialog", "button", "empty"]
+    "components": [
+      "card",
+      "carousel",
+      "dialog",
+      "button",
+      "empty"
+    ]
   },
   "primary_action": "None at rest; inside the lightbox the close and prev/next are ghost/outline. No filled primary competes with the app's.",
   "responsive": "A multi-column grid at md+; a single-item Carousel below md. Thumbnails keep a fixed aspect ratio (aspect-square/aspect-video) and never overflow the row.",
@@ -27,7 +34,11 @@
     "text laid directly over an image with no scrim",
     "a filled primary Button inside the gallery competing with the page's primary"
   ],
-  "governed_by": ["no-color-alone", "tokens-only", "width-by-content"],
+  "governed_by": [
+    "no-color-alone",
+    "tokens-only",
+    "width-by-content"
+  ],
   "assumptions": [
     "Media are PLACEHOLDER slots — wire real images/videos, and use docs/placeholders.md where none exist.",
     "The lightbox is a Dialog; swap for a route if deep-linking to an item is required.",
@@ -36,7 +47,13 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships no gallery block (canonical blocks are dashboard, sidebar, login, signup — https://ui.shadcn.com/blocks). Composed from shadcn PRIMITIVES (Card, Carousel, Dialog, Button, Empty); every part a real, in-repo component.",
-    "shadcn_primitives": ["card", "carousel", "dialog", "button", "empty"],
+    "shadcn_primitives": [
+      "card",
+      "carousel",
+      "dialog",
+      "button",
+      "empty"
+    ],
     "two_one_blocks": [],
     "checked_against": "https://ui.shadcn.com/blocks"
   }

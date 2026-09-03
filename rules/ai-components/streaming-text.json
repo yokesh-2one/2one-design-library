@@ -1,5 +1,6 @@
 {
   "id": "ai-component:streaming-text",
+  "implementation": "tsx",
   "label": "Streaming text",
   "tier": 3,
   "kind": "assistant-element",
@@ -14,7 +15,10 @@
     "The newest N words carry the brand accent, then transition to foreground",
     "A blinking caret at the leading edge while streaming"
   ],
-  "composes": { "components": [], "blocks": [] },
+  "composes": {
+    "components": [],
+    "blocks": []
+  },
   "responsive": "Flows as a paragraph; wraps to its container.",
   "accessibility": [
     "aria-live=polite + aria-busy while streaming so assistive tech follows the update",
@@ -25,7 +29,12 @@
     "leaving text in the accent colour permanently — the accent marks the edge, not the content",
     "using the accent as the only cue that text is still streaming (pair it with aria-busy + the caret)"
   ],
-  "governed_by": ["brand-accent", "no-color-alone", "reduced-motion", "tokens-only"],
+  "governed_by": [
+    "brand-accent",
+    "no-color-alone",
+    "reduced-motion",
+    "tokens-only"
+  ],
   "assumptions": [
     "Streaming is SIMULATED here by a timer over a fixed string — replace with the real token stream.",
     "`accentWords` (3) is a presentation choice; tune to the streaming rate."
