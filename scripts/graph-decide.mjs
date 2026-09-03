@@ -37,15 +37,46 @@ const tierRank = (t) => TIER[t] || 99
 const out = (id, type) => graph.edges.filter((e) => e.source === id && (!type || e.type === type))
 const inc = (id, type) => graph.edges.filter((e) => e.target === id && (!type || e.type === type))
 
+// ---- fuzzy matching: normalise so "show profile" matches "Show a profile" and
+//      order / articles / plurals don't block a hit. Nodes may carry `aliases`.
+const STOP = new Set(['a', 'an', 'the', 'to', 'of', 'for', 'and', 'or', 'with', 'in', 'on', 'your', 'my', 'this', 'that', 'me'])
+const normTokens = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ')
+  .filter((t) => t && !STOP.has(t)).map((t) => t.replace(/s$/, ''))
+const tokset = (s) => new Set(normTokens(s))
+const nodeTokens = (n) => tokset([n.label, ...(n.aliases || [])].join(' '))
+
 // resolve a query string to a node id, optionally constrained to a class
 function resolve(q, klass) {
   if (q == null) return null
   if (byId.has(q)) return q
   const ql = String(q).toLowerCase()
-  let m = graph.nodes.filter((n) => (!klass || n.class === klass) && (n.id.toLowerCase() === ql || n.label.toLowerCase() === ql))
-  if (!m.length) m = graph.nodes.filter((n) => (!klass || n.class === klass) && (n.id.toLowerCase().includes(ql) || n.label.toLowerCase().includes(ql)))
-  m.sort((a, b) => a.id.localeCompare(b.id))
-  return m.length ? m[0].id : null
+  const inClass = (n) => !klass || n.class === klass
+  // 1. exact id or label · 2. exact alias · 3. substring on id/label
+  let m = graph.nodes.filter((n) => inClass(n) && (n.id.toLowerCase() === ql || n.label.toLowerCase() === ql))
+  if (!m.length) m = graph.nodes.filter((n) => inClass(n) && (n.aliases || []).some((a) => String(a).toLowerCase() === ql))
+  if (!m.length) m = graph.nodes.filter((n) => inClass(n) && (n.id.toLowerCase().includes(ql) || n.label.toLowerCase().includes(ql)))
+  if (m.length) { m.sort((a, b) => a.id.localeCompare(b.id)); return m[0].id }
+  // 4. normalised token match — every query token present in the node's label+aliases
+  const Q = tokset(q)
+  if (Q.size) {
+    const cand = graph.nodes.filter(inClass).map((n) => ({ id: n.id, N: nodeTokens(n) }))
+      .filter(({ N }) => [...Q].every((t) => N.has(t)))
+      .map(({ id, N }) => ({ id, extra: N.size - Q.size }))
+      .sort((a, b) => a.extra - b.extra || a.id.localeCompare(b.id))
+    if (cand.length) return cand[0].id
+  }
+  return null
+}
+
+// closest intents to a free-text query — for the "no exact match" hint (D3).
+function suggestIntents(q, limit = 3) {
+  const Q = tokset(q)
+  if (!Q.size) return []
+  return graph.nodes.filter((n) => n.class === 'Intent')
+    .map((n) => { const N = nodeTokens(n); return { id: n.id, label: n.label, shared: [...Q].filter((t) => N.has(t)).length } })
+    .filter((x) => x.shared > 0)
+    .sort((a, b) => b.shared - a.shared || a.id.localeCompare(b.id))
+    .slice(0, limit)
 }
 
 // rules governing a node: governed_by out-edges + applies_to in-edges, with metadata
@@ -70,7 +101,16 @@ function componentsOf(id) {
 // ---- the core decision ----
 function decide(intentQ, context) {
   const intent = resolve(intentQ, 'Intent') || resolve(intentQ)
-  if (!intent) return { error: `No intent matches "${intentQ}"` }
+  if (!intent) {
+    const suggestions = suggestIntents(intentQ)
+    return {
+      error: `No intent matches "${intentQ}"`,
+      suggestions: suggestions.map((s) => ({ id: s.id, label: s.label })),
+      guidance: suggestions.length
+        ? `Did you mean: ${suggestions.map((s) => s.label).join(' · ')}? Pass an intent id, e.g. "${suggestions[0].id.replace('intent:', '')}".`
+        : 'No close intent. A product-domain intent (a meeting, a checkout, a booking) is not in the core graph — add it as a domain pack: see docs/domain-packs.md.',
+    }
+  }
   const ctx = context ? (resolve(context, 'Context') || context) : null
 
   // candidate realisations: realized_by (intent→X) + preferred_for (X→intent) + appropriate_for

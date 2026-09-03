@@ -207,6 +207,19 @@ for (const [group, list] of Object.entries(decisions.nodes ?? {})) {
     addNode(id, group, label || id, rest)
   }
 }
+// Pattern / AI-component NODES from their specs are created HERE, before the decision
+// edges below, so a decision edge (e.g. an intent's realized_by → pattern:app-shell)
+// can resolve its target. Their structural composed_of / governed_by edges are added
+// AFTER the decision layer (de-duplicated) — see the spec-ingest block further down.
+for (const [dirKey, ntype] of [['patternSpecs', 'pattern'], ['aiComponentSpecs', 'ai-component']]) {
+  let dir
+  try { dir = cfg.rel(dirKey) } catch { continue }
+  for (const f of ls(dir, (x) => x.endsWith('.json'))) {
+    let spec
+    try { spec = J(`${dir}/${f}`) } catch { continue }
+    if (spec.id) addNode(spec.id, ntype, spec.label ?? spec.id, { source: spec.file ?? `${dir}/${f}` })
+  }
+}
 // specializes edges for variants
 for (const v of decisions.nodes?.variant ?? []) if (v.specializes) addEdge(v.id, v.specializes, 'specializes', 'explicit', { evidence: v.source })
 

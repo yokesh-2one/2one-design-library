@@ -4,8 +4,8 @@
   "generated_for": "0.2.0",
   "ontology": "graph/ontology.json",
   "stats": {
-    "nodes": 326,
-    "edges": 1007,
+    "nodes": 330,
+    "edges": 1011,
     "by_node_type": {
       "a11y": 8,
       "ai-component": 7,
@@ -16,7 +16,7 @@
       "component": 55,
       "context": 4,
       "contrast": 9,
-      "intent": 23,
+      "intent": 27,
       "pattern": 10,
       "package": 13,
       "token-radius": 7,
@@ -34,7 +34,7 @@
       "Component": 65,
       "Context": 4,
       "Evidence": 9,
-      "Intent": 23,
+      "Intent": 27,
       "Package": 13,
       "Foundation": 74,
       "Rule": 44,
@@ -57,7 +57,7 @@
       "preferred_composition": 46,
       "preferred_for": 6,
       "preferred_over": 2,
-      "realized_by": 20,
+      "realized_by": 24,
       "requires": 15,
       "serves": 5,
       "specializes": 6,
@@ -66,11 +66,11 @@
     },
     "by_provenance": {
       "nodes": {
-        "explicit": 120,
+        "explicit": 124,
         "derived": 206
       },
       "edges": {
-        "explicit": 307,
+        "explicit": 311,
         "derived": 700
       }
     },
@@ -1190,6 +1190,37 @@
       "passes": true
     },
     {
+      "id": "intent:action-toolbar",
+      "type": "intent",
+      "class": "Intent",
+      "prov": "explicit",
+      "label": "Action toolbar",
+      "description": "A row of controls where a critical action must stay reachable.",
+      "source": "src/components/ui/toolbar.tsx",
+      "aliases": [
+        "action toolbar",
+        "toolbar",
+        "control bar",
+        "action bar"
+      ]
+    },
+    {
+      "id": "intent:app-shell",
+      "type": "intent",
+      "class": "Intent",
+      "prov": "explicit",
+      "label": "App shell",
+      "description": "The top-level product frame — brand, navigation, and a content region.",
+      "source": "src/patterns/app-shell.tsx",
+      "aliases": [
+        "app shell",
+        "shell",
+        "application frame",
+        "app layout",
+        "navigation frame"
+      ]
+    },
+    {
       "id": "intent:authenticate",
       "type": "intent",
       "class": "Intent",
@@ -1244,6 +1275,22 @@
       "source": "recipes/build-an-app.md"
     },
     {
+      "id": "intent:media-placeholder",
+      "type": "intent",
+      "class": "Intent",
+      "prov": "explicit",
+      "label": "Show a media placeholder",
+      "description": "An on-brand stand-in where an image or video will go but none is loaded.",
+      "source": "src/components/media-placeholder.tsx",
+      "aliases": [
+        "media placeholder",
+        "image placeholder",
+        "no image",
+        "empty media",
+        "media preview"
+      ]
+    },
+    {
       "id": "intent:navigate",
       "type": "intent",
       "class": "Intent",
@@ -1259,7 +1306,13 @@
       "prov": "explicit",
       "label": "Post to a feed",
       "description": "Show one item in a social/activity feed — author, body, optional media, low-emphasis reactions.",
-      "source": "rules/patterns/feed-item.json"
+      "source": "rules/patterns/feed-item.json",
+      "aliases": [
+        "feed",
+        "feed item",
+        "activity feed",
+        "post"
+      ]
     },
     {
       "id": "intent:present-pricing",
@@ -1322,7 +1375,13 @@
       "prov": "explicit",
       "label": "Show a comment thread",
       "description": "Show a thread of comments and let the reader add one.",
-      "source": "rules/patterns/comment-thread.json"
+      "source": "rules/patterns/comment-thread.json",
+      "aliases": [
+        "comments",
+        "comment thread",
+        "replies",
+        "discussion"
+      ]
     },
     {
       "id": "intent:show-media-gallery",
@@ -1331,7 +1390,13 @@
       "prov": "explicit",
       "label": "Show a media gallery",
       "description": "Show a set of images/videos as a browsable grid or carousel, with a lightbox.",
-      "source": "rules/patterns/media-gallery.json"
+      "source": "rules/patterns/media-gallery.json",
+      "aliases": [
+        "media gallery",
+        "gallery",
+        "photo grid",
+        "image gallery"
+      ]
     },
     {
       "id": "intent:show-profile",
@@ -1340,7 +1405,13 @@
       "prov": "explicit",
       "label": "Show a profile",
       "description": "Introduce a person/account at the top of a profile — avatar, name, bio, stats, one primary relationship action.",
-      "source": "rules/patterns/profile-header.json"
+      "source": "rules/patterns/profile-header.json",
+      "aliases": [
+        "profile",
+        "profile header",
+        "user profile",
+        "account header"
+      ]
     },
     {
       "id": "intent:show-reasoning",
@@ -1350,6 +1421,21 @@
       "label": "Show the reasoning trace",
       "description": "Reveal the model's intermediate steps without dominating the answer.",
       "source": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "id": "intent:side-panel",
+      "type": "intent",
+      "class": "Intent",
+      "prov": "explicit",
+      "label": "Show a side panel",
+      "description": "A secondary panel beside the main content — inline on desktop, a Sheet on mobile.",
+      "source": "graph/decisions.json",
+      "aliases": [
+        "side panel",
+        "detail panel",
+        "responsive side panel",
+        "info panel"
+      ]
     },
     {
       "id": "intent:signal-composing",
@@ -8111,6 +8197,18 @@
       "evidence": "recipes/build-an-app.md"
     },
     {
+      "source": "intent:action-toolbar",
+      "target": "component:toolbar",
+      "type": "realized_by",
+      "prov": "explicit"
+    },
+    {
+      "source": "intent:app-shell",
+      "target": "pattern:app-shell",
+      "type": "realized_by",
+      "prov": "explicit"
+    },
+    {
       "source": "intent:authenticate",
       "target": "pattern:authentication",
       "type": "realized_by",
@@ -8149,6 +8247,12 @@
       "prov": "explicit",
       "priority": "PREFERRED",
       "evidence": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "intent:media-placeholder",
+      "target": "component-2one:media-placeholder",
+      "type": "realized_by",
+      "prov": "explicit"
     },
     {
       "source": "intent:post-to-feed",
@@ -8229,6 +8333,12 @@
       "prov": "explicit",
       "priority": "PREFERRED",
       "evidence": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "source": "intent:side-panel",
+      "target": "pattern:mobile-side-panel",
+      "type": "realized_by",
+      "prov": "explicit"
     },
     {
       "source": "intent:signal-composing",
