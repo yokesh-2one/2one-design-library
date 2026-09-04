@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openCase, ALL_CASES } from './support/harness'
+import { openCase, SCREENSHOT_CASES } from './support/harness'
 
 /*
   Visual-regression snapshots. Each case is captured per project (viewport × theme),
@@ -7,7 +7,7 @@ import { openCase, ALL_CASES } from './support/harness'
   fails CI and produces a diff image in the HTML report + trace.
 */
 
-for (const caseId of ALL_CASES) {
+for (const caseId of SCREENSHOT_CASES) {
   test(`snapshot: ${caseId}`, async ({ page }, testInfo) => {
     await openCase(page, testInfo, caseId)
     await expect(page).toHaveScreenshot(`${caseId}.png`)
