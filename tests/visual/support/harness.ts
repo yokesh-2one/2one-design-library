@@ -38,7 +38,7 @@ export const COMPONENT_IDS = [
 ] as const
 
 /** Dedicated compositions defined directly in cases.tsx. */
-export const COMPOSITION_IDS = ['button', 'card', 'table', 'dialog', 'app-shell', 'meeting'] as const
+export const COMPOSITION_IDS = ['button', 'card', 'table', 'dialog', 'app-shell', 'meeting', 'marketing-site'] as const
 
 /** Full-page blocks (auth, dashboard, marketing). */
 export const BLOCK_IDS = ['login', 'signup', 'dashboard', 'marketing'] as const

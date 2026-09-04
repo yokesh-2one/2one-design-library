@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/table'
 import { AppShell } from '@/patterns/app-shell'
 import { MeetingScreen } from './fixtures/meeting-screen'
+import { MarketingSiteScreen } from './fixtures/marketing-site'
 import { COMPONENT_CASES } from './fixtures/components'
 import { BLOCK_CASES } from './fixtures/blocks'
 import { STATE_CASES } from './fixtures/states'
@@ -221,6 +222,7 @@ export const CASES: Record<string, HarnessCase> = {
   table: { render: () => <TableCase />, layout: 'center' },
   'app-shell': { render: () => <AppShellCase />, layout: 'fill' },
   meeting: { render: () => <MeetingScreen />, layout: 'fill' },
+  'marketing-site': { render: () => <MarketingSiteScreen />, layout: 'fill' },
 
   // One deterministic case per component (gallery).
   ...COMPONENT_CASES,
