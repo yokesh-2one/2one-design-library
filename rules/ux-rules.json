@@ -1,6 +1,6 @@
 {
   "name": "2one UX Rules — the machine-readable design-decision contract",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "purpose": "The single source of truth for 2one's opinionated UX decisions, structured so AI agents and validators consume them deterministically. Prose lives in docs/building-with-the-dls.md and AGENTS.md; this file is the machine contract the knowledge graph and checks are built from (scripts/build-graph.mjs turns each rule into a `rule:` node with `governed_by` edges; scripts/check-rules.mjs validates it).",
   "severity_levels": {
     "forbidden": "Never do this — a violation is a defect. No escape hatch.",
@@ -584,6 +584,46 @@
       "rationale": "Em-dash density is the clearest tell of AI-generated prose: models overuse it to an almost comical degree. The fix is a copy pass, not a token, so this rule keeps the voice from drifting back to the default.",
       "applies_to": [],
       "since": "1.3.0"
+    },
+    {
+      "id": "link-text-descriptive",
+      "category": "accessibility",
+      "severity": "must",
+      "label": "Link text names its destination",
+      "statement": "Visible link text must make the destination clear out of its surrounding context. Never use \"click here\", \"read more\", \"learn more\" or a bare \"here\" as the link, and never show a raw URL as the label — name the destination (\"GitHub repository\", \"live manifest.json\"). Links must also be distinguishable by more than colour (an underline or equivalent, with --brand for emphasis), never colour alone.",
+      "rationale": "Screen-reader users navigate by a list of links out of context, so \"click here\" is meaningless and a raw URL is unreadable (WCAG 2.4.4 / Section 508). Colour-only links fail users who can't perceive the hue (WCAG 1.4.1).",
+      "applies_to": ["intent:navigate", "context:web"],
+      "since": "1.4.0"
+    },
+    {
+      "id": "link-label-consistency",
+      "category": "accessibility",
+      "severity": "should",
+      "label": "Same destination, same link label",
+      "statement": "A given href gets the same accessible name everywhere it repeats — header, footer, and other chrome. The only exception is a genuinely different action to the same URL (e.g. \"Start free\" vs \"Pricing\"); document that exception where it occurs.",
+      "rationale": "Users who move through repeated chrome (and assistive tech that lists links) rely on a stable name→destination mapping; two labels for one URL, or one label for two, is disorienting (WCAG 2.4.4).",
+      "applies_to": ["intent:navigate", "context:web"],
+      "since": "1.4.0"
+    },
+    {
+      "id": "landing-inverted-pyramid",
+      "category": "completeness",
+      "severity": "should",
+      "label": "Landing pages lead with the outcome",
+      "statement": "A marketing/landing page states what it is and the one thing to do in its H1 and first paragraph (inverted pyramid), before any supporting detail. Headings stand alone out of context in words people search for — no clever or colon (\"Topic: subtitle\") titles, and no welcome filler.",
+      "rationale": "People scan a page before they read it; front-loading the outcome and using literal, standalone headings lets them decide and act without hunting, and matches how search and assistive tech surface a page.",
+      "applies_to": ["block:marketing-hero", "context:web"],
+      "since": "1.4.0"
+    },
+    {
+      "id": "no-invented-capabilities",
+      "category": "data-integrity",
+      "severity": "must",
+      "label": "Every claim is backed by the repo",
+      "statement": "On web copy, state only capabilities, prices, and metrics backed by a repo file, a command, or a human-provided number. Never invent features, commercial terms (billing, annual discounts, checkout), or numbers, and don't collapse the product to one part of it (the knowledge graph is the engine, not the whole product). State honest gaps plainly rather than papering over them.",
+      "rationale": "The manifest contract is answer-only-from-repo; marketing copy is where invented claims and fake commercial terms most often creep in, and an unbacked claim is a defect, not a flourish.",
+      "applies_to": ["context:web"],
+      "since": "1.4.0"
     }
   ],
   "deprecations": []
