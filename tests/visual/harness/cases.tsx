@@ -34,6 +34,8 @@ import {
 import { AppShell } from '@/patterns/app-shell'
 import { MeetingScreen } from './fixtures/meeting-screen'
 import { COMPONENT_CASES } from './fixtures/components'
+import { BLOCK_CASES } from './fixtures/blocks'
+import { STATE_CASES } from './fixtures/states'
 import { ALL_CASES } from '../support/harness'
 
 export interface HarnessCase {
@@ -222,6 +224,9 @@ export const CASES: Record<string, HarnessCase> = {
 
   // One deterministic case per component (gallery).
   ...COMPONENT_CASES,
+  // Full-page blocks + the required predictable states.
+  ...BLOCK_CASES,
+  ...STATE_CASES,
 }
 
 // Guard: every id the specs iterate must have a render here (and vice-versa),

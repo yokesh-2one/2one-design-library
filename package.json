@@ -87,7 +87,7 @@
     "verify:visual": "playwright test",
     "test:visual": "playwright test screenshots.spec.ts",
     "test:visual:update": "playwright test --update-snapshots",
-    "test:a11y": "playwright test a11y.spec.ts",
+    "test:a11y": "playwright test tests/visual/specs",
     "test:report": "playwright show-report"
   },
   "peerDependencies": {

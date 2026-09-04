@@ -40,5 +40,23 @@ export const COMPONENT_IDS = [
 /** Dedicated compositions defined directly in cases.tsx. */
 export const COMPOSITION_IDS = ['button', 'card', 'table', 'dialog', 'app-shell', 'meeting'] as const
 
-/** Every case that gets a screenshot + axe pass. */
-export const ALL_CASES = [...COMPOSITION_IDS, ...COMPONENT_IDS] as const
+/** Full-page blocks (auth, dashboard, marketing). */
+export const BLOCK_IDS = ['login', 'signup', 'dashboard', 'marketing'] as const
+
+/** The required predictable states (req #6). */
+export const STATE_IDS = ['state-disabled', 'state-loading', 'state-empty', 'state-error', 'state-success'] as const
+
+/** Every case gets an axe pass. */
+export const ALL_CASES = [...COMPOSITION_IDS, ...COMPONENT_IDS, ...BLOCK_IDS, ...STATE_IDS] as const
+
+/*
+  Screenshot-only exclusions. `dashboard` embeds a recharts chart that animates
+  via JS/SVG attributes — Playwright's `animations: 'disabled'` only freezes CSS,
+  so the shot never stabilises. It is still fully covered by axe and the a11y
+  specs; only its pixel baseline is skipped. (The standalone `chart` case sets
+  isAnimationActive={false}, so it IS screenshotted.)
+*/
+export const SCREENSHOT_EXCLUDE = new Set<string>(['dashboard'])
+
+/** Cases that get a screenshot baseline. */
+export const SCREENSHOT_CASES = ALL_CASES.filter((id) => !SCREENSHOT_EXCLUDE.has(id))
