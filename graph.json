@@ -4,20 +4,20 @@
   "generated_for": "0.2.0",
   "ontology": "graph/ontology.json",
   "stats": {
-    "nodes": 334,
-    "edges": 1014,
+    "nodes": 336,
+    "edges": 1027,
     "by_node_type": {
       "a11y": 8,
       "ai-component": 7,
       "template-block": 20,
       "brand": 8,
       "template-chart": 31,
-      "component-2one": 4,
+      "component-2one": 5,
       "component": 55,
       "context": 4,
       "contrast": 9,
       "intent": 27,
-      "pattern": 10,
+      "pattern": 11,
       "package": 13,
       "token-radius": 7,
       "ramp": 21,
@@ -29,9 +29,9 @@
     },
     "by_class": {
       "AccessibilityRequirement": 8,
-      "Pattern": 68,
+      "Pattern": 69,
       "Brand": 8,
-      "Component": 65,
+      "Component": 66,
       "Context": 4,
       "Evidence": 9,
       "Intent": 27,
@@ -44,13 +44,13 @@
       "alternative_to": 2,
       "applies_when": 1,
       "appropriate_for": 4,
-      "composed_of": 454,
+      "composed_of": 458,
       "demonstrates": 5,
-      "depends_on": 79,
+      "depends_on": 81,
       "derived_from": 26,
       "embodies": 6,
       "forbidden_with": 1,
-      "governed_by": 176,
+      "governed_by": 183,
       "has_contrast": 18,
       "inappropriate_for": 4,
       "overrides": 1,
@@ -66,12 +66,12 @@
     },
     "by_provenance": {
       "nodes": {
-        "explicit": 128,
-        "derived": 206
+        "explicit": 129,
+        "derived": 207
       },
       "edges": {
         "explicit": 312,
-        "derived": 702
+        "derived": 715
       }
     },
     "ontology_violations": 0
@@ -622,6 +622,14 @@
       "prov": "derived",
       "label": "MediaPlaceholder",
       "path": "src/components/media-placeholder.tsx"
+    },
+    {
+      "id": "component-2one:theme-toggle",
+      "type": "component-2one",
+      "class": "Component",
+      "prov": "derived",
+      "label": "ThemeToggle",
+      "path": "src/components/theme-toggle.tsx"
     },
     {
       "id": "component:accordion",
@@ -1534,6 +1542,14 @@
       "label": "Form submission",
       "description": "Label + Input + validation message, one primary submit.",
       "source": "recipes/build-an-app.md"
+    },
+    {
+      "id": "pattern:marketing-site",
+      "type": "pattern",
+      "class": "Pattern",
+      "prov": "explicit",
+      "label": "Marketing site shell",
+      "source": "src/patterns/marketing-site.tsx"
     },
     {
       "id": "pattern:media-gallery",
@@ -3347,6 +3363,12 @@
     {
       "source": "component-2one:media-placeholder",
       "target": "type:xs",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "component-2one:theme-toggle",
+      "target": "component:button",
       "type": "composed_of",
       "prov": "derived"
     },
@@ -5841,6 +5863,24 @@
       "prov": "derived"
     },
     {
+      "source": "pattern:marketing-site",
+      "target": "component-2one:logo",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "component-2one:theme-toggle",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "component:button",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
       "source": "pattern:media-gallery",
       "target": "component:button",
       "type": "composed_of",
@@ -5974,6 +6014,18 @@
     {
       "source": "component-2one:media-placeholder",
       "target": "pkg:lucide-react",
+      "type": "depends_on",
+      "prov": "derived"
+    },
+    {
+      "source": "component-2one:theme-toggle",
+      "target": "pkg:lucide-react",
+      "type": "depends_on",
+      "prov": "derived"
+    },
+    {
+      "source": "component-2one:theme-toggle",
+      "target": "pkg:next-themes",
       "type": "depends_on",
       "prov": "derived"
     },
@@ -7474,6 +7526,48 @@
       "type": "governed_by",
       "prov": "explicit",
       "evidence": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:fixed-vs-theme-color",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:link-label-consistency",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:link-text-descriptive",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:logo-untouchable",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "prov": "derived"
+    },
+    {
+      "source": "pattern:marketing-site",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "prov": "derived"
     },
     {
       "source": "pattern:media-gallery",
