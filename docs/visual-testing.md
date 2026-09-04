@@ -23,10 +23,19 @@ Every case is tested in **light + dark** across **mobile (375)**, **laptop (1280
 and **large desktop (1920)** — six Playwright projects. One screenshot test →
 six baselines.
 
-### Proof-of-concept coverage
+### Coverage
 
-Button, Card, Dialog, AppShell, and one complete video-meeting screen. Expanding to
-the full library is a matter of adding cases (below).
+Every component (55 UI + 4 2one-only) plus key compositions (AppShell, a data
+table, a video-meeting screen) — 62 cases, each captured across 3 viewports × 2
+themes for **372 screenshot baselines**, with axe run on every case × project.
+Overlay components (dialog, sheet, drawer, popover, tooltip, hover-card,
+dropdown, alert-dialog) render in their open state so the surface that matters is
+what's pinned.
+
+Two **serious** accessibility bugs in shipped components were found by building
+this coverage and are fixed here: `Table` and `ScrollArea` both had scroll
+regions that keyboard users couldn't reach (`scrollable-region-focusable`). Each
+is now guarded by its case.
 
 ## Commands
 
@@ -99,9 +108,12 @@ Tolerance is tight on purpose: a small per-pixel colour threshold (AA noise) plu
 
 ## Adding a case
 
-1. Add realistic, deterministic content (states: loading, empty, error, selected,
-   disabled) to `tests/visual/harness/cases.tsx` under a new id. Compose from real
-   DLS components; use fixed data.
-2. Add the id to `POC_CASES` in `tests/visual/support/harness.ts` (or its successor
-   list) — it is picked up by both the screenshot and axe loops.
+1. Add a deterministic render to `tests/visual/harness/fixtures/components.tsx`
+   (or a composition in `cases.tsx`) under a new id. Compose from real DLS
+   components; use fixed data and label every control.
+2. Add the id to `COMPONENT_IDS` (or `COMPOSITION_IDS`) in
+   `tests/visual/support/harness.ts`. That is the single source of truth both
+   specs iterate; `cases.tsx` checks its registry against it, so the two cannot
+   drift.
 3. Run `npm run test:visual:update` to record baselines, review them, and commit.
+   Regenerate the `-linux` set via the CI update run (above) before it can gate.
