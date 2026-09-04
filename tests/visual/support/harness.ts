@@ -19,4 +19,4 @@ export async function openCase(
 }
 
 /** The PoC case set. Expands to the full library after sign-off. */
-export const POC_CASES = ['button', 'card', 'app-shell', 'meeting'] as const
+export const POC_CASES = ['button', 'card', 'table', 'app-shell', 'meeting'] as const

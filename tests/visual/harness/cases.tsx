@@ -23,6 +23,14 @@ import {
   DialogClose,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { AppShell } from '@/patterns/app-shell'
 import { MeetingScreen } from './fixtures/meeting-screen'
 
@@ -162,10 +170,51 @@ function AppShellCase() {
   )
 }
 
+// A table with more columns than a phone is wide, so its container scrolls
+// horizontally on the mobile project. This is the regression guard for the
+// keyboard-access fix in components/ui/table.tsx (axe: scrollable-region-focusable).
+const TABLE_ROWS = [
+  { id: 'INV-1001', client: 'Northwind Traders', owner: 'A. Okafor', status: 'Paid', due: 'Jan 12', amount: '$3,200.00' },
+  { id: 'INV-1002', client: 'Contoso Ltd', owner: 'B. Lund', status: 'Pending', due: 'Jan 18', amount: '$1,540.00' },
+  { id: 'INV-1003', client: 'Fabrikam Inc', owner: 'C. Wei', status: 'Overdue', due: 'Jan 05', amount: '$920.50' },
+]
+
+function TableCase() {
+  return (
+    <div className="w-full max-w-3xl">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Invoice</TableHead>
+            <TableHead>Client</TableHead>
+            <TableHead>Owner</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Due</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {TABLE_ROWS.map((r) => (
+            <TableRow key={r.id}>
+              <TableCell className="font-medium tabular-nums">{r.id}</TableCell>
+              <TableCell>{r.client}</TableCell>
+              <TableCell>{r.owner}</TableCell>
+              <TableCell>{r.status}</TableCell>
+              <TableCell className="tabular-nums">{r.due}</TableCell>
+              <TableCell className="text-right tabular-nums">{r.amount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
 export const CASES: Record<string, HarnessCase> = {
   button: { render: () => <ButtonCase />, layout: 'center' },
   card: { render: () => <CardCase />, layout: 'center' },
   dialog: { render: (p) => <DialogCase open={p.get('open') === '1'} />, layout: 'center' },
+  table: { render: () => <TableCase />, layout: 'center' },
   'app-shell': { render: () => <AppShellCase />, layout: 'fill' },
   meeting: { render: () => <MeetingScreen />, layout: 'fill' },
 }
