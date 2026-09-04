@@ -168,6 +168,68 @@ import { Button } from '@2one/design-library/components/ui/button'
 import { AppShell } from '@2one/design-library/patterns/app-shell'
 ```
 
+## 5 · Build a multi-page marketing site
+
+For a website (not an app), wrap every page in the **`MarketingSite`** pattern — one
+sticky header (brand + nav + theme toggle + an outline Contact) and the shared footer —
+and fill the content with the marketing blocks. The chrome carries no primary button, so
+each page's own primary (in its hero or CTA) stands alone.
+
+```tsx
+import {
+  MarketingSite,
+  MarketingHero,
+  MarketingFeatureGrid,
+  MarketingCtaBanner,
+} from '@2one/design-library'
+
+// One link map, shared by every page's chrome. Same href → same label everywhere
+// (WCAG 2.4.4). See docs/web-writing.md.
+export const NAV = [
+  { label: 'Product', href: '/product' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'About', href: '/about' },
+]
+
+export function ProductPage() {
+  return (
+    <MarketingSite nav={NAV} activeHref="/product" contactHref="/contact">
+      <MarketingHero />
+      <MarketingFeatureGrid />
+      <MarketingCtaBanner />
+    </MarketingSite>
+  )
+}
+```
+
+Each page passes its own `activeHref`, so the header marks the current destination
+(`aria-current` + weight, never colour alone). Blocks are importable by subpath too, for
+a lean per-page bundle:
+
+```tsx
+import { MarketingHero } from '@2one/design-library/blocks/marketing/hero'
+```
+
+**MPA or router — the `@source` rule still holds.** However you split pages (a Vite MPA
+with several HTML entries, or a router), Tailwind only generates classes it can *see*, so
+`@source` **every folder you actually render**:
+
+```css
+/* app.css */
+@import 'tailwindcss';
+@import '@2one/design-library/styles';
+@source '../node_modules/@2one/design-library/dist'; /* the DLS components + blocks */
+@source './';                                         /* YOUR pages/components too */
+```
+
+If a page renders unstyled, a folder it uses is missing from `@source` — the same silent
+failure as step 2, now across more entry points. (The `@` → `src` alias in this repo is
+internal to the DLS build; a consumer that installs the package doesn't need it — only a
+project that *vendors the source* (option C) sets its own alias.)
+
+For which blocks and patterns are public API, see [public-api.md](./public-api.md).
+
 ## Verify it worked
 
 Fastest check — run it in your app, not in the DLS repo:
