@@ -5,7 +5,7 @@
   "ontology": "graph/ontology.json",
   "stats": {
     "nodes": 330,
-    "edges": 1011,
+    "edges": 1013,
     "by_node_type": {
       "a11y": 8,
       "ai-component": 7,
@@ -44,7 +44,7 @@
       "alternative_to": 2,
       "applies_when": 1,
       "appropriate_for": 4,
-      "composed_of": 452,
+      "composed_of": 454,
       "demonstrates": 5,
       "depends_on": 79,
       "derived_from": 26,
@@ -71,7 +71,7 @@
       },
       "edges": {
         "explicit": 311,
-        "derived": 700
+        "derived": 702
       }
     },
     "ontology_violations": 0
@@ -5428,6 +5428,12 @@
     },
     {
       "source": "component:table",
+      "target": "radius:md",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "component:table",
       "target": "token:border",
       "type": "composed_of",
       "prov": "derived"
@@ -5447,6 +5453,12 @@
     {
       "source": "component:table",
       "target": "token:muted-foreground",
+      "type": "composed_of",
+      "prov": "derived"
+    },
+    {
+      "source": "component:table",
+      "target": "token:ring",
       "type": "composed_of",
       "prov": "derived"
     },

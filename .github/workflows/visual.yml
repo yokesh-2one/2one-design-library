@@ -1,0 +1,67 @@
+name: Visual + a11y
+
+# Rendered visual-regression + accessibility tests (Playwright + axe). Separate
+# from the fast `CI` (verify) workflow because it needs a browser download and is
+# minutes, not seconds. Runs on every PR.
+#
+# Cross-OS note: screenshot baselines are OS-specific (font rendering differs).
+# Baselines committed from a developer's machine carry a `-win32`/`-darwin` suffix;
+# THIS job runs on Linux and needs `-linux` baselines. Generate them once with the
+# manual "update baselines" run below (Run workflow → update = true), download the
+# artifact, and commit the files under tests/visual/__screenshots__/. See
+# docs/visual-testing.md.
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      update:
+        description: 'Regenerate baselines and upload them as an artifact (does not commit)'
+        type: boolean
+        default: false
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run visual + a11y suite
+        if: ${{ github.event.inputs.update != 'true' }}
+        run: npm run verify:visual
+
+      - name: Regenerate baselines (manual)
+        if: ${{ github.event.inputs.update == 'true' }}
+        run: npm run test:visual:update
+
+      # On failure: the HTML report + diff/actual images, so a reviewer can see
+      # exactly what changed and approve or reject it.
+      - name: Upload report + diffs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      # On the manual update run: the freshly generated Linux baselines to commit.
+      - name: Upload regenerated baselines
+        if: ${{ github.event.inputs.update == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-baselines
+          path: tests/visual/__screenshots__/
+          retention-days: 14

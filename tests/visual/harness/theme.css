@@ -1,0 +1,32 @@
+/* The real DLS theme + Tailwind source scanning for the harness only.
+   (globals.css stays free of test @source paths, exactly like dev/theme-dev.css.) */
+@import '../../../src/styles/globals.css';
+
+@source '../../../src/components/**/*.{ts,tsx}';
+@source '../../../src/blocks/**/*.{ts,tsx}';
+@source '../../../src/patterns/**/*.{ts,tsx}';
+@source './**/*.{ts,tsx}';
+
+/* ---------------------------------------------------------------------------
+   Determinism for screenshots. Screenshots must be byte-identical run to run,
+   so kill everything time-dependent: animations, transitions, the text caret,
+   and smooth scrolling. prefers-reduced-motion is ALSO set at the Playwright
+   project level; this belt-and-braces guarantees stillness even outside PW.
+   --------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  caret-color: transparent !important;
+  scroll-behavior: auto !important;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}

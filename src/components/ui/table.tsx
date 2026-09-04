@@ -6,7 +6,13 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      // A table wider than its container scrolls horizontally; the scroll region
+      // must be reachable by keyboard, or keyboard-only users cannot see the
+      // clipped columns (axe: scrollable-region-focusable, serious — surfaced by
+      // a wide table on a mobile viewport). tabIndex makes it a focus stop; the
+      // ring keeps that focus visible.
+      tabIndex={0}
+      className="relative w-full overflow-x-auto rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <table
         data-slot="table"
