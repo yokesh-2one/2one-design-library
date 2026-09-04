@@ -70,9 +70,11 @@ export * from './components/logo'
 export * from './components/app-bar'
 export * from './components/bottom-nav-item'
 export * from './components/media-placeholder'
+export * from './components/theme-toggle'
 
 // Tier-3 page patterns — importable compositions. For a lean import that skips the
 // rest of the barrel, use the subpath: '@2one/design-library/patterns/app-shell'.
 // (Spec-only patterns — feed-item, profile-header, … — live in rules/patterns/.)
 export * from './patterns/app-shell'
 export * from './patterns/pricing-page'
+export * from './patterns/marketing-site'
