@@ -33,6 +33,8 @@ import {
 } from '@/components/ui/table'
 import { AppShell } from '@/patterns/app-shell'
 import { MeetingScreen } from './fixtures/meeting-screen'
+import { COMPONENT_CASES } from './fixtures/components'
+import { ALL_CASES } from '../support/harness'
 
 export interface HarnessCase {
   /** Rendered node. `params` carries the URL query (e.g. ?open=1). */
@@ -217,4 +219,18 @@ export const CASES: Record<string, HarnessCase> = {
   table: { render: () => <TableCase />, layout: 'center' },
   'app-shell': { render: () => <AppShellCase />, layout: 'fill' },
   meeting: { render: () => <MeetingScreen />, layout: 'fill' },
+
+  // One deterministic case per component (gallery).
+  ...COMPONENT_CASES,
+}
+
+// Guard: every id the specs iterate must have a render here (and vice-versa),
+// so the string list in support/harness.ts can never silently drift.
+if (import.meta.env?.DEV) {
+  const missing = ALL_CASES.filter((id) => !(id in CASES))
+  const extra = Object.keys(CASES).filter((id) => !(ALL_CASES as readonly string[]).includes(id))
+  if (missing.length || extra.length) {
+    // eslint-disable-next-line no-console
+    console.error('[harness] case list drift — missing:', missing, 'extra:', extra)
+  }
 }

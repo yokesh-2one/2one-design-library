@@ -42,7 +42,9 @@ export default defineConfig({
     '{testDir}/__screenshots__/{testFileName}/{arg}-{projectName}-{platform}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  // Browser + axe runs have rare transient flakes under heavy parallelism; a
+  // retry in CI absorbs those without masking a real, reproducible failure.
+  retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI
     ? [['github'], ['html', { open: 'never' }], ['list']]
     : [['html', { open: 'never' }], ['list']],

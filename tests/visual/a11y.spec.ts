@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-import { openCase, POC_CASES } from './support/harness'
+import { openCase, ALL_CASES } from './support/harness'
 
 /* ---------------------------------------------------------------------------
    1. Axe — zero serious/critical violations, every case, every theme/viewport.
    --------------------------------------------------------------------------- */
-for (const caseId of POC_CASES.concat('dialog' as never)) {
+for (const caseId of ALL_CASES) {
   test(`axe: ${caseId}`, async ({ page }, testInfo) => {
-    await openCase(page, testInfo, caseId, caseId === 'dialog' ? { open: '1' } : {})
+    await openCase(page, testInfo, caseId)
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze()
