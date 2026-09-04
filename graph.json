@@ -4,8 +4,8 @@
   "generated_for": "0.2.0",
   "ontology": "graph/ontology.json",
   "stats": {
-    "nodes": 330,
-    "edges": 1013,
+    "nodes": 334,
+    "edges": 1014,
     "by_node_type": {
       "a11y": 8,
       "ai-component": 7,
@@ -21,7 +21,7 @@
       "package": 13,
       "token-radius": 7,
       "ramp": 21,
-      "rule": 44,
+      "rule": 48,
       "state": 10,
       "token-color": 36,
       "token-type": 10,
@@ -37,7 +37,7 @@
       "Intent": 27,
       "Package": 13,
       "Foundation": 74,
-      "Rule": 44,
+      "Rule": 48,
       "State": 10
     },
     "by_edge_type": {
@@ -50,7 +50,7 @@
       "derived_from": 26,
       "embodies": 6,
       "forbidden_with": 1,
-      "governed_by": 175,
+      "governed_by": 176,
       "has_contrast": 18,
       "inappropriate_for": 4,
       "overrides": 1,
@@ -66,11 +66,11 @@
     },
     "by_provenance": {
       "nodes": {
-        "explicit": 124,
+        "explicit": 128,
         "derived": 206
       },
       "edges": {
-        "explicit": 311,
+        "explicit": 312,
         "derived": 702
       }
     },
@@ -2192,6 +2192,51 @@
       "source": "rules/ux-rules.json"
     },
     {
+      "id": "rule:landing-inverted-pyramid",
+      "type": "rule",
+      "class": "Rule",
+      "prov": "explicit",
+      "label": "Landing pages lead with the outcome",
+      "kind": "guideline",
+      "priority": "PREFERRED",
+      "severity": "should",
+      "tier": "completeness",
+      "category": "completeness",
+      "statement": "A marketing/landing page states what it is and the one thing to do in its H1 and first paragraph (inverted pyramid), before any supporting detail. Headings stand alone out of context in words people search for — no clever or colon (\"Topic: subtitle\") titles, and no welcome filler.",
+      "rationale": "People scan a page before they read it; front-loading the outcome and using literal, standalone headings lets them decide and act without hunting, and matches how search and assistive tech surface a page.",
+      "source": "rules/ux-rules.json"
+    },
+    {
+      "id": "rule:link-label-consistency",
+      "type": "rule",
+      "class": "Rule",
+      "prov": "explicit",
+      "label": "Same destination, same link label",
+      "kind": "guideline",
+      "priority": "PREFERRED",
+      "severity": "should",
+      "tier": "accessibility",
+      "category": "accessibility",
+      "statement": "A given href gets the same accessible name everywhere it repeats — header, footer, and other chrome. The only exception is a genuinely different action to the same URL (e.g. \"Start free\" vs \"Pricing\"); document that exception where it occurs.",
+      "rationale": "Users who move through repeated chrome (and assistive tech that lists links) rely on a stable name→destination mapping; two labels for one URL, or one label for two, is disorienting (WCAG 2.4.4).",
+      "source": "rules/ux-rules.json"
+    },
+    {
+      "id": "rule:link-text-descriptive",
+      "type": "rule",
+      "class": "Rule",
+      "prov": "explicit",
+      "label": "Link text names its destination",
+      "kind": "constraint",
+      "priority": "MANDATORY",
+      "severity": "must",
+      "tier": "accessibility",
+      "category": "accessibility",
+      "statement": "Visible link text must make the destination clear out of its surrounding context. Never use \"click here\", \"read more\", \"learn more\" or a bare \"here\" as the link, and never show a raw URL as the label — name the destination (\"GitHub repository\", \"live manifest.json\"). Links must also be distinguishable by more than colour (an underline or equivalent, with --brand for emphasis), never colour alone.",
+      "rationale": "Screen-reader users navigate by a list of links out of context, so \"click here\" is meaningless and a raw URL is unreadable (WCAG 2.4.4 / Section 508). Colour-only links fail users who can't perceive the hue (WCAG 1.4.1).",
+      "source": "rules/ux-rules.json"
+    },
+    {
       "id": "rule:loading-state",
       "type": "rule",
       "class": "Rule",
@@ -2339,6 +2384,21 @@
       "category": "consistency",
       "statement": "Any count, badge number, or list shown in the UI derives from the generated source (manifest.json / graph.json) — never a hand-typed literal.",
       "rationale": "Hand-typed numbers drift the moment the repo grows — a nav badge read 198 while the graph held 213. Deriving from source keeps the UI honest by construction (docs/building-with-the-dls.md §20).",
+      "source": "rules/ux-rules.json"
+    },
+    {
+      "id": "rule:no-invented-capabilities",
+      "type": "rule",
+      "class": "Rule",
+      "prov": "explicit",
+      "label": "Every claim is backed by the repo",
+      "kind": "constraint",
+      "priority": "MANDATORY",
+      "severity": "must",
+      "tier": "data-integrity",
+      "category": "data-integrity",
+      "statement": "On web copy, state only capabilities, prices, and metrics backed by a repo file, a command, or a human-provided number. Never invent features, commercial terms (billing, annual discounts, checkout), or numbers, and don't collapse the product to one part of it (the knowledge graph is the engine, not the whole product). State honest gaps plainly rather than papering over them.",
+      "rationale": "The manifest contract is answer-only-from-repo; marketing copy is where invented claims and fake commercial terms most often creep in, and an unbacked claim is a defect, not a flourish.",
       "source": "rules/ux-rules.json"
     },
     {
@@ -6753,6 +6813,12 @@
       "type": "governed_by",
       "prov": "explicit",
       "evidence": "rules/ai-components/typing-indicator.json"
+    },
+    {
+      "source": "block:marketing-hero",
+      "target": "rule:landing-inverted-pyramid",
+      "type": "governed_by",
+      "prov": "explicit"
     },
     {
       "source": "component-2one:logo",
