@@ -60,7 +60,7 @@ export const COMPONENT_IDS = [
   'resizable', 'scroll-area', 'select', 'separator', 'sheet', 'sidebar',
   'skeleton', 'slider', 'sonner', 'spinner', 'switch', 'tabs', 'textarea',
   'toggle', 'toggle-group', 'toolbar', 'tooltip',
-  'app-bar', 'bottom-nav-item', 'logo', 'media-placeholder',
+  'app-bar', 'bottom-nav-item', 'logo', 'media-placeholder', 'theme-toggle',
 ] as const
 
 /** Dedicated compositions defined directly in cases.tsx. */

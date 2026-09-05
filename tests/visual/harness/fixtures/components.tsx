@@ -79,6 +79,7 @@ import { Logo } from '@/components/logo'
 import { AppBar } from '@/components/app-bar'
 import { BottomNavItem } from '@/components/bottom-nav-item'
 import { MediaPlaceholder } from '@/components/media-placeholder'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 /*
   Component gallery — one deterministic case per DLS component, mounted in
@@ -130,6 +131,9 @@ const chartData = [
 ]
 
 export const COMPONENT_CASES: Record<string, Case> = {
+  'theme-toggle': {
+    render: () => <ThemeToggle />,
+  },
   accordion: {
     render: () => (
       <Accordion type="single" defaultValue="a" collapsible className="w-80">

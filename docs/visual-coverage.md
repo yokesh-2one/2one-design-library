@@ -8,12 +8,12 @@ and forced-colors run on focused, sufficient subsets.
 
 ## Summary
 
-- **72** cases under test
-- **72** with pixel screenshots (× 2 themes × 3 viewports = 432 baselines)
+- **73** cases under test
+- **73** with pixel screenshots (× 2 themes × 3 viewports = 438 baselines)
 - **12** with interaction-state shots (hover/focus/open)
-- **69** with ARIA-tree snapshots (semantic)
+- **70** with ARIA-tree snapshots (semantic)
 - **14** under RTL, **13** under forced-colors (High Contrast)
-- **60** library components; **59** have a case, **1** rely on composition/other coverage
+- **60** library components; **60** have a case, **0** rely on composition/other coverage
 
 ## Per-case coverage
 
@@ -87,6 +87,7 @@ and forced-colors run on focused, sufficient subsets.
 | table | ✓ | · | ✓ | ✓ | ✓ |
 | tabs | ✓ | focus | ✓ | ✓ | ✓ |
 | textarea | ✓ | focus | ✓ | · | · |
+| theme-toggle | ✓ | · | ✓ | · | · |
 | toggle | ✓ | focus hover | ✓ | · | · |
 | toggle-group | ✓ | focus hover | ✓ | · | · |
 | toolbar | ✓ | · | ✓ | ✓ | · |
@@ -94,7 +95,7 @@ and forced-colors run on focused, sufficient subsets.
 
 ## Components without a dedicated case
 
-- theme-toggle
+_none_
 
 _These are covered indirectly (e.g. inside a pattern/composition) or are structural. Add a
 dedicated case if you want per-component screenshot + ARIA coverage._
