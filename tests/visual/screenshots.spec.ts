@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { openCase, SCREENSHOT_CASES } from './support/harness'
+import { openCase, SCREENSHOT_CASES, shotTarget } from './support/harness'
 
 /*
   Visual-regression snapshots. Each case is captured per project (viewport × theme),
@@ -10,6 +10,8 @@ import { openCase, SCREENSHOT_CASES } from './support/harness'
 for (const caseId of SCREENSHOT_CASES) {
   test(`snapshot: ${caseId}`, async ({ page }, testInfo) => {
     await openCase(page, testInfo, caseId)
-    await expect(page).toHaveScreenshot(`${caseId}.png`)
+    // A2: fill → full-page; center → clipped to the component (portaled-open overlays
+    // fall back to full-page). See shotTarget.
+    await expect(await shotTarget(page)).toHaveScreenshot(`${caseId}.png`)
   })
 }
