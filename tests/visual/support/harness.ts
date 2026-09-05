@@ -123,10 +123,11 @@ export const FORCED_COLORS_CASES = [
   'tabs', 'dialog-open', 'select', 'field', 'state-error',
 ] as const
 
-/* B7 · aspect-ratio and skeleton are purely presentational — their accessibility tree
-   is empty, so there is nothing semantic to snapshot (Playwright writes no baseline).
-   Every other case has a meaningful tree. */
-export const ARIA_EXCLUDE = new Set<string>(['aspect-ratio', 'skeleton'])
+/* B7 · Cases with no stable semantic tree to snapshot:
+   - aspect-ratio, skeleton: purely presentational — empty tree, nothing to capture.
+   - dashboard: its recharts chart builds axis ticks from font-driven measurements, so
+     the tree varies across OS; it stays covered by screenshot + axe + console instead. */
+export const ARIA_EXCLUDE = new Set<string>(['aspect-ratio', 'skeleton', 'dashboard'])
 export const ARIA_CASES = ALL_CASES.filter((id) => !ARIA_EXCLUDE.has(id))
 
 /* A5 · No page overflow applies to the RESPONSIVE surfaces — the patterns, pages and
