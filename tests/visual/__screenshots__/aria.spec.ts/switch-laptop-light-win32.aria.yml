@@ -1,0 +1,4 @@
+- switch "Notifications" [checked]
+- text: Notifications
+- switch "Marketing emails"
+- text: Marketing emails

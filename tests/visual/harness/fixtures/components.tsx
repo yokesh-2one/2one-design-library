@@ -414,7 +414,7 @@ export const COMPONENT_CASES: Record<string, Case> = {
   },
   'input-otp': {
     render: () => (
-      <InputOTP maxLength={6} defaultValue="123456" aria-label="One-time passcode" containerClassName="gap-2">
+      <InputOTP maxLength={6} value="123456" onChange={() => {}} aria-label="One-time passcode" containerClassName="gap-2">
         <InputOTPGroup>
           {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
         </InputOTPGroup>

@@ -1,0 +1,25 @@
+- text: Create an account Enter your information below to create your account
+- group:
+  - text: Full Name
+  - textbox "Full Name":
+    - /placeholder: John Doe
+- group:
+  - text: Email
+  - textbox "Email":
+    - /placeholder: team@2one.solutions
+  - paragraph: We'll use this to contact you. We will not share your email with anyone else.
+- group:
+  - text: Password
+  - textbox "Password"
+  - paragraph: Must be at least 8 characters long.
+- group:
+  - text: Confirm Password
+  - textbox "Confirm Password"
+  - paragraph: Please confirm your password.
+- group:
+  - button "Create Account"
+  - button "Sign up with Google"
+  - paragraph:
+    - text: Already have an account?
+    - link "Sign in":
+      - /url: "#"

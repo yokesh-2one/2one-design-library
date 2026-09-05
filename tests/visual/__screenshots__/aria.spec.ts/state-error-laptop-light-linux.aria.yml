@@ -1,0 +1,5 @@
+- alert: Payment failed Your card was declined. Try another method.
+- group:
+  - text: Card number
+  - textbox "Card number" [invalid]: /\d+ \d+ \d+ \d+/
+  - alert: This card number is invalid.

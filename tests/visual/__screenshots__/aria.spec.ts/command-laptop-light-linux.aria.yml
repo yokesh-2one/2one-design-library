@@ -1,0 +1,6 @@
+- combobox [expanded]
+- listbox "Suggestions":
+  - group "Suggestions":
+    - option "Home" [selected]
+    - option "Search"
+    - option "Settings"

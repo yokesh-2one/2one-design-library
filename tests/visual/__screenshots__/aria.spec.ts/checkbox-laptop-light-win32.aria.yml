@@ -1,0 +1,6 @@
+- checkbox "Accept terms" [checked]
+- text: Accept terms
+- checkbox "Subscribe"
+- text: Subscribe
+- checkbox "Disabled" [disabled]
+- text: Disabled

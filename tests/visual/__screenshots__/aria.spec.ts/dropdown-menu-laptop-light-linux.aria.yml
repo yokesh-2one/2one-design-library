@@ -1,0 +1,6 @@
+- button "Open menu" [expanded]
+- menu "Open menu":
+  - text: My account
+  - separator
+  - menuitem "Profile"
+  - menuitem "Settings"

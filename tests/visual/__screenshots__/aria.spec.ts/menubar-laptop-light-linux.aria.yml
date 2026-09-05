@@ -1,0 +1,4 @@
+- menubar:
+  - menuitem "File"
+  - menuitem "Edit"
+  - menuitem "View"

@@ -1,0 +1,18 @@
+- link "Acme":
+  - /url: /
+  - img "2one"
+- list:
+  - listitem:
+    - button "Home"
+  - listitem:
+    - button "Search"
+  - listitem:
+    - button "Alerts"
+  - listitem:
+    - button "Profile"
+- main:
+  - text: Home
+  - main:
+    - heading "Good morning" [level=1]
+    - paragraph: A stable content region so the shell chrome — sidebar on desktop, app bar + bottom nav on mobile — is what the screenshot captures.
+    - text: /Active projects \d+ in progress Open reviews 3 awaiting you/

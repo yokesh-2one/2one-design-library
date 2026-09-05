@@ -123,6 +123,12 @@ export const FORCED_COLORS_CASES = [
   'tabs', 'dialog-open', 'select', 'field', 'state-error',
 ] as const
 
+/* B7 · aspect-ratio and skeleton are purely presentational — their accessibility tree
+   is empty, so there is nothing semantic to snapshot (Playwright writes no baseline).
+   Every other case has a meaningful tree. */
+export const ARIA_EXCLUDE = new Set<string>(['aspect-ratio', 'skeleton'])
+export const ARIA_CASES = ALL_CASES.filter((id) => !ARIA_EXCLUDE.has(id))
+
 /* A5 · No page overflow applies to the RESPONSIVE surfaces — the patterns, pages and
    blocks that must reflow to any width. The isolated component demos are intentionally
    fixed-width showcases (e.g. a w-96 card, or a wide Table that scrolls inside its own
