@@ -144,6 +144,13 @@ export function ChartAreaInteractive() {
   const isMobile = useIsMobile()
   const [timeRange, setTimeRange] = React.useState("90d")
 
+  // Honour prefers-reduced-motion: recharts animates via JS, which CSS reduced-motion
+  // can't stop, so turn its animation off for readers who ask for less motion.
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
   React.useEffect(() => {
     if (isMobile) {
       setTimeRange("7d")
@@ -275,6 +282,7 @@ export function ChartAreaInteractive() {
               fill="url(#fillMobile)"
               stroke="var(--color-mobile)"
               stackId="a"
+              isAnimationActive={!reduceMotion}
             />
             <Area
               dataKey="desktop"
@@ -282,6 +290,7 @@ export function ChartAreaInteractive() {
               fill="url(#fillDesktop)"
               stroke="var(--color-desktop)"
               stackId="a"
+              isAnimationActive={!reduceMotion}
             />
           </AreaChart>
         </ChartContainer>

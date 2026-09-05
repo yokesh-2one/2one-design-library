@@ -33,10 +33,14 @@ Math.random = () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296
 }
 
-// Params: ?case=<id>&theme=<light|dark>  (viewport is set by the Playwright project)
+// Params: ?case=<id>&theme=<light|dark>&rtl=1  (viewport is set by the Playwright project)
 const params = new URLSearchParams(location.search)
 const caseId = params.get('case') ?? 'index'
 const theme = params.get('theme') === 'dark' ? 'dark' : 'light'
+
+// RTL axis: components must survive dir="rtl". Set before render so layout is RTL from
+// the first paint.
+if (params.get('rtl') === '1') document.documentElement.setAttribute('dir', 'rtl')
 
 const entry = CASES[caseId]
 const content = entry ? (
@@ -52,6 +56,9 @@ const content = entry ? (
 )
 
 const fill = entry?.layout === 'fill'
+// Tests read this to decide clipping: 'fill' cases are shot full-page; 'center' cases
+// are clipped to [data-harness-content] for a tight per-component baseline (A2).
+document.documentElement.dataset.layout = fill ? 'fill' : 'center'
 
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider forcedTheme={theme}>
@@ -63,7 +70,9 @@ createRoot(document.getElementById('root')!).render(
           : 'flex min-h-dvh w-full items-center justify-center bg-background p-8 text-foreground'
       }
     >
-      {content}
+      {/* display:contents — the wrapper is a clip anchor for A2 but generates no box,
+          so component layout is identical to rendering content directly. */}
+      {fill ? content : <div data-harness-content style={{ display: 'contents' }}>{content}</div>}
     </div>
   </ThemeProvider>,
 )

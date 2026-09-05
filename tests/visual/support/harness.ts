@@ -5,6 +5,23 @@ export function themeOf(testInfo: TestInfo): 'light' | 'dark' {
   return t === 'dark' ? 'dark' : 'light'
 }
 
+/*
+  Decide what to screenshot (A2). 'fill' cases (patterns/pages) are shot full-page.
+  'center' cases are clipped to the component for a tight baseline — UNLESS the
+  component portals its visible content to <body> (an overlay rendered open, so the
+  in-place wrapper is empty), in which case we fall back to full-page so the portal
+  is captured. Returns a Playwright screenshot target (Page or Locator).
+*/
+export async function shotTarget(page: Page) {
+  const layout = await page.locator('html').getAttribute('data-layout')
+  if (layout === 'fill') return page
+  // The wrapper is display:contents (no box), so clip to its component child.
+  const content = page.locator('[data-harness-content] > *').first()
+  const box = await content.boundingBox()
+  if (!box || box.width < 2 || box.height < 2) return page
+  return content
+}
+
 /** Navigate to a harness case in the project's theme and wait for a stable frame. */
 export async function openCase(
   page: Page,
@@ -50,13 +67,55 @@ export const STATE_IDS = ['state-disabled', 'state-loading', 'state-empty', 'sta
 export const ALL_CASES = [...COMPOSITION_IDS, ...COMPONENT_IDS, ...BLOCK_IDS, ...STATE_IDS] as const
 
 /*
-  Screenshot-only exclusions. `dashboard` embeds a recharts chart that animates
-  via JS/SVG attributes — Playwright's `animations: 'disabled'` only freezes CSS,
-  so the shot never stabilises. It is still fully covered by axe and the a11y
-  specs; only its pixel baseline is skipped. (The standalone `chart` case sets
-  isAnimationActive={false}, so it IS screenshotted.)
+  Screenshot-only exclusions. Empty now: `dashboard` used to be skipped because its
+  recharts chart animates via JS (which `animations: 'disabled'` can't freeze), but
+  the chart now honours prefers-reduced-motion (isAnimationActive off under the
+  reduced-motion the projects emulate), so it renders deterministically and IS shot.
 */
-export const SCREENSHOT_EXCLUDE = new Set<string>(['dashboard'])
+export const SCREENSHOT_EXCLUDE = new Set<string>([])
 
 /** Cases that get a screenshot baseline. */
 export const SCREENSHOT_CASES = ALL_CASES.filter((id) => !SCREENSHOT_EXCLUDE.has(id))
+
+/* ---------------------------------------------------------------------------
+   A1 · Interaction-state matrix. The resting screenshot misses hover and focus,
+   where a hover surface or a focus-visible ring silently regresses. We capture
+   those per interactive control. (The OPEN state of overlays — menus, dialogs,
+   tooltips — is already covered: the component gallery renders those cases with
+   `defaultOpen`, so their base snapshot IS the open state.)
+   --------------------------------------------------------------------------- */
+export const STATE_SHOTS: Record<string, ReadonlyArray<'hover' | 'focus'>> = {
+  button: ['hover', 'focus'],
+  checkbox: ['hover', 'focus'],
+  switch: ['hover', 'focus'],
+  toggle: ['hover', 'focus'],
+  'toggle-group': ['hover', 'focus'],
+  select: ['hover', 'focus'],
+  input: ['focus'],
+  textarea: ['focus'],
+  'native-select': ['focus'],
+  'radio-group': ['focus'],
+  tabs: ['focus'],
+  slider: ['focus'],
+}
+
+/* A3 · RTL — a curated subset of direction-sensitive cases (chrome, tables, nav,
+   grouped controls, forms). Run under dir="rtl". */
+export const RTL_CASES = [
+  'app-shell', 'marketing-site', 'meeting', 'table', 'tabs', 'breadcrumb',
+  'pagination', 'navigation-menu', 'button-group', 'input-group', 'toolbar',
+  'card', 'form', 'login',
+] as const
+
+/* A4 · Forced colors (Windows High Contrast) — components whose borders, fills and
+   state cues must survive the forced palette. */
+export const FORCED_COLORS_CASES = [
+  'button', 'input', 'checkbox', 'switch', 'badge', 'alert', 'card', 'table',
+  'tabs', 'dialog-open', 'select', 'field', 'state-error',
+] as const
+
+/* A5 · No page overflow applies to the RESPONSIVE surfaces — the patterns, pages and
+   blocks that must reflow to any width. The isolated component demos are intentionally
+   fixed-width showcases (e.g. a w-96 card, or a wide Table that scrolls inside its own
+   overflow-x container) and are out of scope for a PAGE-overflow check. */
+export const OVERFLOW_CASES = ['app-shell', 'marketing-site', 'meeting', ...BLOCK_IDS] as const
