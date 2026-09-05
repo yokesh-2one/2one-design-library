@@ -63,6 +63,10 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4188',
     trace: 'on-first-retry',
+    // Pin the timezone so date-derived rendering (calendar, dashboard) is identical
+    // across the developer's local OS and CI — otherwise local (e.g. America/*) and
+    // CI (UTC) disagree, which surfaces in the OS-independent aria snapshots.
+    timezoneId: 'UTC',
   },
   projects,
   webServer: {

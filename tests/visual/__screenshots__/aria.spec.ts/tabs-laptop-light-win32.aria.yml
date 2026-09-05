@@ -1,0 +1,5 @@
+- tablist:
+  - tab "Overview" [selected]
+  - tab "Activity"
+  - tab "Settings"
+- tabpanel "Overview": Overview content.

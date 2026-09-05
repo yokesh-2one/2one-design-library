@@ -1,0 +1,10 @@
+- navigation "Main":
+  - list:
+    - listitem:
+      - button "Products"
+    - listitem:
+      - link "Pricing":
+        - /url: "#"
+    - listitem:
+      - link "Docs":
+        - /url: "#"

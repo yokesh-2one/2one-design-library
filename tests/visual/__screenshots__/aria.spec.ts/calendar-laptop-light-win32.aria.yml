@@ -1,0 +1,81 @@
+- navigation "Navigation bar":
+  - button "Go to the Previous Month"
+  - button "Go to the Next Month"
+- status: /January \d+/
+- grid /January \d+/:
+  - rowgroup:
+    - row /Sunday, December 29th, \d+ Monday, December 30th, \d+ Tuesday, December 31st, \d+ Wednesday, January 1st, \d+ Thursday, January 2nd, \d+ Friday, January 3rd, \d+ Saturday, January 4th, \d+/:
+      - gridcell /Sunday, December 29th, \d+/:
+        - button /Sunday, December 29th, \d+/
+      - gridcell /Monday, December 30th, \d+/:
+        - button /Monday, December 30th, \d+/
+      - gridcell /Tuesday, December 31st, \d+/:
+        - button /Tuesday, December 31st, \d+/
+      - gridcell /Wednesday, January 1st, \d+/:
+        - button /Wednesday, January 1st, \d+/
+      - gridcell /Thursday, January 2nd, \d+/:
+        - button /Thursday, January 2nd, \d+/
+      - gridcell /Friday, January 3rd, \d+/:
+        - button /Friday, January 3rd, \d+/
+      - gridcell /Saturday, January 4th, \d+/:
+        - button /Saturday, January 4th, \d+/
+    - row /Sunday, January 5th, \d+ Monday, January 6th, \d+ Tuesday, January 7th, \d+ Wednesday, January 8th, \d+ Thursday, January 9th, \d+ Friday, January 10th, \d+ Saturday, January 11th, \d+/:
+      - gridcell /Sunday, January 5th, \d+/:
+        - button /Sunday, January 5th, \d+/
+      - gridcell /Monday, January 6th, \d+/:
+        - button /Monday, January 6th, \d+/
+      - gridcell /Tuesday, January 7th, \d+/:
+        - button /Tuesday, January 7th, \d+/
+      - gridcell /Wednesday, January 8th, \d+/:
+        - button /Wednesday, January 8th, \d+/
+      - gridcell /Thursday, January 9th, \d+/:
+        - button /Thursday, January 9th, \d+/
+      - gridcell /Friday, January 10th, \d+/:
+        - button /Friday, January 10th, \d+/
+      - gridcell /Saturday, January 11th, \d+/:
+        - button /Saturday, January 11th, \d+/
+    - row /Sunday, January 12th, \d+ Monday, January 13th, \d+ Tuesday, January 14th, \d+ Today, Wednesday, January 15th, \d+, selected Thursday, January 16th, \d+ Friday, January 17th, \d+ Saturday, January 18th, \d+/:
+      - gridcell /Sunday, January 12th, \d+/:
+        - button /Sunday, January 12th, \d+/
+      - gridcell /Monday, January 13th, \d+/:
+        - button /Monday, January 13th, \d+/
+      - gridcell /Tuesday, January 14th, \d+/:
+        - button /Tuesday, January 14th, \d+/
+      - gridcell /Today, Wednesday, January 15th, \d+, selected/ [selected]:
+        - button /Today, Wednesday, January 15th, \d+, selected/
+      - gridcell /Thursday, January 16th, \d+/:
+        - button /Thursday, January 16th, \d+/
+      - gridcell /Friday, January 17th, \d+/:
+        - button /Friday, January 17th, \d+/
+      - gridcell /Saturday, January 18th, \d+/:
+        - button /Saturday, January 18th, \d+/
+    - row /Sunday, January 19th, \d+ Monday, January 20th, \d+ Tuesday, January 21st, \d+ Wednesday, January 22nd, \d+ Thursday, January 23rd, \d+ Friday, January 24th, \d+ Saturday, January 25th, \d+/:
+      - gridcell /Sunday, January 19th, \d+/:
+        - button /Sunday, January 19th, \d+/
+      - gridcell /Monday, January 20th, \d+/:
+        - button /Monday, January 20th, \d+/
+      - gridcell /Tuesday, January 21st, \d+/:
+        - button /Tuesday, January 21st, \d+/
+      - gridcell /Wednesday, January 22nd, \d+/:
+        - button /Wednesday, January 22nd, \d+/
+      - gridcell /Thursday, January 23rd, \d+/:
+        - button /Thursday, January 23rd, \d+/
+      - gridcell /Friday, January 24th, \d+/:
+        - button /Friday, January 24th, \d+/
+      - gridcell /Saturday, January 25th, \d+/:
+        - button /Saturday, January 25th, \d+/
+    - row /Sunday, January 26th, \d+ Monday, January 27th, \d+ Tuesday, January 28th, \d+ Wednesday, January 29th, \d+ Thursday, January 30th, \d+ Friday, January 31st, \d+ Saturday, February 1st, \d+/:
+      - gridcell /Sunday, January 26th, \d+/:
+        - button /Sunday, January 26th, \d+/
+      - gridcell /Monday, January 27th, \d+/:
+        - button /Monday, January 27th, \d+/
+      - gridcell /Tuesday, January 28th, \d+/:
+        - button /Tuesday, January 28th, \d+/
+      - gridcell /Wednesday, January 29th, \d+/:
+        - button /Wednesday, January 29th, \d+/
+      - gridcell /Thursday, January 30th, \d+/:
+        - button /Thursday, January 30th, \d+/
+      - gridcell /Friday, January 31st, \d+/:
+        - button /Friday, January 31st, \d+/
+      - gridcell /Saturday, February 1st, \d+/:
+        - button /Saturday, February 1st, \d+/

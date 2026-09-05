@@ -1,0 +1,12 @@
+- button "Primary action"
+- button "Secondary"
+- button "Outline"
+- button "Ghost"
+- button "Delete"
+- button "Disabled" [disabled]
+- button "Loading Loading" [disabled]:
+  - status "Loading"
+  - text: ""
+- button "With icon"
+- button "Small"
+- button "Large"

@@ -1,0 +1,5 @@
+- toolbar:
+  - button "Bold"
+  - button "Italic"
+  - button "Star"
+  - button "Publish"

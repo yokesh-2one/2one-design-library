@@ -1,0 +1,31 @@
+- table:
+  - rowgroup:
+    - row "Invoice Client Owner Status Due Amount":
+      - columnheader "Invoice"
+      - columnheader "Client"
+      - columnheader "Owner"
+      - columnheader "Status"
+      - columnheader "Due"
+      - columnheader "Amount"
+  - rowgroup:
+    - row /INV-\d+ Northwind Traders A\. Okafor Paid Jan \d+ \$\d+,\d+\.\d+/:
+      - cell /INV-\d+/
+      - cell "Northwind Traders"
+      - cell "A. Okafor"
+      - cell "Paid"
+      - cell /Jan \d+/
+      - cell /\$\d+,\d+\.\d+/
+    - row /INV-\d+ Contoso Ltd B\. Lund Pending Jan \d+ \$\d+,\d+\.\d+/:
+      - cell /INV-\d+/
+      - cell "Contoso Ltd"
+      - cell "B. Lund"
+      - cell "Pending"
+      - cell /Jan \d+/
+      - cell /\$\d+,\d+\.\d+/
+    - row /INV-\d+ Fabrikam Inc C\. Wei Overdue Jan \d+ \$\d+\.\d+/:
+      - cell /INV-\d+/
+      - cell "Fabrikam Inc"
+      - cell "C. Wei"
+      - cell "Overdue"
+      - cell /Jan \d+/
+      - cell /\$\d+\.\d+/

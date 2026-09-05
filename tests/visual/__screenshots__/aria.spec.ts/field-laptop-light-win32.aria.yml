@@ -1,0 +1,8 @@
+- group:
+  - text: Full name
+  - textbox "Full name": Ada Lovelace
+  - paragraph: As it appears on your ID.
+- group:
+  - text: Email
+  - textbox "Email" [invalid]: not-an-email
+  - alert: Enter a valid email address.

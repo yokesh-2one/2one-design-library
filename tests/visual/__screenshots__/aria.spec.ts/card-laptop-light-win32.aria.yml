@@ -1,0 +1,6 @@
+- text: Team plan Everything a small product team needs to ship. Popular
+- list:
+  - listitem: Unlimited projects
+  - listitem: Audited accessibility
+  - listitem: Priority support
+- button "Choose Team"

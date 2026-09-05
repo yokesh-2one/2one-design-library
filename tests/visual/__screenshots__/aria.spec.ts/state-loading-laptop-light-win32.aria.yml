@@ -1,0 +1,3 @@
+- button "Loading Loading" [disabled]:
+  - status "Loading"
+  - text: ""

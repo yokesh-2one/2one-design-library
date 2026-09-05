@@ -1,0 +1,5 @@
+- alertdialog "Delete account?":
+  - heading "Delete account?" [level=2]
+  - paragraph: This action cannot be undone.
+  - button "Cancel"
+  - button "Delete"

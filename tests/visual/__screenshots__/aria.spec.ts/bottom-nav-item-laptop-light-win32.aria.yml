@@ -1,0 +1,5 @@
+- navigation "Primary":
+  - button "Home"
+  - button "Search"
+  - button "Alerts"
+  - button "Profile"

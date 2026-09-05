@@ -1,0 +1,22 @@
+- banner: /Design system weekly Recording \d+:\d+ 4/
+- main "Participant videos":
+  - img "Amara Okafor's camera"
+  - text: AO Amara Okafor
+  - img "Unmuted"
+  - img "Bjorn Lund's camera"
+  - text: BL Bjorn Lund
+  - img "Muted"
+  - img "Chen Wei's camera"
+  - text: CW Chen Wei
+  - img "Unmuted"
+  - img "Dara Singh's camera"
+  - text: DS Dara Singh
+  - img "Muted"
+- contentinfo:
+  - toolbar:
+    - button "Mute microphone"
+    - button "Stop camera"
+    - button "Share screen"
+    - button "Show participants"
+    - button "Open chat"
+    - button "Leave"

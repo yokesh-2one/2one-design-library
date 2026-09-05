@@ -1,0 +1,4 @@
+- button "Hover me"
+- tooltip "Helpful hint":
+  - text: ""
+  - img
