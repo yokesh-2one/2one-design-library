@@ -5,7 +5,7 @@
   - radio "Last 3 months" [checked]
   - radio /Last \d+ days/
   - radio "Last 7 days"
-- application: /Apr 3 Apr 8 Apr \d+ Apr \d+ Apr \d+ May 1 May 6 May \d+ May \d+ May \d+ May \d+ Jun 5 Jun \d+ Jun \d+ Jun \d+ Jun \d+/
+- application: /Apr 4 Apr 9 Apr \d+ Apr \d+ Apr \d+ May 3 May 8 May \d+ May \d+ May \d+ Jun 1 Jun 6 Jun \d+ Jun \d+ Jun \d+ Jun \d+/
 - text: View
 - tablist:
   - tab "Outline" [selected]
