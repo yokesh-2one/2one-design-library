@@ -15,9 +15,18 @@ export function themeOf(testInfo: TestInfo): 'light' | 'dark' {
 export async function shotTarget(page: Page) {
   const layout = await page.locator('html').getAttribute('data-layout')
   if (layout === 'fill') return page
-  // The wrapper is display:contents (no box), so clip to its component child.
+  // Overlays rendered open (dialog, alert-dialog, sheet, drawer, and popper overlays
+  // like tooltip/menu/popover) portal their content to <body>, so the in-place wrapper
+  // has no child — shoot full-page so the portal is captured.
+  const portals = await page
+    .locator('[role="dialog"],[role="alertdialog"],[data-radix-popper-content-wrapper]')
+    .count()
+  if (portals > 0) return page
+  // The wrapper is display:contents (no box), so clip to its component child. Guard the
+  // empty case first: boundingBox() on a missing locator auto-waits to the test timeout.
   const content = page.locator('[data-harness-content] > *').first()
-  const box = await content.boundingBox()
+  if ((await content.count()) === 0) return page
+  const box = await content.boundingBox().catch(() => null)
   if (!box || box.width < 2 || box.height < 2) return page
   return content
 }
