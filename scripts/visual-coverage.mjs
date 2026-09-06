@@ -110,6 +110,21 @@ _These are covered indirectly (e.g. inside a pattern/composition) or are structu
 `
 
 writeFileSync(join(root, 'docs/visual-coverage.md'), md)
+
+const json = {
+  generated_by: 'scripts/visual-coverage.mjs',
+  cases: allCases.length,
+  screenshots: screenshots.size,
+  screenshot_matrix: screenshots.size * 6,
+  state_cases: stateMap.size,
+  aria: ariaSet.size,
+  rtl: rtlSet.size,
+  forced_colors: fcSet.size,
+  components: components.length,
+  components_with_case: components.length - gaps.length,
+}
+writeFileSync(join(root, 'metrics/visual-coverage.json'), `${JSON.stringify(json, null, 2)}\n`)
+
 console.log(
   `\n  visual-coverage: ${allCases.length} cases · ${screenshots.size} screenshots · ${stateMap.size} state-shot · ${ariaSet.size} aria · ${rtlSet.size} rtl · ${fcSet.size} forced-colors`,
 )

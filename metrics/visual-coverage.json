@@ -1,0 +1,12 @@
+{
+  "generated_by": "scripts/visual-coverage.mjs",
+  "cases": 73,
+  "screenshots": 73,
+  "screenshot_matrix": 438,
+  "state_cases": 12,
+  "aria": 70,
+  "rtl": 14,
+  "forced_colors": 13,
+  "components": 60,
+  "components_with_case": 60
+}

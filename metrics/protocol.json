@@ -1,0 +1,59 @@
+{
+  "product": "Origin (this repository today; a standalone product later). KPIs measure connecting an agent to the repo versus dumping files into a prompt.",
+  "not": "Not a comparison to Anthropic Claude Design. Not billed token usage. Not Origin seat pricing.",
+  "when_user_asks_to_test": [
+    "Run npm run kpis (scripts/build-metrics.mjs --extensive).",
+    "That re-measures context packs, graph:decide / what-uses queries, graph:test, evals, check-usage coverage, and a11y.",
+    "It writes metrics/snapshot.json (site + decisions) and metrics/last-run.json (timings and traces).",
+    "Read snapshot KPIs, say which are measured vs estimated, and recommend product work from the gaps — do not invent a better number."
+  ],
+  "baselines": {
+    "dump_graph": "Paste graph.json into the prompt.",
+    "dump_src": "Paste every src/**/*.tsx file into the prompt.",
+    "dump_tracked": "Paste every git-tracked file (when git is available).",
+    "connected_pack": "manifest.json + llms.txt + AGENTS.md + brand/brand.json + tokens/*.json + rules/ux-rules.json + dls.config.json + skills/2one-dls/SKILL.md.",
+    "connected_query": "Call graph:decide / what-uses and keep the JSON answer — do not dump the graph."
+  },
+  "kpis": [
+    {
+      "id": "token_saved_query_vs_graph",
+      "category": "token",
+      "question": "How many estimated tokens do you avoid by querying the graph instead of dumping it?"
+    },
+    {
+      "id": "usd_saved_query_vs_graph",
+      "category": "cost",
+      "question": "What is that token delta at the working input rate, per query and per 100 queries?"
+    },
+    {
+      "id": "token_saved_pack_vs_src",
+      "category": "token",
+      "question": "How many estimated tokens do you avoid by reading the AI-legible pack instead of dumping src TSX?"
+    },
+    {
+      "id": "usd_saved_pack_vs_src",
+      "category": "cost",
+      "question": "API input $ for that pack-vs-src delta (estimated)."
+    },
+    {
+      "id": "graph_test_pass_pct",
+      "category": "efficiency",
+      "question": "Do the same intents still resolve to the same 2one decisions?"
+    },
+    {
+      "id": "evals_pass_pct",
+      "category": "efficiency",
+      "question": "Do guardrail evals still catch named rules? Extensive run only."
+    },
+    {
+      "id": "checkable_rule_pct",
+      "category": "efficiency",
+      "question": "What share of UX rules can an agent prove mechanically?"
+    },
+    {
+      "id": "hours_saved_per_100_cycles",
+      "category": "labour",
+      "question": "Modelled engineer hours saved per 100 generation cycles (assumptions, not a time study)."
+    }
+  ]
+}

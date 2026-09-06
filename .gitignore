@@ -1,6 +1,10 @@
+# KPI traces (wall-clock). Snapshot KPIs stay in metrics/snapshot.json.
+metrics/last-run.json
+
 node_modules
 dist
 dist-site
+dist-origin
 .vercel
 *.log
 *.tgz

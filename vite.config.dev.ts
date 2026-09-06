@@ -27,6 +27,7 @@ export default defineConfig({
         graph: fileURLToPath(new URL('./dev/graph.html', import.meta.url)),
         dls: fileURLToPath(new URL('./dev/dls.html', import.meta.url)),
         components: fileURLToPath(new URL('./dev/components.html', import.meta.url)),
+        studio: fileURLToPath(new URL('./dev/studio.html', import.meta.url)),
         changelog: fileURLToPath(new URL('./dev/changelog.html', import.meta.url)),
       },
     },

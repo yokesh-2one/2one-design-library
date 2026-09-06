@@ -1,0 +1,422 @@
+{
+  "est_chars_per_token": 4,
+  "assumptions": {
+    "retrieved": "2026-09-04",
+    "model": "claude-sonnet-4.6",
+    "usd_per_million_input_tokens": 3,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "labour_usd_per_hour": 125,
+    "minutes_without": 20,
+    "minutes_with": 8
+  },
+  "kpis": [
+    {
+      "unit": "est_tokens",
+      "kind": "estimated",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "token",
+      "product_use": "Keep CLI queries. Do not paste graph.json into a chat.",
+      "method": "Call graph:decide / what-uses and keep the JSON answer — do not dump the graph.",
+      "id": "token_saved_query_vs_graph",
+      "label": "Est. tokens saved: query vs dump graph.json",
+      "value": 62680,
+      "source": "graph.json bytes vs mean graph:decide + what-uses JSON"
+    },
+    {
+      "unit": "usd",
+      "kind": "estimated",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "cost",
+      "product_use": "Sales figure is estimated API input, not an Origin licence discount.",
+      "method": "token_saved_query_vs_graph × working input rate. Output tokens not modelled.",
+      "id": "usd_saved_query_vs_graph",
+      "label": "Est. API input $ saved per graph query",
+      "value": 0.188,
+      "source": "claude-sonnet-4.6 3/MTok input · https://platform.claude.com/docs/en/about-claude/pricing"
+    },
+    {
+      "unit": "usd",
+      "kind": "estimated",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "cost",
+      "product_use": "Scale the per-query estimate; still not billed usage.",
+      "method": "Headline labour and API $ are per 100 generation cycles so a single-query figure is not mistaken for a contract value.",
+      "id": "usd_saved_query_vs_graph_per_100",
+      "label": "Est. API input $ saved per 100 graph queries",
+      "value": 18.8,
+      "source": "usd_saved_query_vs_graph × scale.cycles_for_headline"
+    },
+    {
+      "unit": "est_tokens",
+      "kind": "estimated",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "token",
+      "product_use": "Agents should start from the pack, then open one component — not the whole src tree.",
+      "method": "manifest.json + llms.txt + AGENTS.md + brand/brand.json + tokens/*.json + rules/ux-rules.json + dls.config.json + skills/2one-dls/SKILL.md.",
+      "id": "token_saved_pack_vs_src",
+      "label": "Est. tokens saved: AI-legible pack vs dump src TSX",
+      "value": 64587,
+      "source": "connected pack bytes vs src/**/*.tsx"
+    },
+    {
+      "unit": "usd",
+      "kind": "estimated",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "cost",
+      "product_use": "Same caveat: estimated input, one dump avoided.",
+      "method": "token_saved_pack_vs_src × working input rate.",
+      "id": "usd_saved_pack_vs_src",
+      "label": "Est. API input $ saved: pack vs dump src TSX",
+      "value": 0.1938,
+      "source": "claude-sonnet-4.6 3/MTok input"
+    },
+    {
+      "unit": "usd",
+      "kind": "estimated",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "cost",
+      "product_use": "Internal planning only until we measure real dump frequency.",
+      "method": "Headline labour and API $ are per 100 generation cycles so a single-query figure is not mistaken for a contract value.",
+      "id": "usd_saved_pack_vs_src_per_100",
+      "label": "Est. API input $ saved per 100 pack-vs-src dumps avoided",
+      "value": 19.38,
+      "source": "usd_saved_pack_vs_src × scale"
+    },
+    {
+      "unit": "est_tokens",
+      "kind": "estimated",
+      "surfaces": [
+        "ask",
+        "internal"
+      ],
+      "category": "token",
+      "product_use": "Upper bound. Nobody should paste the whole tree; this shows why the pack exists.",
+      "method": "Paste every git-tracked file (when git is available).",
+      "id": "token_saved_pack_vs_tracked",
+      "label": "Est. tokens saved: pack vs all git-tracked files",
+      "value": 3599973,
+      "source": "git ls-files byte sum vs pack"
+    },
+    {
+      "unit": "percent",
+      "kind": "measured",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "efficiency",
+      "product_use": "If this drops, an agent will ship a different pattern than last week.",
+      "method": "Same intent must return the same 2one decision.",
+      "id": "graph_test_pass_pct",
+      "label": "Decision tests passing",
+      "value": 100,
+      "source": "npm run graph:test (13 cases)"
+    },
+    {
+      "unit": "percent",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "efficiency",
+      "product_use": "Raise this to cut review load. Advisory must-rules still need eyes.",
+      "method": "Efficiency of integrating: share of rules an agent can prove without a human.",
+      "id": "checkable_rule_pct",
+      "label": "UX rules that are mechanically checkable",
+      "value": 48,
+      "source": "npx 2one check --json → coverage.checked / coverage.total"
+    },
+    {
+      "unit": "hours",
+      "kind": "estimated",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "labour",
+      "product_use": "Not a time study. Use to compare review-load bets, not to quote a customer saving.",
+      "method": "One generation cycle = produce a screen, then review. Without the product: read the output and restyle by eye. With the product: run npx 2one check and graph:decide, then fix what they name. These minutes are assumptions until a time-and-motion study exists.",
+      "id": "hours_saved_per_100_cycles",
+      "label": "Modelled hours saved per 100 generation cycles",
+      "value": 20,
+      "source": "metrics/assumptions.json → labour"
+    },
+    {
+      "unit": "usd",
+      "kind": "estimated",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "labour",
+      "product_use": "Internal. Do not put this on a sales page as a guarantee.",
+      "method": "Working assumption for a senior product engineer, not a 2one wage study.",
+      "id": "usd_labour_saved_per_100_cycles",
+      "label": "Modelled labour $ per 100 cycles",
+      "value": 2500,
+      "source": "hours_saved_per_100_cycles × $125/h working assumption"
+    },
+    {
+      "unit": "ratio",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "efficiency",
+      "product_use": "If this shrinks, the pack is bloating — split it.",
+      "method": "How much smaller the connected pack is than dumping components.",
+      "id": "context_ratio_src_to_pack",
+      "label": "src TSX size / AI-legible pack size",
+      "value": 2.5,
+      "source": "byte ratio"
+    }
+  ],
+  "scores": [
+    {
+      "unit": "semver",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Track unproven-in-production status (AGENTS.md).",
+      "method": "",
+      "id": "package_version",
+      "label": "Package version",
+      "value": "0.2.0",
+      "source": "package.json"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Watch the public primitive surface.",
+      "method": "",
+      "id": "components_ui",
+      "label": "UI primitives (src/components/ui)",
+      "value": 55,
+      "source": "src/components/ui/*.tsx"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Components shadcn does not ship.",
+      "method": "",
+      "id": "components_2one",
+      "label": "2one-authored components",
+      "value": 5,
+      "source": "src/components/*.tsx"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Headline count; regenerate so it cannot drift.",
+      "method": "",
+      "id": "components_total",
+      "label": "Components in src/components",
+      "value": 60,
+      "source": "src/components/ui + src/components"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Do not list dark as a gap.",
+      "method": "",
+      "id": "themes_audited",
+      "label": "Themes audited",
+      "value": 2,
+      "source": "src/styles/globals.css :root and .dark; npm run a11y"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Impact-analysis coverage.",
+      "method": "",
+      "id": "graph_nodes",
+      "label": "Graph nodes",
+      "value": 336,
+      "source": "graph.json → stats.nodes"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "marketing",
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Impact-analysis coverage.",
+      "method": "",
+      "id": "graph_edges",
+      "label": "Graph edges",
+      "value": 1027,
+      "source": "graph.json → stats.edges"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Contract density; npm run check:rules.",
+      "method": "",
+      "id": "ux_rules",
+      "label": "UX rules",
+      "value": 48,
+      "source": "rules/ux-rules.json"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Template coverage.",
+      "method": "",
+      "id": "charts",
+      "label": "Chart blocks",
+      "value": 31,
+      "source": "src/blocks/charts/*.tsx"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Website-kit completeness.",
+      "method": "",
+      "id": "marketing_block_files",
+      "label": "Marketing block files",
+      "value": 11,
+      "source": "src/blocks/marketing/*.tsx"
+    },
+    {
+      "unit": "count",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Track marketing-site vs app-shell coverage.",
+      "method": "",
+      "id": "patterns",
+      "label": "Page patterns in src/patterns",
+      "value": 3,
+      "source": "src/patterns/*.tsx"
+    },
+    {
+      "unit": "bytes",
+      "kind": "measured",
+      "surfaces": [
+        "ask",
+        "internal"
+      ],
+      "category": "inventory",
+      "product_use": "Baseline for the dump-graph KPI.",
+      "method": "",
+      "id": "graph_json_bytes",
+      "label": "graph.json size",
+      "value": 253198,
+      "source": "stat graph.json"
+    },
+    {
+      "unit": "bytes",
+      "kind": "measured",
+      "surfaces": [
+        "ask",
+        "internal"
+      ],
+      "category": "inventory",
+      "product_use": "Connected-repo context.",
+      "method": "",
+      "id": "pack_bytes",
+      "label": "AI-legible pack size",
+      "value": 171681,
+      "source": "manifest.json, llms.txt, AGENTS.md, brand/brand.json, rules/ux-rules.json, dls.config.json, skills/2one-dls/SKILL.md, tokens/colors.json, tokens/spacing.json, tokens/tokens.dtcg.json, tokens/typography.json"
+    },
+    {
+      "unit": "bytes",
+      "kind": "measured",
+      "surfaces": [
+        "ask",
+        "internal"
+      ],
+      "category": "inventory",
+      "product_use": "Dump-src baseline.",
+      "method": "",
+      "id": "src_tsx_bytes",
+      "label": "src/**/*.tsx size",
+      "value": 430029,
+      "source": "walk src"
+    },
+    {
+      "unit": "boolean",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "Install-path gap.",
+      "method": "",
+      "id": "public_npm",
+      "label": "On a public npm registry",
+      "value": false,
+      "source": "docs/consuming.md · AGENTS.md"
+    },
+    {
+      "unit": "boolean",
+      "kind": "measured",
+      "surfaces": [
+        "ask"
+      ],
+      "category": "inventory",
+      "product_use": "CI is static; do not claim rendered-test coverage.",
+      "method": "",
+      "id": "product_test_suite",
+      "label": "vitest/Playwright as the product suite",
+      "value": false,
+      "source": "AGENTS.md"
+    }
+  ]
+}

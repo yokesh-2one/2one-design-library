@@ -17,6 +17,7 @@ import {
 export const GLOBAL_NAV: [string, string][] = [
   ['/', 'nav.overview'],
   ['/components.html', 'nav.components'],
+  ['/studio.html', 'nav.studio'],
   ['/graph.html', 'nav.graph'],
 ]
 

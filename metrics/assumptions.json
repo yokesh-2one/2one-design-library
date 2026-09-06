@@ -1,0 +1,24 @@
+{
+  "note": "Working rate card for labelled estimates. Not billed usage. Not Origin licence pricing. Update when the source page changes.",
+  "retrieved": "2026-09-04",
+  "chars_per_token": 4,
+  "chars_per_token_note": "Industry rule of thumb (bytes/4). Not a vendor tokenizer. Label every token figure as estimated.",
+  "model": {
+    "id": "claude-sonnet-4.6",
+    "usd_per_million_input_tokens": 3,
+    "usd_per_million_output_tokens": 15,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "source_note": "Official table row Claude Sonnet 4.6, Base Input Tokens $3 / MTok, retrieved 2026-09-04. Input-only for dump vs query (the extra context is the input). Output is not modelled."
+  },
+  "labour": {
+    "usd_per_hour": 125,
+    "usd_per_hour_note": "Working assumption for a senior product engineer, not a 2one wage study.",
+    "minutes_review_without_product": 20,
+    "minutes_review_with_product": 8,
+    "cycle_note": "One generation cycle = produce a screen, then review. Without the product: read the output and restyle by eye. With the product: run npx 2one check and graph:decide, then fix what they name. These minutes are assumptions until a time-and-motion study exists."
+  },
+  "scale": {
+    "cycles_for_headline": 100,
+    "scale_note": "Headline labour and API $ are per 100 generation cycles so a single-query figure is not mistaken for a contract value."
+  }
+}
