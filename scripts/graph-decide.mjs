@@ -20,11 +20,15 @@
 */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, resolve as resolvePath } from 'node:path'
+import { join, resolve as resolvePath } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const graph = JSON.parse(readFileSync(join(root, 'graph.json'), 'utf8'))
-const ontology = JSON.parse(readFileSync(join(root, 'graph/ontology.json'), 'utf8'))
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
+const graph = JSON.parse(readFileSync(join(root, cfg.rel('out.graph')), 'utf8'))
+const ontology = JSON.parse(readFileSync(join(root, cfg.rel('ontology')), 'utf8'))
 
 const byId = new Map(graph.nodes.map((n) => [n.id, n]))
 const label = (id) => (byId.get(id) ? byId.get(id).label : id)

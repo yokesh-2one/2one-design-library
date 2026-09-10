@@ -10,10 +10,13 @@
   docs/visual-coverage.md and prints a summary. Run: node scripts/visual-coverage.mjs
 */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
 const shotsDir = join(root, 'tests/visual/__screenshots__')
 
 const ls = (d) => (existsSync(d) ? readdirSync(d) : [])
@@ -54,7 +57,7 @@ for (const a of argsIn('states.spec.ts')) {
 // plus dashboard (axe-covered, screenshot-excluded historically) as the axe universe.
 const allCases = [...new Set([...screenshots, ...stateMap.keys(), ...ariaSet])].sort()
 
-const graph = JSON.parse(readFileSync(join(root, 'graph.json'), 'utf8'))
+const graph = JSON.parse(readFileSync(join(root, cfg.rel('out.graph')), 'utf8'))
 const components = graph.nodes
   .filter((n) => n.type === 'component' || n.type === 'component-2one')
   .map((n) => n.id.split(':')[1])

@@ -9,16 +9,19 @@
   run Tailwind v4, and `@source` the package's dist so component utilities generate.
 */
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
 const dist = resolve(root, 'dist')
 
 // 1) theme — ship globals.css as the styles entry.
 //    Rewrite the dev-relative token imports (../../tokens/) to the packaged
 //    location (./tokens/, copied below), so the shipped stylesheet resolves.
-const globals = readFileSync(resolve(root, 'src/styles/globals.css'), 'utf8').replaceAll(
+const globals = readFileSync(resolve(root, cfg.rel('theme')), 'utf8').replaceAll(
   '../../tokens/',
   './tokens/',
 )
@@ -54,7 +57,7 @@ if (unshipped.length) {
 }
 
 // 2) fonts — Satoshi woff2 (styles.css references ./fonts/*)
-const fontsSrc = resolve(root, 'src/styles/fonts')
+const fontsSrc = resolve(root, cfg.rel('fonts'))
 const fontsDist = resolve(dist, 'fonts')
 mkdirSync(fontsDist, { recursive: true })
 for (const f of readdirSync(fontsSrc)) copyFileSync(resolve(fontsSrc, f), resolve(fontsDist, f))

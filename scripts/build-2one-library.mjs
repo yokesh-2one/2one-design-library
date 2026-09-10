@@ -10,10 +10,13 @@
 */
 import { execSync } from 'node:child_process'
 import { cpSync, rmSync, mkdirSync, copyFileSync, readFileSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
 const site = join(root, 'site')
 const run = (cmd, cwd = root) => { console.log(`\n· ${cmd}  (${cwd === root ? '.' : 'astryx'})`); execSync(cmd, { cwd, stdio: 'inherit' }) }
 
@@ -30,7 +33,7 @@ run('npm run build:site', join(root, 'astryx'))                   // astryx → 
 copyFileSync(join(root, 'site-src/index.html'), join(site, 'index.html'))
 mkdirSync(join(site, 'fonts'), { recursive: true })
 for (const f of ['Satoshi-Medium.woff2', 'Satoshi-Bold.woff2', 'Satoshi-Black.woff2'])
-  copyFileSync(join(root, 'src/styles/fonts', f), join(site, 'fonts', f))
+  copyFileSync(join(root, cfg.rel('fonts'), f), join(site, 'fonts', f))
 
 // 4) drop the two stacks in
 cpSync(join(root, 'dist-site'), join(site, 'shadcn'), { recursive: true })

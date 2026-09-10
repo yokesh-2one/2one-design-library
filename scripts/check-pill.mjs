@@ -16,12 +16,15 @@
   rendered radius is confirmed by eye (see the PR). Run: npm run check:pill
 */
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
 // Strip comments first so selector text in a comment can't pollute the parse.
-const css = readFileSync(join(root, 'src/styles/globals.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+const css = readFileSync(join(root, cfg.rel('theme')), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 
 // Every selector whose rule sets a full pill radius.
 const pill = new Set()

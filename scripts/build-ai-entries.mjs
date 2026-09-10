@@ -27,11 +27,14 @@
   Run: npm run ai-entries   (called by npm run manifest)
 */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const m = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'))
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
+const m = JSON.parse(readFileSync(join(root, cfg.rel('out.manifest')), 'utf8'))
 
 const STAMP = 'Generated from manifest.json by scripts/build-ai-entries.mjs — do not edit by hand.'
 
