@@ -261,13 +261,40 @@ const RULES = [
     implements: 'tokens-only',
     severity: 'error',
     why: 'Hard-coded colour drifts from the tokens and breaks re-theming. Use the semantic utilities (bg-primary, text-muted-foreground, border).',
-    test: ({ lines }) =>
-      lines.flatMap((l, i) =>
-        // hex in a className or style, but not inside an SVG path/fill of a brand asset
+    test: ({ src, lines }) => {
+      /*
+        A brand mark paints a FIXED fill by design — fixed-vs-theme-color is a
+        `must` rule that requires it, and mechanises the same idea for <Logo>
+        usage. So the file that DEFINES the mark legitimately hardcodes black
+        and white, and flagging it puts two of this system's own rules in
+        direct contradiction.
+
+        The intent was already here as a per-LINE test for `.svg|viewBox|d="M`,
+        but logo.tsx picks its fill on an ordinary line —
+        `const fill = variant === 'white' ? '#ffffff' : '#000000'` — which no
+        per-line SVG check can see. The question is about the FILE.
+      */
+      const marksBrand = /<svg\b|viewBox=/.test(src)
+      const ACHROMATIC = /^#(?:fff(?:fff)?|000(?:000)?)$/i
+
+      return lines.flatMap((l, i) =>
         [...l.matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-          .filter(() => !/\.svg|viewBox|d="M/.test(l))
+          .filter((m) => {
+            if (/\.svg|viewBox|d="M/.test(l)) return false
+            if (marksBrand && ACHROMATIC.test(m[0])) return false
+            /*
+              A hex inside a Tailwind arbitrary variant is a SELECTOR, not a
+              value: `[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border`
+              matches the colour Recharts hardcodes in its own inline SVG in
+              order to replace it with a token. That is the rule being obeyed,
+              not broken, and chart.tsx was reported five times for it.
+            */
+            const around = l.slice(Math.max(0, m.index - 40), m.index + m[0].length + 3)
+            return !new RegExp(`\\[[\\w-]+=['"]${m[0]}['"]\\]`).test(around)
+          })
           .map((m) => ({ line: i + 1, detail: `hard-coded ${m[0]}` }))
-      ),
+      )
+    },
   },
   {
     id: 'foreign-palette',
@@ -597,14 +624,24 @@ const RULES = [
         colour is decoration, which is what the rule forbids.
       */
       const VALIDATION_HOSTS = /^(?:Alert|FormMessage|FieldError|Toast|Toaster|Button)|(?:Item|Action|Trigger)$/
-      if (SIGNAL.test(stripComments(src)) || /FormMessage/.test(stripComments(src))) return []
+      const code = stripComments(src)
+      if (SIGNAL.test(code) || /FormMessage/.test(code)) return []
       if (!VALIDATION_NAMES.length) return []
       const hue = new RegExp(`\\b(?:${VALIDATION_NAMES.join('|')})\\b`)
-      return [...src.matchAll(/<([A-Z][\w]*)\b([^>]*)>/g)]
-        .filter((m) => !VALIDATION_HOSTS.test(m[1]) && hue.test(m[2]))
-        .map((m) => ({
-          line: src.slice(0, m.index).split('\n').length,
-          detail: `<${m[1]}> is styled with a validation hue but carries no validation state`,
+      /*
+        Radix components arrive as member expressions: `<ContextMenuPrimitive.Item>`.
+        Matching `<([A-Z][\w]*)` captured `ContextMenuPrimitive` and dropped the
+        `.Item`, so the Item/Action/Trigger exemption never matched and every
+        destructive menu item in the library was reported as decoration. The
+        exemption keys on what the tag IS, which is its last segment. Walking
+        rather than matching also fixes the same `[^>]*` truncation that
+        handrolled-control hit.
+      */
+      return jsxOpenTags(code, ['[A-Z][\\w]*(?:\\.[A-Z][\\w]*)*'])
+        .filter((t) => !VALIDATION_HOSTS.test(t.tag.split('.').pop()) && hue.test(t.attrs))
+        .map((t) => ({
+          line: code.slice(0, t.index).split('\n').length,
+          detail: `<${t.tag}> is styled with a validation hue but carries no validation state`,
         }))
     },
   },
