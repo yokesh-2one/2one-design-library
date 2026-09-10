@@ -20,7 +20,7 @@
 */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve as resolvePath } from 'node:path'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const graph = JSON.parse(readFileSync(join(root, 'graph.json'), 'utf8'))
@@ -184,83 +184,145 @@ function decide(intentQ, context) {
   }
 }
 
-// ---- CLI ----
-const args = process.argv.slice(2)
-const json = args.includes('--json')
-const ctxFlag = (() => { const i = args.indexOf('--context'); return i >= 0 ? args[i + 1] : null })()
-const pos = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--context')
-const cmd = pos[0]
+/*
+  ---- query API ----
 
-// Required positional args per command — fail with a clean usage line, never a stack trace.
-const NEEDS_ARG = { decide: 1, rules: 1, alternatives: 1, incompatible: 1, a11y: 1, states: 1, check: 2, why: 2 }
-if (NEEDS_ARG[cmd] && !pos[NEEDS_ARG[cmd]]) {
-  const shape = cmd === 'check' || cmd === 'why' ? '<source-id> <target-id>' : '<node-id-or-label>'
-  console.error(`Usage: graph-decide ${cmd} ${shape}${cmd === 'decide' ? ' [--context <ctx>]' : ''}`)
-  process.exit(1)
+  Four of the commands below used to compute their answers inline in the CLI
+  dispatch, so the only way to ask the graph a question was to run a process and
+  read its stdout. They are functions now, and the dispatch is one caller.
+*/
+
+/** Nodes offered as alternatives to `id`, deduped. */
+export function alternativesFor(id) {
+  return [...new Set([
+    ...out(id, 'alternative_to').map((e) => e.target),
+    ...inc(id, 'alternative_to').map((e) => e.source),
+    ...inc(id, 'preferred_over').map((e) => e.source),
+  ])]
 }
 
-function print(obj) { console.log(JSON.stringify(obj, null, 2)) }
+/**
+ * Nodes that must never be composed with `id`.
+ * Not deduped, matching what this command has always returned: a node reachable
+ * both ways is genuinely forbidden twice over, and collapsing that would hide
+ * one of the two authored edges.
+ */
+export function incompatibleWith(id) {
+  return [...out(id, 'forbidden_with').map((e) => e.target), ...inc(id, 'forbidden_with').map((e) => e.source)]
+}
 
-if (cmd === 'decide') {
-  const r = decide(pos[1], ctxFlag)
-  if (json) { print(r); process.exit(r.error ? 1 : 0) }
-  if (r.error) { console.error(r.error); process.exit(1) }
-  const bar = '─'.repeat(58)
-  console.log(`\n${bar}\n  INTENT   ${r.intent_label}${r.context_label ? '   ·   CONTEXT ' + r.context_label : ''}\n${bar}`)
-  console.log(`\n  ✓ USE   ${r.decision_label}   (${r.decision})   [${r.decision_class}]`)
-  for (const c of r.context_overrides) console.log(`     ↳ ${label(c.prefer)} preferred over ${label(c.over)} — ${c.because}  (${c.evidence || 'authored'})`)
-  if (r.composition.length) console.log(`\n  COMPOSE WITH   ${r.composition.map((c) => c.label).join(' · ')}`)
-  if (r.mandatory_rules.length) { console.log(`\n  MANDATORY RULES (by tier):`); r.mandatory_rules.forEach((x) => console.log(`     • [${x.priority}/${x.tier}] ${x.label}`)) }
-  if (r.anti_patterns.length) { console.log(`\n  AVOID:`); r.anti_patterns.forEach((x) => console.log(`     ✗ [${x.priority || 'AVOID'}] ${x.subject === 'rule' ? '' : label(x.subject) + ' '}${x.avoid}`)) }
-  if (r.accessibility.length) { console.log(`\n  ACCESSIBILITY:`); r.accessibility.forEach((a) => console.log(`     ♿ ${a.label}  (${a.evidence || 'authored'})`)) }
-  if (r.alternatives.length) console.log(`\n  ALTERNATIVES   ${r.alternatives.map((a) => a.label).join(' · ')}`)
-  console.log('')
-} else if (cmd === 'rules') {
-  const id = resolve(pos[1]); const r = rulesFor(id)
-  if (json) print({ node: id, rules: r })
-  else { console.log(`\n  Rules governing ${label(id)} (${id}), strongest tier first:`); r.forEach((x) => console.log(`   • [${x.priority}/${x.tier}] ${x.label}  (${x.id})`)); console.log('') }
-} else if (cmd === 'alternatives') {
-  const id = resolve(pos[1])
-  const alt = [...out(id, 'alternative_to'), ...inc(id, 'alternative_to'), ...inc(id, 'preferred_over').map((e) => ({ ...e, note: 'this is preferred over ' + e.target })), ...out(id, 'preferred_over')]
-  const list = [...new Set([...out(id, 'alternative_to').map((e) => e.target), ...inc(id, 'alternative_to').map((e) => e.source), ...inc(id, 'preferred_over').map((e) => e.source)])]
-  if (json) print({ node: id, alternatives: list })
-  else { console.log(`\n  Alternatives to ${label(id)}:`); list.forEach((a) => console.log(`   • ${label(a)}  (${a})`)); if (!list.length) console.log('   (none encoded)'); console.log('') }
-} else if (cmd === 'incompatible') {
-  const id = resolve(pos[1])
-  const list = [...out(id, 'forbidden_with').map((e) => e.target), ...inc(id, 'forbidden_with').map((e) => e.source)]
-  if (json) print({ node: id, forbidden_with: list })
-  else { console.log(`\n  Must NOT be composed with ${label(id)}:`); list.forEach((a) => console.log(`   ✗ ${label(a)}`)); if (!list.length) console.log('   (none encoded)'); console.log('') }
-} else if (cmd === 'a11y') {
-  const id = resolve(pos[1]); const r = a11yFor(id)
-  if (json) print({ node: id, accessibility: r })
-  else { console.log(`\n  Accessibility requirements for ${label(id)}:`); r.forEach((a) => console.log(`   ♿ ${a.label}  (${a.evidence || 'authored'})`)); if (!r.length) console.log('   (none encoded)'); console.log('') }
-} else if (cmd === 'states') {
-  const id = resolve(pos[1]); const r = statesFor(id)
-  if (json) print({ node: id, states: r })
-  else { console.log(`\n  ${label(id)} supports states: ${r.map((s) => s.label).join(', ') || '(none encoded)'}\n`) }
-} else if (cmd === 'check') {
-  // check <component> <intent|context> → is this a valid choice? YES / NO / UNSPECIFIED
-  const s = resolve(pos[1]), t = resolve(pos[2])
+/**
+ * Is `sourceQ` a valid choice for `targetQ`? YES / NO / UNSPECIFIED.
+ * Governing rules follow `specializes`, so a variant inherits its parent's.
+ */
+export function checkPair(sourceQ, targetQ) {
+  const s = resolve(sourceQ), t = resolve(targetQ)
   const rels = graph.edges.filter((e) => e.source === s && e.target === t)
   const negative = rels.filter((e) => e.type === 'inappropriate_for' || e.type === 'forbidden_with')
   const positive = rels.filter((e) => ['preferred_for', 'appropriate_for', 'realized_by', 'requires', 'supports_state'].includes(e.type))
   const verdict = negative.length ? 'NO' : positive.length ? 'YES' : 'UNSPECIFIED'
-  // rules governing the source, following `specializes` so a variant inherits its parent's rules
   const surface = [s, ...out(s, 'specializes').map((e) => e.target)]
   const governing = [...new Map(surface.flatMap((x) => rulesFor(x)).map((r) => [r.id, r])).values()]
     .sort((a, b) => tierRank(a.tier) - tierRank(b.tier) || a.id.localeCompare(b.id))
-  const res = { source: s, target: t, verdict, evidence: (negative[0] || positive[0] || {}).evidence, relations: rels.map((e) => ({ type: e.type, priority: e.priority, evidence: e.evidence })), governing_rules: governing.map((r) => r.id) }
-  if (json) { print(res); process.exit(0) }
-  console.log(`\n  Can ${label(s)} be used for ${label(t)}?  →  ${verdict}`)
-  rels.forEach((e) => console.log(`   ${e.type}  [${e.priority || '-'}]  ${e.evidence || ''}`))
-  if (governing.length) console.log(`   governed by: ${governing.map((r) => r.label).join(' · ')}`)
-  console.log('')
-} else if (cmd === 'why') {
-  const s = resolve(pos[1]), t = resolve(pos[2])
-  const es = graph.edges.filter((e) => e.source === s && e.target === t)
-  if (json) print({ source: s, target: t, edges: es })
-  else { console.log(`\n  ${label(s)} → ${label(t)}:`); es.forEach((e) => console.log(`   ${e.type}  [${e.priority || '-'}/${e.prov}]  evidence: ${e.evidence || 'n/a'}`)); if (!es.length) console.log('   (no direct relationship)'); console.log('') }
-} else {
-  console.error('Usage: graph-decide <decide|rules|alternatives|incompatible|a11y|states|why> …  (see file header)')
-  process.exit(1)
+  return { source: s, target: t, verdict, evidence: (negative[0] || positive[0] || {}).evidence, relations: rels.map((e) => ({ type: e.type, priority: e.priority, evidence: e.evidence })), governing_rules: governing.map((r) => r.id) }
+}
+
+/** Every directly authored edge from `sourceQ` to `targetQ`, with its evidence. */
+export function edgesBetween(sourceQ, targetQ) {
+  const source = resolve(sourceQ), target = resolve(targetQ)
+  return { source, target, edges: graph.edges.filter((e) => e.source === source && e.target === target) }
+}
+
+/*
+  The already-pure helpers, published under names that do not collide with what
+  a caller is likely to have in scope. `resolve` in particular is node:path's in
+  most files.
+*/
+export { resolve as resolveNode, decide, rulesFor, a11yFor, statesFor, label as labelOf }
+
+/** What this graph can be asked about, for an embedder discovering it. */
+export const graphSummary = {
+  nodes: graph.nodes.length,
+  edges: graph.edges.length,
+  classes: [...new Set(graph.nodes.map((n) => n.class))].sort(),
+  intents: graph.nodes.filter((n) => n.class === 'Intent').map((n) => ({ id: n.id, label: n.label })).sort((a, b) => a.id.localeCompare(b.id)),
+}
+
+/*
+  ---- CLI ----
+
+  Runs only when this file IS the program, so importing the module answers
+  nothing, prints nothing and exits nothing.
+*/
+const isMain = process.argv[1] && resolvePath(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isMain) {
+  const args = process.argv.slice(2)
+  const json = args.includes('--json')
+  const ctxFlag = (() => { const i = args.indexOf('--context'); return i >= 0 ? args[i + 1] : null })()
+  const pos = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--context')
+  const cmd = pos[0]
+
+  // Required positional args per command — fail with a clean usage line, never a stack trace.
+  const NEEDS_ARG = { decide: 1, rules: 1, alternatives: 1, incompatible: 1, a11y: 1, states: 1, check: 2, why: 2 }
+  if (NEEDS_ARG[cmd] && !pos[NEEDS_ARG[cmd]]) {
+    const shape = cmd === 'check' || cmd === 'why' ? '<source-id> <target-id>' : '<node-id-or-label>'
+    console.error(`Usage: graph-decide ${cmd} ${shape}${cmd === 'decide' ? ' [--context <ctx>]' : ''}`)
+    process.exit(1)
+  }
+
+  const print = (obj) => console.log(JSON.stringify(obj, null, 2))
+
+  if (cmd === 'decide') {
+    const r = decide(pos[1], ctxFlag)
+    if (json) { print(r); process.exit(r.error ? 1 : 0) }
+    if (r.error) { console.error(r.error); process.exit(1) }
+    const bar = '─'.repeat(58)
+    console.log(`\n${bar}\n  INTENT   ${r.intent_label}${r.context_label ? '   ·   CONTEXT ' + r.context_label : ''}\n${bar}`)
+    console.log(`\n  ✓ USE   ${r.decision_label}   (${r.decision})   [${r.decision_class}]`)
+    for (const c of r.context_overrides) console.log(`     ↳ ${label(c.prefer)} preferred over ${label(c.over)} — ${c.because}  (${c.evidence || 'authored'})`)
+    if (r.composition.length) console.log(`\n  COMPOSE WITH   ${r.composition.map((c) => c.label).join(' · ')}`)
+    if (r.mandatory_rules.length) { console.log(`\n  MANDATORY RULES (by tier):`); r.mandatory_rules.forEach((x) => console.log(`     • [${x.priority}/${x.tier}] ${x.label}`)) }
+    if (r.anti_patterns.length) { console.log(`\n  AVOID:`); r.anti_patterns.forEach((x) => console.log(`     ✗ [${x.priority || 'AVOID'}] ${x.subject === 'rule' ? '' : label(x.subject) + ' '}${x.avoid}`)) }
+    if (r.accessibility.length) { console.log(`\n  ACCESSIBILITY:`); r.accessibility.forEach((a) => console.log(`     ♿ ${a.label}  (${a.evidence || 'authored'})`)) }
+    if (r.alternatives.length) console.log(`\n  ALTERNATIVES   ${r.alternatives.map((a) => a.label).join(' · ')}`)
+    console.log('')
+  } else if (cmd === 'rules') {
+    const id = resolve(pos[1]); const r = rulesFor(id)
+    if (json) print({ node: id, rules: r })
+    else { console.log(`\n  Rules governing ${label(id)} (${id}), strongest tier first:`); r.forEach((x) => console.log(`   • [${x.priority}/${x.tier}] ${x.label}  (${x.id})`)); console.log('') }
+  } else if (cmd === 'alternatives') {
+    const id = resolve(pos[1])
+    const list = alternativesFor(id)
+    if (json) print({ node: id, alternatives: list })
+    else { console.log(`\n  Alternatives to ${label(id)}:`); list.forEach((a) => console.log(`   • ${label(a)}  (${a})`)); if (!list.length) console.log('   (none encoded)'); console.log('') }
+  } else if (cmd === 'incompatible') {
+    const id = resolve(pos[1])
+    const list = incompatibleWith(id)
+    if (json) print({ node: id, forbidden_with: list })
+    else { console.log(`\n  Must NOT be composed with ${label(id)}:`); list.forEach((a) => console.log(`   ✗ ${label(a)}`)); if (!list.length) console.log('   (none encoded)'); console.log('') }
+  } else if (cmd === 'a11y') {
+    const id = resolve(pos[1]); const r = a11yFor(id)
+    if (json) print({ node: id, accessibility: r })
+    else { console.log(`\n  Accessibility requirements for ${label(id)}:`); r.forEach((a) => console.log(`   ♿ ${a.label}  (${a.evidence || 'authored'})`)); if (!r.length) console.log('   (none encoded)'); console.log('') }
+  } else if (cmd === 'states') {
+    const id = resolve(pos[1]); const r = statesFor(id)
+    if (json) print({ node: id, states: r })
+    else { console.log(`\n  ${label(id)} supports states: ${r.map((s) => s.label).join(', ') || '(none encoded)'}\n`) }
+  } else if (cmd === 'check') {
+    // check <component> <intent|context> → is this a valid choice? YES / NO / UNSPECIFIED
+    const res = checkPair(pos[1], pos[2])
+    if (json) { print(res); process.exit(0) }
+    console.log(`\n  Can ${label(res.source)} be used for ${label(res.target)}?  →  ${res.verdict}`)
+    res.relations.forEach((e) => console.log(`   ${e.type}  [${e.priority || '-'}]  ${e.evidence || ''}`))
+    if (res.governing_rules.length) console.log(`   governed by: ${res.governing_rules.map((rid) => label(rid)).join(' · ')}`)
+    console.log('')
+  } else if (cmd === 'why') {
+    const { source: s, target: t, edges: es } = edgesBetween(pos[1], pos[2])
+    if (json) print({ source: s, target: t, edges: es })
+    else { console.log(`\n  ${label(s)} → ${label(t)}:`); es.forEach((e) => console.log(`   ${e.type}  [${e.priority || '-'}/${e.prov}]  evidence: ${e.evidence || 'n/a'}`)); if (!es.length) console.log('   (no direct relationship)'); console.log('') }
+  } else {
+    console.error('Usage: graph-decide <decide|rules|alternatives|incompatible|a11y|states|why> …  (see file header)')
+    process.exit(1)
+  }
 }

@@ -15,7 +15,7 @@
   checked in a CHILD process that imports the module and reports what it saw, so
   a stray console.log or process.exit is caught rather than inherited.
 
-  Covered so far: check-usage, dls-info. Add a section here as each further
+  Covered so far: check-usage, dls-info, graph-decide. Add a section here as each further
   script gains an entry point.
 
   Run: npm run check:api
@@ -29,12 +29,14 @@ import { spawnSync } from 'node:child_process'
 const here = dirname(fileURLToPath(import.meta.url))
 const CHECK = pathToFileURL(join(here, 'check-usage.mjs')).href
 const INFO = pathToFileURL(join(here, 'dls-info.mjs')).href
+const GRAPH = pathToFileURL(join(here, 'graph-decide.mjs')).href
 
 const fails = []
 const t = (name, ok) => { if (!ok) fails.push(name) }
 
 const { checkUsage, ruleset } = await import(CHECK)
 const { dlsInfo } = await import(INFO)
+const graphApi = await import(GRAPH)
 
 /** A bare import must be silent and must not exit. Asserted from a child. */
 const importIsInert = (href, label) => {
@@ -99,9 +101,35 @@ try {
   // could not do this at all: it bound itself to process.cwd() on import.
   t('info: survives being called twice for different roots', mine !== theirs)
 
+  // ---- graph-decide: answers questions instead of printing them ----
+  const { decide, resolveNode, rulesFor, alternativesFor, incompatibleWith, checkPair, edgesBetween, graphSummary } = graphApi
+  const intent = graphSummary.intents[0]
+  t('graph: summary describes the graph', graphSummary.nodes > 0 && graphSummary.edges > 0 && graphSummary.classes.length > 0)
+  t('graph: summary lists intents', Array.isArray(graphSummary.intents) && graphSummary.intents.length > 0)
+
+  const d = decide(intent.id)
+  t('graph: decide answers a real intent', d && !d.error && typeof d.decision === 'string')
+  t('graph: decision carries its rules', Array.isArray(d.mandatory_rules) && Array.isArray(d.all_rules))
+
+  // An unresolvable query is DATA, not a thrown error or an exit.
+  const nonsense = decide('zzz-no-such-intent-anywhere')
+  t('graph: unknown intent returns an error field', Boolean(nonsense && nonsense.error))
+  t('graph: unknown intent does not throw', true)
+
+  t('graph: resolveNode maps a label to an id', resolveNode(intent.label) === intent.id)
+  t('graph: rulesFor returns a list', Array.isArray(rulesFor(intent.id)))
+  t('graph: alternativesFor returns a list', Array.isArray(alternativesFor(intent.id)))
+  t('graph: incompatibleWith returns a list', Array.isArray(incompatibleWith(intent.id)))
+
+  const verdict = checkPair(intent.id, intent.id)
+  t('graph: checkPair returns a known verdict', ['YES', 'NO', 'UNSPECIFIED'].includes(verdict.verdict))
+  t('graph: checkPair cites its relations', Array.isArray(verdict.relations) && Array.isArray(verdict.governing_rules))
+  t('graph: edgesBetween returns edges', Array.isArray(edgesBetween(intent.id, intent.id).edges))
+
   // ---- importing either module must be inert ----
   importIsInert(CHECK, 'check')
   importIsInert(INFO, 'info')
+  importIsInert(GRAPH, 'graph')
 } finally {
   rmSync(root, { recursive: true, force: true })
 }
@@ -113,4 +141,4 @@ if (fails.length) {
   console.error('  module scope, importing stopped being free and the CLI would not show it.\n')
   process.exit(1)
 }
-console.log('\n  ✓ check:api — checkUsage() and dlsInfo() return data, fail without exiting, and import inertly\n')
+console.log('\n  ✓ check:api — checkUsage(), dlsInfo() and the graph API return data, fail without exiting, and import inertly\n')
