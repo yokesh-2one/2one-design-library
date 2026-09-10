@@ -15,12 +15,12 @@
   checked in a CHILD process that imports the module and reports what it saw, so
   a stray console.log or process.exit is caught rather than inherited.
 
-  Covered so far: check-usage, dls-info, graph-decide. Add a section here as each further
+  Covered so far: the api facade, check-usage, dls-info, graph-decide. Add a section here as each further
   script gains an entry point.
 
   Run: npm run check:api
 */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -30,6 +30,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const CHECK = pathToFileURL(join(here, 'check-usage.mjs')).href
 const INFO = pathToFileURL(join(here, 'dls-info.mjs')).href
 const GRAPH = pathToFileURL(join(here, 'graph-decide.mjs')).href
+const API = pathToFileURL(join(here, 'api.mjs')).href
 
 const fails = []
 const t = (name, ok) => { if (!ok) fails.push(name) }
@@ -37,6 +38,7 @@ const t = (name, ok) => { if (!ok) fails.push(name) }
 const { checkUsage, ruleset } = await import(CHECK)
 const { dlsInfo } = await import(INFO)
 const graphApi = await import(GRAPH)
+const api = await import(API)
 
 /** A bare import must be silent and must not exit. Asserted from a child. */
 const importIsInert = (href, label) => {
@@ -126,10 +128,35 @@ try {
   t('graph: checkPair cites its relations', Array.isArray(verdict.relations) && Array.isArray(verdict.governing_rules))
   t('graph: edgesBetween returns edges', Array.isArray(edgesBetween(intent.id, intent.id).edges))
 
+  // ---- the facade re-exports everything, and is REACHABLE from a package ----
+  const expected = ['checkUsage', 'ruleset', 'dlsInfo', 'decide', 'resolveNode', 'rulesFor', 'a11yFor',
+    'statesFor', 'alternativesFor', 'incompatibleWith', 'checkPair', 'edgesBetween', 'labelOf',
+    'graphSummary', 'config']
+  for (const name of expected) t(`api: exports ${name}`, typeof api[name] !== 'undefined')
+
+  /*
+    The export map is the part that was silently broken and stayed invisible.
+    package.json maps "./*" to "./dist/*", so every scripts/*.mjs specifier
+    resolved to a file under dist that does not exist: the entry points were
+    reachable only by absolute path, which is no use to an installed package.
+
+    Resolution is checked against a throwaway package built from the REAL
+    package.json plus a stub, so this asserts the map itself rather than the
+    contents of this repo, and costs two small files instead of a copy.
+  */
+  const pkgRoot = join(root, 'node_modules', '@2one', 'design-library')
+  mkdirSync(join(pkgRoot, 'scripts'), { recursive: true })
+  writeFileSync(join(pkgRoot, 'package.json'), readFileSync(join(here, '..', 'package.json'), 'utf8'))
+  writeFileSync(join(pkgRoot, 'scripts', 'api.mjs'), 'export const reached = true\n')
+  writeFileSync(join(root, 'probe.mjs'), "import { reached } from '@2one/design-library/api'\nconsole.error(reached ? 'REACHED' : 'NO')\n")
+  const res = spawnSync(process.execPath, [join(root, 'probe.mjs')], { encoding: 'utf8', cwd: root })
+  t('api: resolves as @2one/design-library/api', res.status === 0 && res.stderr.includes('REACHED'))
+
   // ---- importing either module must be inert ----
   importIsInert(CHECK, 'check')
   importIsInert(INFO, 'info')
   importIsInert(GRAPH, 'graph')
+  importIsInert(API, 'api')
 } finally {
   rmSync(root, { recursive: true, force: true })
 }
@@ -141,4 +168,4 @@ if (fails.length) {
   console.error('  module scope, importing stopped being free and the CLI would not show it.\n')
   process.exit(1)
 }
-console.log('\n  ✓ check:api — checkUsage(), dlsInfo() and the graph API return data, fail without exiting, and import inertly\n')
+console.log('\n  ✓ check:api — the api facade resolves from a package, returns data, fails without exiting, and imports inertly\n')
