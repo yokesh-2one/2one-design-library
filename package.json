@@ -84,7 +84,7 @@
     "evals": "node scripts/run-evals.mjs",
     "check:graph-integrity": "node scripts/check-graph-integrity.mjs",
     "check:scan": "node scripts/check-usage-scan.test.mjs",
-    "check:api": "node scripts/check-usage-api.test.mjs",
+    "check:api": "node scripts/engine-api.test.mjs",
     "check:web-copy": "node scripts/check-web-copy.mjs",
     "verify:visual": "playwright test",
     "test:visual": "playwright test screenshots.spec.ts",
