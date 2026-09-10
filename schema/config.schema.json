@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yokesh-2one/2one-design-library/schema/config.schema.json",
+  "title": "dls.config.json",
+  "description": "How a payload describes itself to the engine. Every path is relative to the directory holding this file, which is what the engine treats as the payload root. A payload that omits a key gets the default in scripts/lib/config.mjs, which is the 2one layout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "type": "string",
+      "description": "The design system's name, used in generated prose and reports.",
+      "minLength": 1
+    },
+    "packageName": {
+      "type": ["string", "null"],
+      "description": "npm package name consumers install, or null when the payload is not published."
+    },
+    "repoUrl": {
+      "type": ["string", "null"],
+      "description": "Repository URL, used in generated install instructions."
+    },
+    "identity": {
+      "type": ["string", "null"],
+      "description": "Path to an identity file carrying payload prose and provenance. Absent is valid."
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Where this payload keeps its files. The engine holds no knowledge of these locations.",
+      "properties": {
+        "tokenSources": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The authored CSS the token build reads.",
+          "properties": {
+            "colors": { "type": "string" },
+            "typography": { "type": "string" },
+            "spacing": { "type": "string" }
+          }
+        },
+        "theme": { "type": "string", "description": "The stylesheet defining light and dark theme variables." },
+        "fonts": { "type": "string" },
+        "components": { "type": "string", "description": "The primitive component directory the rules govern." },
+        "ownComponents": { "type": "string", "description": "Components authored by this payload rather than adapted." },
+        "blocks": { "type": "string" },
+        "patterns": { "type": "string" },
+        "patternSpecs": { "type": "string" },
+        "aiComponents": { "type": "string" },
+        "aiComponentSpecs": { "type": "string" },
+        "barrel": { "type": "string", "description": "The single export surface consumers import from." },
+        "schemas": { "type": "string", "description": "Directory holding this payload's JSON schemas." },
+        "rules": { "type": "string", "description": "The authored UX rule set. Optional: a payload with no authored rules still produces a valid derived graph." },
+        "ontology": { "type": "string", "description": "Authored graph ontology. Optional." },
+        "decisions": { "type": "string", "description": "Authored decision table. Optional." },
+        "brand": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "structured": { "type": "string" },
+            "prose": { "type": "string" },
+            "logo": { "type": "string" }
+          }
+        },
+        "out": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Where generated artifacts are written.",
+          "properties": {
+            "tokens": { "type": "string" },
+            "manifest": { "type": "string" },
+            "graph": { "type": "string" },
+            "dtcg": { "type": "string" }
+          }
+        },
+        "integrations": {
+          "type": "object",
+          "description": "Per-integration output paths. Open-ended: an integration the engine does not know about is still a valid key.",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The opinions the engine enforces on this payload's behalf.",
+      "properties": {
+        "wordmark": {
+          "type": ["string", "null"],
+          "description": "The brand word that must never be set as type. Null disables the wordmark checks."
+        },
+        "neutralRamp": {
+          "type": "string",
+          "description": "Name of the ramp every neutral surface is built from. Read by validate. Keep this and primaryRamp in agreement unless the payload genuinely separates them.",
+          "default": "neutral"
+        },
+        "primaryRamp": {
+          "type": "string",
+          "description": "Name of the ramp the token build treats as primary. Read by build-tokens, which falls back to the first declared ramp when absent. Distinct from neutralRamp: setting one and not the other is the most common payload mistake."
+        },
+        "brandAccent": {
+          "type": "string",
+          "description": "The single accent hue, as hex. Emphasis only, never a primary fill.",
+          "pattern": "^#[0-9a-fA-F]{3,8}$"
+        },
+        "iconLibrary": { "type": "string", "description": "The icon package consumers import, e.g. lucide-react." },
+        "iconLibraryLabel": { "type": "string", "description": "Human name for that library, used in prose." },
+        "spacingBase": { "type": "number", "description": "The spacing grid step in px. Off-grid values are reported.", "exclusiveMinimum": 0 },
+        "grayscaleOnly": { "type": "boolean", "description": "When true, any hue outside the declared ramps is a violation." },
+        "validationHues": {
+          "type": "array",
+          "description": "Hues permitted for validation state and data trend, always paired with a non-colour cue.",
+          "items": { "type": "string" }
+        },
+        "signature": { "type": ["string", "null"], "description": "One sentence naming what makes this system visually identifiable." },
+        "ownComponentsInUi": {
+          "type": "array",
+          "description": "Components that live in the primitive directory but are authored by this payload rather than adapted.",
+          "items": { "type": "string" }
+        },
+        "ownComponentNodeType": { "type": "string", "description": "Graph node type given to those authored components." }
+      }
+    }
+  }
+}
