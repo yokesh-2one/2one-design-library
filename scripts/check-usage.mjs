@@ -22,7 +22,8 @@
   Exit code: 1 if any error-severity finding (or any finding with --warnings).
 */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
-import { join, relative, extname } from 'node:path'
+import { join, relative, extname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { config as cfg } from './lib/config.mjs'
 
 const root = cfg.root
@@ -30,7 +31,6 @@ const args = process.argv.slice(2)
 const asJson = args.includes('--json')
 const strict = args.includes('--warnings')
 const draft = args.includes('--draft')
-const targets = args.filter((a) => !a.startsWith('--'))
 
 /*
   The knowledge graph is the authority on which tokens exist. Without it this
@@ -936,21 +936,32 @@ const CODE = new Set(['.tsx', '.jsx', '.ts', '.js', '.html'])
   via .2oneignore, .gitignore, or repeatable `--ignore <glob>`.
 */
 const IGNORE_DIRS = new Set(['node_modules', 'dist', 'build', 'coverage', 'out', '.next', '.nuxt', '.svelte-kit', '.vite', '.turbo', '.cache', '.git', '.vercel', '.output', '.parcel-cache'])
-const ignoreGlobs = []
-for (let i = 0; i < args.length; i++) if (args[i] === '--ignore' && args[i + 1]) ignoreGlobs.push(args[i + 1])
-for (const f of ['.2oneignore', '.gitignore']) {
-  try {
-    for (const l of readFileSync(join(process.cwd(), f), 'utf8').split('\n')) {
-      const t = l.trim()
-      if (t && !t.startsWith('#') && !t.startsWith('!')) ignoreGlobs.push(t.replace(/^\/+/, '').replace(/\/+$/, ''))
-    }
-  } catch { /* file absent — fine */ }
+/*
+  Ignore globs come from the caller plus the project's own ignore files. This is
+  a function rather than module-level state because the library entry point takes
+  its ignores as an argument: reading process.argv at import time meant an
+  embedder (the MCP server, a test, another checker) silently inherited whatever
+  flags its own host process happened to be launched with.
+*/
+const collectIgnoreGlobs = (extra = [], cwd = process.cwd()) => {
+  const globs = [...extra]
+  for (const f of ['.2oneignore', '.gitignore']) {
+    try {
+      for (const l of readFileSync(join(cwd, f), 'utf8').split('\n')) {
+        const t = l.trim()
+        if (t && !t.startsWith('#') && !t.startsWith('!')) globs.push(t.replace(/^\/+/, '').replace(/\/+$/, ''))
+      }
+    } catch { /* file absent, fine */ }
+  }
+  return globs
 }
 const globToRe = (g) => new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, ' ').replace(/\*/g, '[^/]*').replace(/ /g, '.*').replace(/\?/g, '.') + '$')
-const ignoreRes = ignoreGlobs.map(globToRe)
-const isIgnored = (name, rel) => IGNORE_DIRS.has(name) || ignoreRes.some((re) => re.test(name) || re.test(rel))
+const makeIsIgnored = (globs) => {
+  const res = globs.map(globToRe)
+  return (name, rel) => IGNORE_DIRS.has(name) || res.some((re) => re.test(name) || re.test(rel))
+}
 
-const walk = (p, base = p, acc = []) => {
+const walk = (p, isIgnored, base = p, acc = []) => {
   const s = statSync(p)
   if (s.isDirectory()) {
     for (const f of readdirSync(p)) {
@@ -959,7 +970,7 @@ const walk = (p, base = p, acc = []) => {
       const rel = relative(base, abs).replace(/\\/g, '/')
       if (isIgnored(f, rel)) continue
       const st = statSync(abs)
-      if (st.isDirectory()) walk(abs, base, acc)
+      if (st.isDirectory()) walk(abs, isIgnored, base, acc)
       else if (CODE.has(extname(abs))) acc.push(abs)
     }
   } else if (CODE.has(extname(p))) acc.push(p) // an explicitly-named file target is always scanned
@@ -975,137 +986,210 @@ const walk = (p, base = p, acc = []) => {
   unshipped package, so it audits the consumer's OWN src/ instead. And zero scannable
   files is an ACTIONABLE failure, never a silent "audit passed".
 */
-const resolveTarget = (t) => (t.startsWith('/') || /^[A-Za-z]:/.test(t) ? t : join(process.cwd(), t))
 const inNodeModules = (p) => p.replace(/\\/g, '/').includes('/node_modules/')
-const positional = []
-for (let i = 0; i < args.length; i++) { if (args[i] === '--ignore') { i++; continue } if (!args[i].startsWith('--')) positional.push(args[i]) }
 
-let inputs
-let scannedLabel
-if (positional.length) {
-  inputs = positional.map(resolveTarget)
-  scannedLabel = positional.join(', ')
-} else {
-  const payloadDirs = ['blocks', 'patterns', 'aiComponents']
-    .map((k) => { try { return join(root, cfg.rel(k)) } catch { return null } })
-    .filter((d) => d && existsSync(d) && !inNodeModules(d))
-  if (payloadDirs.length) { inputs = payloadDirs; scannedLabel = 'the design system’s own templates' }
-  else {
-    const cwdSrc = join(process.cwd(), 'src')
-    inputs = [existsSync(cwdSrc) ? cwdSrc : process.cwd()]
-    scannedLabel = existsSync(cwdSrc) ? 'src' : 'this project'
-  }
-}
+/**
+ * Audit code against this payload's rules.
+ *
+ * The engine's first library entry point. It RETURNS a result and never prints
+ * or exits, so an embedder can call it without spawning a process and parsing
+ * stdout. The CLI at the bottom of this file is now one caller of this function
+ * rather than the only way in.
+ *
+ * Input failures that used to exit(1) come back as `ok: false` with a typed
+ * error, because "no such path" is something an embedder has to render, not a
+ * reason to kill the host process.
+ *
+ * @param {object} [opts]
+ * @param {string[]} [opts.targets] paths to audit; empty means the default target
+ * @param {string[]} [opts.ignore] extra ignore globs, as `--ignore` would supply
+ * @param {string} [opts.cwd] directory that relative targets resolve from
+ */
+export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = {}) {
+  const resolveTarget = (t) => (t.startsWith('/') || /^[A-Za-z]:/.test(t) ? t : join(cwd, t))
+  const isIgnored = makeIsIgnored(collectIgnoreGlobs(ignore, cwd))
 
-const files = inputs.flatMap((p) => {
-  try {
-    return walk(p)
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      console.error(`\n  check-usage: no such file or directory: ${p}\n`)
-      process.exit(1)
-    }
-    throw e
-  }
-})
-
-if (!files.length) {
-  console.error(
-    `\n  check-usage: no scannable files found in ${scannedLabel}.\n` +
-      `  Looked for ${[...CODE].join(' ')} files (skipping node_modules, dist, build, …).\n` +
-      `  ${positional.length ? 'Check the path you passed.' : 'Point it at your source, e.g. `npx 2one check src`.'}\n`,
-  )
-  process.exit(1)
-}
-
-// ---- run ----
-const findings = []
-for (const file of files) {
-  const src = readFileSync(file, 'utf8')
-  const lines = src.split('\n')
-  for (const rule of ACTIVE) {
-    for (const hit of rule.test({ src, lines, file })) {
-      findings.push({
-        file: relative(root, file).replace(/\\/g, '/'),
-        line: hit.line,
-        rule: rule.id,
-        // The authored rule this detector enforces — the id a payload author,
-        // the graph and graph-decide all know it by.
-        enforces: rule.implements ?? null,
-        severity: rule.severity,
-        detail: hit.detail,
-        why: rule.why,
-      })
-    }
-  }
-}
-
-const errors = findings.filter((f) => f.severity === 'error')
-const warns = findings.filter((f) => f.severity === 'warn')
-
-if (asJson) {
-  console.log(JSON.stringify({ scanned: files.length, errors: errors.length, warnings: warns.length, degraded: !coverage, coverage, findings }, null, 2))
-} else {
-  const scope = coverage ? `${coverage.checked} of ${coverage.total} ${cfg.name} rules` : `the ${cfg.name} rules`
-  console.log(`\n  check-usage — ${files.length} file(s) scanned against ${scope}\n`)
-  // Degraded mode: the payload's rules file couldn't be resolved from `root`, so
-  // only the built-in detectors ran — a REDUCED set. Say so loudly; a silent
-  // "the N rules" (with no count) reads like full coverage when it isn't.
-  if (!coverage) {
-    const rel = cfg.rel('rules')
-    console.log(
-      `  ⚠ Degraded coverage — no ${cfg.name} rules file resolved` +
-        (rel ? ` (looked for "${rel}" under ${root})` : '') + `.\n` +
-        `    Only the built-in detectors ran, not this system's full ruleset.\n` +
-        `    Run from a project with dls.config.json (or inside the DLS repo, passing\n` +
-        `    your app path as the target) for full coverage. A clean run here does\n` +
-        `    NOT mean the ${cfg.name} rules hold.\n`,
-    )
-  }
-  if (!findings.length) {
-    // Never "✓ no violations" unqualified — that is the sentence that made an
-    // inert rule look like a passing one for weeks.
-    console.log(coverage ? `  ✓ no violations of the ${coverage.checked} checkable rules\n` : '  ✓ no violations\n')
+  let inputs
+  let scannedLabel
+  if (targets.length) {
+    inputs = targets.map(resolveTarget)
+    scannedLabel = targets.join(', ')
   } else {
-    let current = ''
-    for (const f of [...errors, ...warns]) {
-      if (f.file !== current) {
-        current = f.file
-        console.log(`  ${f.file}`)
-      }
-      const tag = f.severity === 'error' ? 'error' : 'warn '
-      console.log(`    ${tag}  ${String(f.line).padStart(4)}  ${f.rule}  —  ${f.detail}`)
-      console.log(`                 ${f.why}`)
+    const payloadDirs = ['blocks', 'patterns', 'aiComponents']
+      .map((k) => { try { return join(root, cfg.rel(k)) } catch { return null } })
+      .filter((d) => d && existsSync(d) && !inNodeModules(d))
+    if (payloadDirs.length) { inputs = payloadDirs; scannedLabel = 'the design system’s own templates' }
+    else {
+      const cwdSrc = join(cwd, 'src')
+      inputs = [existsSync(cwdSrc) ? cwdSrc : cwd]
+      scannedLabel = existsSync(cwdSrc) ? 'src' : 'this project'
     }
-    console.log(`\n  ${errors.length} error(s), ${warns.length} warning(s)\n`)
   }
 
-  if (coverage?.advisory.length) {
-    const musts = coverage.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
-    console.log(
-      `  ${coverage.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
-        (musts.length ? `, ${musts.length} of them "must"` : '') + '.',
-    )
-    if (draft && musts.length) {
-      // --draft: a static run cannot judge these, so PROMPT the reviewer by name —
-      // a "must" is never silently skipped. Confirm each by eye before shipping.
-      console.log('\n  Draft review — confirm each advisory "must" by eye (a static run can\'t):')
-      for (const r of musts) console.log(`    ☐ ${r.id.padEnd(24)} ${r.label}`)
-      console.log('')
-    } else if (args.includes('--coverage')) {
-      for (const r of coverage.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
-    } else {
-      console.log('  Re-run with --coverage to list them, or --draft for a review checklist of the "must" rules. A clean run does not mean these hold.\n')
+  // Shape stays identical on the failure paths so a caller can read `coverage`
+  // and `scannedLabel` off a failed result without special-casing it.
+  const blank = { scanned: 0, scannedLabel, findings: [], errors: [], warnings: [], degraded: !coverage, coverage }
+
+  const files = []
+  for (const p of inputs) {
+    try {
+      files.push(...walk(p, isIgnored))
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        return { ok: false, error: { code: 'ENOENT', message: `no such file or directory: ${p}`, path: p }, ...blank }
+      }
+      throw e
     }
   }
-  // The unmissable line. A clean run is a STATIC check of the rules it can
-  // mechanise — it says nothing about sizing, proportion, or visual consistency,
-  // and it never looked at a rendered pixel. The video-app defects (a crushed logo,
-  // pills that broke on asChild triggers) all passed this. Rule 16 / 24.
-  console.log(`  ${findings.length ? '—' : '✓'} check-usage is STATIC. A clean run does NOT cover sizing, proportion or
+
+  if (!files.length) {
+    return { ok: false, error: { code: 'EMPTY', message: `no scannable files found in ${scannedLabel}`, path: null }, ...blank }
+  }
+
+  const findings = []
+  for (const file of files) {
+    const src = readFileSync(file, 'utf8')
+    const lines = src.split('\n')
+    for (const rule of ACTIVE) {
+      for (const hit of rule.test({ src, lines, file })) {
+        findings.push({
+          file: relative(root, file).replace(/\\/g, '/'),
+          line: hit.line,
+          rule: rule.id,
+          // The authored rule this detector enforces — the id a payload author,
+          // the graph and graph-decide all know it by.
+          enforces: rule.implements ?? null,
+          severity: rule.severity,
+          detail: hit.detail,
+          why: rule.why,
+        })
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    error: null,
+    scanned: files.length,
+    scannedLabel,
+    findings,
+    errors: findings.filter((f) => f.severity === 'error'),
+    warnings: findings.filter((f) => f.severity === 'warn'),
+    degraded: !coverage,
+    coverage,
+  }
+}
+
+/*
+  What this payload asks of code, without scanning anything. An embedder that
+  wants to answer "what are the rules" should not have to run an audit against a
+  throwaway directory to find out.
+*/
+export const ruleset = {
+  payload: cfg.name,
+  root,
+  coverage,
+  checked: ACTIVE.map((r) => ({ id: r.id, enforces: r.implements ?? null, severity: r.severity, why: r.why })),
+}
+
+/*
+  ---- CLI ----
+
+  Runs only when this file IS the program. Imported, the module is inert, which
+  is the whole point of the split: an embedder gets `checkUsage` and `ruleset`
+  without the module deciding to print a report and exit the host process.
+*/
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isMain) {
+  const positional = []
+  const ignore = []
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--ignore') { if (args[i + 1]) ignore.push(args[i + 1]); i++; continue }
+    if (!args[i].startsWith('--')) positional.push(args[i])
+  }
+
+  const result = checkUsage({ targets: positional, ignore })
+
+  if (!result.ok) {
+    if (result.error.code === 'ENOENT') {
+      console.error(`\n  check-usage: ${result.error.message}\n`)
+    } else {
+      console.error(
+        `\n  check-usage: no scannable files found in ${result.scannedLabel}.\n` +
+          `  Looked for ${[...CODE].join(' ')} files (skipping node_modules, dist, build, …).\n` +
+          `  ${positional.length ? 'Check the path you passed.' : 'Point it at your source, e.g. `npx 2one check src`.'}\n`,
+      )
+    }
+    process.exit(1)
+  }
+
+  const { findings, errors, warnings: warns, scanned } = result
+
+  if (asJson) {
+    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, degraded: !coverage, coverage, findings }, null, 2))
+  } else {
+    const scope = coverage ? `${coverage.checked} of ${coverage.total} ${cfg.name} rules` : `the ${cfg.name} rules`
+    console.log(`\n  check-usage — ${scanned} file(s) scanned against ${scope}\n`)
+    // Degraded mode: the payload's rules file couldn't be resolved from `root`, so
+    // only the built-in detectors ran — a REDUCED set. Say so loudly; a silent
+    // "the N rules" (with no count) reads like full coverage when it isn't.
+    if (!coverage) {
+      const rel = cfg.rel('rules')
+      console.log(
+        `  ⚠ Degraded coverage — no ${cfg.name} rules file resolved` +
+          (rel ? ` (looked for "${rel}" under ${root})` : '') + `.\n` +
+          `    Only the built-in detectors ran, not this system's full ruleset.\n` +
+          `    Run from a project with dls.config.json (or inside the DLS repo, passing\n` +
+          `    your app path as the target) for full coverage. A clean run here does\n` +
+          `    NOT mean the ${cfg.name} rules hold.\n`,
+      )
+    }
+    if (!findings.length) {
+      // Never "✓ no violations" unqualified — that is the sentence that made an
+      // inert rule look like a passing one for weeks.
+      console.log(coverage ? `  ✓ no violations of the ${coverage.checked} checkable rules\n` : '  ✓ no violations\n')
+    } else {
+      let current = ''
+      for (const f of [...errors, ...warns]) {
+        if (f.file !== current) {
+          current = f.file
+          console.log(`  ${f.file}`)
+        }
+        const tag = f.severity === 'error' ? 'error' : 'warn '
+        console.log(`    ${tag}  ${String(f.line).padStart(4)}  ${f.rule}  —  ${f.detail}`)
+        console.log(`                 ${f.why}`)
+      }
+      console.log(`\n  ${errors.length} error(s), ${warns.length} warning(s)\n`)
+    }
+
+    if (coverage?.advisory.length) {
+      const musts = coverage.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
+      console.log(
+        `  ${coverage.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
+          (musts.length ? `, ${musts.length} of them "must"` : '') + '.',
+      )
+      if (draft && musts.length) {
+        // --draft: a static run cannot judge these, so PROMPT the reviewer by name —
+        // a "must" is never silently skipped. Confirm each by eye before shipping.
+        console.log('\n  Draft review — confirm each advisory "must" by eye (a static run can\'t):')
+        for (const r of musts) console.log(`    ☐ ${r.id.padEnd(24)} ${r.label}`)
+        console.log('')
+      } else if (args.includes('--coverage')) {
+        for (const r of coverage.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
+      } else {
+        console.log('  Re-run with --coverage to list them, or --draft for a review checklist of the "must" rules. A clean run does not mean these hold.\n')
+      }
+    }
+    // The unmissable line. A clean run is a STATIC check of the rules it can
+    // mechanise — it says nothing about sizing, proportion, or visual consistency,
+    // and it never looked at a rendered pixel. The video-app defects (a crushed logo,
+    // pills that broke on asChild triggers) all passed this. Rule 16 / 24.
+    console.log(`  ${findings.length ? '—' : '✓'} check-usage is STATIC. A clean run does NOT cover sizing, proportion or
     visual consistency, and it has not rendered anything. Before you call it done,
     eyeball the page in BOTH themes at multiple widths (docs/building-with-the-dls.md
     rule 16). "Passes the checks" is not "looks right".\n`)
-}
+  }
 
-process.exit(errors.length || (strict && warns.length) ? 1 : 0)
+  process.exit(errors.length || (strict && warns.length) ? 1 : 0)
+}
