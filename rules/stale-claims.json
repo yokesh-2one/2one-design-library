@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "description": "Phrases that were true once and are not any more. The engine fails the build if any survives in tracked text. This list is payload data because what counts as a stale claim is a fact about this design system, not about the engine.",
+  "exclude": [
+    "CHANGELOG.md",
+    "package-lock.json"
+  ],
+  "banned": [
+    {
+      "why": "single-theme claim — the system ships light + audited dark",
+      "pattern": "\\blight[\\s-]only\\b",
+      "flags": "i"
+    },
+    {
+      "why": "false claim — an audited .dark palette IS defined in globals.css",
+      "pattern": "\\bno\\s+`?\\.?dark`?\\s+palette\\b",
+      "flags": "i"
+    },
+    {
+      "why": "false claim — dark: utilities resolve under .dark (they are not inert)",
+      "pattern": "\\bstays?\\s+inert\\b",
+      "flags": "i"
+    },
+    {
+      "why": "stale roadmap — dark mode has shipped, it is not \"not planned\"",
+      "pattern": "\\bdark(?:\\s+theme)?[^.\\n]{0,40}?\\bnot\\s+planned\\b",
+      "flags": "i"
+    },
+    {
+      "why": "graph counts must be read live from graph.json → stats, never hard-coded (they drift)",
+      "pattern": "\\b\\d{2,4}\\s+(?:nodes|edges)\\b",
+      "flags": "i"
+    }
+  ]
+}

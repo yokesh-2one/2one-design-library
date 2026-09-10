@@ -149,7 +149,7 @@ const assistantSpecs = ls(cfg.path('aiComponentSpecs'), (f) => f.endsWith('.json
 // here so an agent finds the rules the same way it finds tokens — and so the
 // counts in the manifest cannot disagree with the rules file itself.
 const uxRules = (() => {
-  const p = join(root, 'rules/ux-rules.json')
+  const p = join(root, cfg.rel('rules'))
   return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null
 })()
 const logoDir = cfg.path('brand.logo')

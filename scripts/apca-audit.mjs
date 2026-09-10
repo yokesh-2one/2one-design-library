@@ -41,7 +41,7 @@ function apca(txt, bg) {
 // The :root block is the light theme; the .dark block redefines the same
 // semantic vars for dark. We parse each block separately so dark values never
 // clobber light ones — BOTH themes must clear their thresholds.
-const css = readFileSync(join(root, 'src/styles/globals.css'), 'utf8')
+const css = readFileSync(join(root, cfg.rel('theme')), 'utf8')
 const blockBody = (selectorRe) => { const m = css.match(selectorRe); return m ? m[1] : '' }
 const parseTokens = (body) => {
   const t = {}

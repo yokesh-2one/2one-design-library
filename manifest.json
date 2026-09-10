@@ -1836,7 +1836,8 @@
     ]
   },
   "provenance": {
-    "source_of_truth": "Figma (Mobile App Design System) + 2one brand → this repo → @2one/design-library",
+    "authority": "This repository. Every brand and design fact is answered from repo content; nothing outside it overrides what is here.",
+    "lineage": "Figma (Mobile App Design System) + 2one brand → this repo → @2one/design-library. This records where the content came from, not who decides it. Figma is origin and a token consumer, never an authority.",
     "components_based_on": "shadcn/ui (MIT), re-skinned to 2one tokens",
     "note": "Automated Figma→repo extraction pipeline is on the roadmap (see guide-app/VERSIONLOG.md); current content was extracted + curated."
   }

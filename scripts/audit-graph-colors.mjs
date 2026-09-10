@@ -13,10 +13,13 @@
   Run:  node scripts/audit-graph-colors.mjs   (exits 1 if any pair is below the floor)
 */
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { config as cfg } from './lib/config.mjs'
+
+// Root at the PAYLOAD, not at this file. Resolving from the script directory
+// meant a client run read 2one's files and reported on them.
+const root = cfg.root
 
 // ---- APCA-W3 0.1.9 (same reference as scripts/apca-audit.mjs) ----
 function sRGBtoY([R, G, B]) { const f = (v) => Math.pow(v / 255, 2.4); return 0.2126729 * f(R) + 0.7151522 * f(G) + 0.0721750 * f(B) }
@@ -47,7 +50,7 @@ for (const m of typesBody.matchAll(/'([\w-]+)':\s*\{([^}]*)\}/g)) {
 if (!palette.length) { console.error('  ✗ could not parse the node palette from dev/graph-main.ts'); process.exit(1) }
 
 // ---- the grounds the dots are drawn on, from the DLS theme (per theme scope) ----
-const css = readFileSync(join(root, 'src/styles/globals.css'), 'utf8')
+const css = readFileSync(join(root, cfg.rel('theme')), 'utf8')
 const block = (re) => { const m = css.match(re); return m ? m[1] : '' }
 const tok = (body, name) => (body.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})`)) || [])[1]
 const lightBody = block(/:root\s*\{([\s\S]*?)\n\s*\}/)

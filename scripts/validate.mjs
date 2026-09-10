@@ -73,6 +73,47 @@ const schemaDir = cfg.rel('schemas') ?? 'schema'
 if (existsSync(join(root, schemaDir))) {
   check(existsSync(join(root, `${schemaDir}/token.schema.json`)), `${schemaDir}/token.schema.json missing`)
   check(existsSync(join(root, `${schemaDir}/component.schema.json`)), `${schemaDir}/component.schema.json missing`)
+  check(existsSync(join(root, `${schemaDir}/config.schema.json`)), `${schemaDir}/config.schema.json missing`)
+}
+
+/*
+  ---- dls.config.json against its own schema ----
+
+  A payload describes itself here, and until now nothing checked that
+  description. `manifest.json` advertised `schema/config.schema.json` and
+  `dls.config.json` pointed its own `$schema` at the same path, but the file
+  did not exist, so both references were promises to a client that could not
+  be kept.
+
+  The failure this catches is specific and silent: a mistyped path key does not
+  error, it falls through to the default in lib/config.mjs, and the engine then
+  operates on the 2one layout while reporting success against the client's repo.
+  That is the exact class of bug the payload seam exists to prevent, so an
+  unrecognised key is an error rather than a warning.
+
+  Structural, not full JSON Schema, matching the rest of this file: walk the
+  objects the schema closes with additionalProperties:false and report keys it
+  does not declare. Swapping in ajv later subsumes this.
+*/
+if (cfg.configured) {
+  try {
+    const schema = load(`${schemaDir}/config.schema.json`)
+    const raw = load('dls.config.json')
+    const unknown = []
+    const walkKeys = (node, sch, path) => {
+      if (!sch || sch.additionalProperties !== false || !sch.properties) return
+      for (const k of Object.keys(node)) {
+        const child = sch.properties[k]
+        if (!child) { unknown.push(path + k); continue }
+        const v = node[k]
+        if (v && typeof v === 'object' && !Array.isArray(v)) walkKeys(v, child, `${path}${k}.`)
+      }
+    }
+    walkKeys(raw, schema, '')
+    for (const k of unknown) {
+      check(false, `dls.config.json: "${k}" is not a key the engine reads — it will be ignored and the default used instead`)
+    }
+  } catch (e) { errors.push('dls.config.json: ' + e.message) }
 }
 
 // ---- graph.json invariants (the graph must be trustworthy, not just pretty) ----

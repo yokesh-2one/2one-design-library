@@ -19,7 +19,7 @@ import { dirname, join } from 'node:path'
 import { config as cfg } from './lib/config.mjs'
 
 const root = cfg.root
-const graph = JSON.parse(readFileSync(join(root, 'graph.json'), 'utf8'))
+const graph = JSON.parse(readFileSync(join(root, cfg.rel('out.graph')), 'utf8'))
 const byId = new Map(graph.nodes.map((n) => [n.id, n]))
 const label = (id) => (byId.get(id) ? byId.get(id).label : id)
 const typeOf = (id) => (byId.get(id) ? byId.get(id).type : '?')
