@@ -1,5 +1,6 @@
 {
   "id": "ai-component:guardrail-notice",
+  "implementation": "tsx",
   "label": "Guardrail notice",
   "tier": 3,
   "kind": "assistant-element",
@@ -13,7 +14,13 @@
     "A DLS Alert with a lucide ShieldAlert icon, title and message",
     "One primary Button offering the nearest safe alternative"
   ],
-  "composes": { "components": ["alert", "button"], "blocks": [] },
+  "composes": {
+    "components": [
+      "alert",
+      "button"
+    ],
+    "blocks": []
+  },
   "primary_action": "Exactly one filled Button — the nearest safe alternative. Omit it only when no alternative exists.",
   "responsive": "Caps at a readable max width; the action stacks below the message.",
   "accessibility": [
@@ -26,7 +33,12 @@
     "a dead-end refusal with no alternative offered",
     "two competing primary actions"
   ],
-  "governed_by": ["no-color-alone", "one-primary", "pill-buttons", "build-from-library"],
+  "governed_by": [
+    "no-color-alone",
+    "one-primary",
+    "pill-buttons",
+    "build-from-library"
+  ],
   "assumptions": [
     "Title, message and alternative label are DEMO copy — replace with the real refusal and the real alternative.",
     "`onAlternative` is wired by the caller to the safe action."
@@ -34,8 +46,14 @@
   "references": {
     "shadcn_block": null,
     "note": "assistant-ui's Elements catalogue (https://www.assistant-ui.com/elements, checked 2026-08) is the CONCEPTUAL reference; no code is copied. Composed from real DLS primitives (Alert + Button).",
-    "shadcn_primitives": ["alert", "button"],
-    "dls_components": ["alert", "button"],
+    "shadcn_primitives": [
+      "alert",
+      "button"
+    ],
+    "dls_components": [
+      "alert",
+      "button"
+    ],
     "checked_against": "https://www.assistant-ui.com/elements"
   }
 }

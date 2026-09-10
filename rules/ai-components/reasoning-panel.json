@@ -1,5 +1,6 @@
 {
   "id": "ai-component:reasoning-panel",
+  "implementation": "tsx",
   "label": "Reasoning panel",
   "tier": 3,
   "kind": "assistant-element",
@@ -14,7 +15,14 @@
     "A left-ruled timeline of steps (title + detail) that stream in",
     "A Separator and a settled summary once complete"
   ],
-  "composes": { "components": ["collapsible", "button", "separator"], "blocks": [] },
+  "composes": {
+    "components": [
+      "collapsible",
+      "button",
+      "separator"
+    ],
+    "blocks": []
+  },
   "responsive": "Full width; the timeline indents from a single ruled edge at every width.",
   "accessibility": [
     "Collapsible manages aria-expanded + disclosure semantics",
@@ -26,7 +34,12 @@
     "leaving the panel open and streaming with no way to collapse it",
     "rebuilding the disclosure by hand instead of using Collapsible"
   ],
-  "governed_by": ["reduced-motion", "build-from-library", "tokens-only", "one-primary"],
+  "governed_by": [
+    "reduced-motion",
+    "build-from-library",
+    "tokens-only",
+    "one-primary"
+  ],
   "assumptions": [
     "Steps and the summary are DEMO content — replace with the real reasoning trace.",
     "The panel defaults to open for the demo; choose the default that fits the surface."
@@ -34,8 +47,16 @@
   "references": {
     "shadcn_block": null,
     "note": "assistant-ui's Elements catalogue (https://www.assistant-ui.com/elements, checked 2026-08) is the CONCEPTUAL reference; no code is copied. shadcn has no reasoning/AI block, so the disclosure is composed from real DLS primitives (Collapsible + Button + Separator).",
-    "shadcn_primitives": ["collapsible", "button", "separator"],
-    "dls_components": ["collapsible", "button", "separator"],
+    "shadcn_primitives": [
+      "collapsible",
+      "button",
+      "separator"
+    ],
+    "dls_components": [
+      "collapsible",
+      "button",
+      "separator"
+    ],
     "checked_against": "https://www.assistant-ui.com/elements"
   }
 }

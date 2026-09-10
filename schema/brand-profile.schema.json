@@ -1,0 +1,272 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yokesh-2one/2one-design-library/schema/brand-profile.schema.json",
+  "title": "Brand Profile — the opinion carrier",
+  "description": "The single file that turns the NEUTRAL engine into an OPINIONATED system for one brand. The engine holds no taste; this profile supplies it, and the checks enforce it, so after customisation the system rejects anything off-brand. Three layers meet here: a QUALITY FLOOR the engine always applies and no profile can switch off (accessibility, consistency, anti-slop); design MODELS the brand picks from CURATED options (so no choice can produce slop); and the VALUES/seeds a generator expands into an accessible token set. From this one file the engine derives the tokens, the per-brand rule set, the component skin, and the AI-legible layer (manifest/graph). It complements brand/brand.json (the Tier-1 strategy: mission, voice, personas); this is the Tier-2 design configuration. Paths/plumbing stay in dls.config.json.",
+  "type": "object",
+  "required": ["schemaVersion", "brand", "color", "typography", "shape", "spacing", "decoration", "enforcement"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version of THIS schema the profile targets. Lets the engine migrate old profiles."
+    },
+    "profileVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver of the brand's own profile. A brand's opinion evolves; check-rules-compat treats a change to an enforced choice as a contract change, so bump this when one moves."
+    },
+
+    "brand": {
+      "type": "object",
+      "required": ["name", "wordmark"],
+      "additionalProperties": false,
+      "description": "Who the system is for. Strategy (mission, personas) lives in brand/brand.json; this is only what the design layer needs.",
+      "properties": {
+        "name": { "type": "string", "description": "Display name of the brand." },
+        "wordmark": {
+          "type": "object",
+          "required": ["asset"],
+          "additionalProperties": false,
+          "description": "The mark is an ASSET, never typeset. This points at the brand's supplied SVG(s); the engine renders it through the Logo slot and never reproduces it as text.",
+          "properties": {
+            "asset": { "type": "string", "description": "Path/URL to the brand SVG (or a { light, dark } pair)." },
+            "assetDark": { "type": "string", "description": "Optional dark-surface variant; else the engine adapts by theme." },
+            "minWidthPx": { "type": "integer", "minimum": 1, "description": "Standalone legibility floor. In-app chrome uses a smaller size the engine derives." }
+          }
+        },
+        "voice": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The copy layer of the opinion. Governs generated placeholder copy and the copy checks.",
+          "properties": {
+            "tone": { "type": "array", "items": { "type": "string" }, "description": "Tone descriptors (e.g. bold, precise, warm)." },
+            "emDash": {
+              "type": "string",
+              "enum": ["sparing", "avoid"],
+              "default": "sparing",
+              "description": "Copy policy for the em-dash — the clearest tell of AI-written prose. `avoid` is stricter than the engine's always-on density cap."
+            }
+          }
+        }
+      }
+    },
+
+    "color": {
+      "type": "object",
+      "required": ["model", "neutral", "accents"],
+      "additionalProperties": false,
+      "description": "The colour opinion. `model` decides how many hues carry weight; `neutral` and `accents` are seeds a generator expands into full, ACCESSIBLE ramps (the engine derives APCA-safe steps for light and dark — a brand never hand-tunes contrast).",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["mono-accent", "dual-accent", "multi-accent"],
+          "description": "CURATED colour models. mono-accent: grayscale foundation + one accent for emphasis (2one's model). dual-accent: two coordinated accents. multi-accent: a categorical set. Each is pre-composed to stay coherent; free-form palettes are not offered."
+        },
+        "neutral": {
+          "type": "object",
+          "required": ["tint"],
+          "additionalProperties": false,
+          "properties": {
+            "tint": {
+              "type": "string",
+              "enum": ["true", "cool", "warm", "brand-biased"],
+              "description": "The grey is CHOSEN, not defaulted. A neutral biased slightly toward the accent reads as considered; a pure mid-grey reads as unconsidered."
+            },
+            "seed": { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Optional neutral seed; else derived from tint." }
+          }
+        },
+        "accents": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "description": "Accent seeds. COUNT MUST MATCH `model` (mono=1, dual=2, multi=3–5); the engine validates and, where a seed can't clear the contrast target as text/UI, auto-shifts it to a compliant step of the same hue.",
+          "items": {
+            "type": "object",
+            "required": ["name", "seed", "role"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "description": "Token name (e.g. brand, secondary)." },
+              "seed": { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "The identity hex; the ramp and accessible steps are derived from it." },
+              "role": {
+                "type": "string",
+                "enum": ["emphasis", "primary-fill", "decorative"],
+                "description": "What the accent is allowed to do. emphasis = links/focus/selection only (2one's discipline); primary-fill = may fill primary controls; decorative = broader use."
+              }
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Semantic hues, reserved for state. Always paired with a non-colour cue (icon/text) — that pairing is part of the locked quality floor and cannot be disabled here.",
+          "properties": {
+            "hues": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["danger", "success", "warning", "info"] },
+              "uniqueItems": true,
+              "description": "Which validation hues the brand uses."
+            }
+          }
+        },
+        "derivation": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "How the generator expands seeds into ramps. Accessibility here is not optional; it is the floor.",
+          "properties": {
+            "textApcaMin": { "type": "number", "default": 60, "description": "APCA Lc floor for accent-as-text pairs." },
+            "uiApcaMin": { "type": "number", "default": 15, "description": "APCA Lc floor for non-text (borders, focus rings)." },
+            "themes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["light", "dark"] },
+              "default": ["light", "dark"],
+              "description": "Themes to generate and audit. Both are the default; a brand may ship one, but each shipped theme is audited."
+            }
+          }
+        }
+      }
+    },
+
+    "typography": {
+      "type": "object",
+      "required": ["pairing"],
+      "additionalProperties": false,
+      "description": "Type is chosen from a CURATED, anti-slop-screened library, not a free-form font field. This is where the neutral engine refuses to hand a tenant the Inter/Space-Grotesk defaults that read as AI.",
+      "properties": {
+        "pairing": {
+          "type": "string",
+          "enum": ["grotesk-humanist", "geometric-editorial", "serif-display-sans-body", "mono-accent-sans", "neo-grotesk"],
+          "description": "A vetted display+body pairing id. Each maps to two real faces (a characterful display, a readable body) known not to read as generic. 2one is grotesk-humanist (Satoshi + Inter). Custom brand faces are onboarded by adding a vetted pairing, never a raw font field."
+        },
+        "scale": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ratio": {
+              "type": "string",
+              "enum": ["minor-third", "major-third", "perfect-fourth"],
+              "default": "major-third",
+              "description": "Modular scale ratio the type steps are generated from."
+            }
+          }
+        },
+        "labelCase": {
+          "type": "string",
+          "enum": ["title", "sentence", "upper"],
+          "default": "title",
+          "description": "Case for section labels/eyebrows. `upper` everywhere is an AI tell; reserve it as an intentional accent."
+        }
+      }
+    },
+
+    "shape": {
+      "type": "object",
+      "required": ["language"],
+      "additionalProperties": false,
+      "description": "The radius/shape signature — the most legible piece of a brand's character on controls. A curated language, not an arbitrary radius, so the whole system stays coherent.",
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": ["pill", "rounded", "sharp"],
+          "description": "Control shape. pill = radius-full (2one's signature); rounded = a medium radius; sharp = near-square. The engine writes the radius scale from this and the check enforces it on controls."
+        }
+      }
+    },
+
+    "spacing": {
+      "type": "object",
+      "required": ["base", "density"],
+      "additionalProperties": false,
+      "properties": {
+        "base": { "type": "integer", "enum": [4, 8], "description": "The spacing unit. One base for the whole system; ad-hoc values fail the check." },
+        "density": { "type": "string", "enum": ["compact", "comfortable", "spacious"], "description": "Global rhythm; scales component padding coherently." }
+      }
+    },
+
+    "elevation": {
+      "type": "string",
+      "enum": ["flat", "subtle", "layered"],
+      "default": "subtle",
+      "description": "Shadow/elevation model. Shadows are neutral; coloured/neon glows are never offered (an AI tell)."
+    },
+
+    "decoration": {
+      "type": "object",
+      "required": ["gradients", "icons"],
+      "additionalProperties": false,
+      "description": "The anti-slop policy layer. Defaults are restrictive because the tells (gradients, glows, emoji) are exactly what a neutral generator would otherwise reach for.",
+      "properties": {
+        "gradients": {
+          "type": "string",
+          "enum": ["forbidden", "emphasis-only", "allowed"],
+          "default": "forbidden",
+          "description": "Decorative gradients. `forbidden` is 2one's stance (and the safe default); `emphasis-only` permits one intentional gradient; `allowed` opens it up. The check reads this."
+        },
+        "glow": { "type": "string", "enum": ["forbidden", "allowed"], "default": "forbidden", "description": "Coloured/neon shadows." },
+        "icons": {
+          "type": "object",
+          "required": ["library"],
+          "additionalProperties": false,
+          "properties": {
+            "library": { "type": "string", "enum": ["lucide", "tabler", "phosphor"], "description": "One vetted icon set for the whole system. Mixed sets and emoji-as-icons are always rejected (floor)." }
+          }
+        }
+      }
+    },
+
+    "motion": {
+      "type": "string",
+      "enum": ["none", "functional", "expressive"],
+      "default": "functional",
+      "description": "Motion budget. `functional` = purposeful micro-interactions only; blanket fade-in-everything and bounce-on-hover are not generated (tells)."
+    },
+
+    "enforcement": {
+      "type": "object",
+      "required": ["choices", "qualityFloor"],
+      "additionalProperties": false,
+      "description": "What turns TASTE into an OPINION. Each brand choice is bound to a severity; the engine emits the brand's ux-rules from this map, so `must` choices fail the build and `should` choices warn. This is why customising the neutral engine makes it strict.",
+      "properties": {
+        "choices": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Severity per enforceable choice. Keys map to profile fields; values are the brand's chosen strictness.",
+          "properties": {
+            "shape.language": { "$ref": "#/definitions/severity" },
+            "color.model": { "$ref": "#/definitions/severity" },
+            "color.accents.role": { "$ref": "#/definitions/severity" },
+            "decoration.gradients": { "$ref": "#/definitions/severity" },
+            "decoration.glow": { "$ref": "#/definitions/severity" },
+            "decoration.icons.library": { "$ref": "#/definitions/severity" },
+            "typography.pairing": { "$ref": "#/definitions/severity" },
+            "spacing.base": { "$ref": "#/definitions/severity" },
+            "brand.voice.emDash": { "$ref": "#/definitions/severity" }
+          }
+        },
+        "qualityFloor": {
+          "type": "object",
+          "required": ["locked", "includes"],
+          "additionalProperties": false,
+          "description": "The engine's always-on guarantees. This is DECLARATIVE: the floor is enforced regardless of what a profile says, and `locked` records that a tenant cannot switch it off.",
+          "properties": {
+            "locked": { "type": "boolean", "const": true, "description": "Always true. The floor is not a per-brand choice." },
+            "includes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["accessibility", "consistency", "anti-slop", "no-color-alone", "one-system"] },
+              "description": "The universal guarantees every tenant inherits: accessible (APCA, both themes), consistent (one token system), anti-slop (no generic composition/copy), never colour-alone, one system across surfaces."
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "severity": {
+      "type": "string",
+      "enum": ["must", "should", "may"],
+      "description": "How strictly the engine enforces this brand choice. must = a violation fails the build; should = warns; may = allowed escape hatch."
+    }
+  }
+}

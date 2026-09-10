@@ -1,0 +1,3 @@
+- button "Open popover" [expanded]
+- dialog:
+  - paragraph: Popover content with details.

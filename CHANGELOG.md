@@ -42,6 +42,11 @@ uses [Semantic Versioning](https://semver.org/).
 - **New audit coverage** — mechanised detectors `fixed-vs-theme-color` and `logo-in-button`,
   new guards `check:pill` / `check:logo-sizing` / `check:docs`, and a `--draft` review
   checklist for the "must" rules a static run can't judge.
+- **Anti-slop rules** ([`rules/ux-rules.json`](rules/ux-rules.json) → v1.3.0): two new rules
+  and their `check-usage` detectors — `hero-badge-cliche` / `badge-above-h1` (no pill Badge
+  stacked directly above a hero H1) and `copy-em-dash` / `em-dash-overuse` (copy that leans
+  on the em-dash). Born from an audit against the known tells of AI-generated design: the
+  token layer already resisted them, so the composition and copy layers are now governed too.
 
 ### Changed
 - **Colour foundation is now three explicit levels: Primary (neutral) · Accent
@@ -68,6 +73,11 @@ uses [Semantic Versioning](https://semver.org/).
 - **Showcase.** A single global Help menu, "Components for AI Interface" folded into the
   Components page as a section, a responsive mobile nav, and a knowledge graph that works
   on touch — all bilingual (EN + FR).
+- **Marketing templates de-slopped.** The hero is now a left-aligned two-column lockup
+  (no badge-above-H1); the feature grid is a left-aligned list with inline icons (not
+  centred icon-on-top cards); the stats band is framed and left-aligned (not a centred
+  number row); and a copy pass cut the em-dash density across the blocks. This closes the
+  four composition/copy tells the anti-slop audit surfaced.
 
 ### Fixed
 - **`login-05` logo invisible in dark.** The block shipped a single black `Logo` on the

@@ -1,5 +1,6 @@
 {
   "id": "pattern:profile-header",
+  "implementation": "spec-only",
   "label": "Profile header",
   "tier": 3,
   "kind": "section-pattern",
@@ -14,7 +15,13 @@
     "Optional status/role Badges (outline)"
   ],
   "composes": {
-    "components": ["card", "avatar", "button", "badge", "separator"]
+    "components": [
+      "card",
+      "avatar",
+      "button",
+      "badge",
+      "separator"
+    ]
   },
   "primary_action": "Exactly one filled Button — the relationship action (Follow, or Edit profile on your own profile). Message / more are outline or ghost.",
   "responsive": "Avatar + identity stack on mobile and sit inline at sm+; the stats row wraps rather than scrolls.",
@@ -29,7 +36,12 @@
     "a per-user coloured avatar ring for warmth (a second decorative hue — see the expressive-warmth decision)",
     "stats as bare numbers with no label"
   ],
-  "governed_by": ["one-primary", "no-color-alone", "tokens-only", "pill-buttons"],
+  "governed_by": [
+    "one-primary",
+    "no-color-alone",
+    "tokens-only",
+    "pill-buttons"
+  ],
   "assumptions": [
     "Name, handle, bio and stats are PLACEHOLDER 2one content — replace with real data.",
     "The single primary action is Follow (or Edit profile on the viewer's own profile).",
@@ -38,7 +50,13 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships no profile block (canonical blocks are dashboard, sidebar, login, signup — https://ui.shadcn.com/blocks). Composed from shadcn PRIMITIVES (Card, Avatar, Button, Badge, Separator); every part a real, in-repo component.",
-    "shadcn_primitives": ["card", "avatar", "button", "badge", "separator"],
+    "shadcn_primitives": [
+      "card",
+      "avatar",
+      "button",
+      "badge",
+      "separator"
+    ],
     "two_one_blocks": [],
     "checked_against": "https://ui.shadcn.com/blocks"
   }

@@ -1,0 +1,2 @@
+- button "Toggle details" [expanded]
+- text: Details revealed here.

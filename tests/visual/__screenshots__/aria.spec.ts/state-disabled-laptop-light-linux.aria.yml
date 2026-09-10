@@ -1,0 +1,7 @@
+- text: Email
+- textbox "Email" [disabled]: ada@example.com
+- checkbox "Remember me" [disabled]
+- text: Remember me
+- switch "Notifications" [disabled]
+- text: Notifications
+- button "Continue" [disabled]

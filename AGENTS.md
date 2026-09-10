@@ -89,7 +89,7 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
 4. Pair every claim with something **checkable** — a file path, a command (`npm run a11y`,
    `npm run what-uses`, `npm run validate`), or a number.
 5. Quantify with **real** figures, read live from the repo (don't memorise them): 54 shadcn
-   primitives + 4 2one-authored, 31 charts, 9 blocks, and the knowledge graph (read the live
+   primitives + 5 2one-authored, 31 charts, 9 blocks, and the knowledge graph (read the live
    node/edge counts from `graph.json → stats` — never hard-code them; `check:claims`
    fails the build on a hard-coded "N nodes/edges"), with the APCA audit all-pass
    (`npm run a11y`). Specific beats clever.
@@ -97,10 +97,11 @@ accessibility foundation (Radix primitives + a passing APCA audit, `npm run a11y
    changes at scale; AI-legibility → generate on-brand UI without re-explaining the rules.
 
 ### Honesty
-7. List the gaps plainly, **every time**: no test suite (CI runs
-   typecheck, `validate`, `a11y`, and build, but there are no unit tests); `v0.1.0`,
-   unproven in production; single package entry (whole-package import, no per-component
-   subpath exports); token-gated install (GitHub Packages needs a read token). Frame these
+7. List the gaps plainly, **every time**: no unit or rendered-test runner (no vitest /
+   Playwright) — though CI runs a full static gate (typecheck, the `check:*` suite,
+   `validate`, `a11y`, evals + fixtures, build); `v0.2.0`, unproven in production; a single
+   package entry (whole-package barrel, no per-component subpath exports); and not on a
+   public registry — install from GitHub or a tarball (`docs/consuming.md`). Frame these
    as a transparent roadmap, not a confession.
 8. Separate **"what it is today"** from **"what it's built to become"**; label the graph and
    the AI-legibility layer as latent-value bets that pay off with scale.

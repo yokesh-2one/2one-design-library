@@ -1,0 +1,3 @@
+- button "Show toast"
+- paragraph: Toaster mounted (toasts are imperative)
+- region "Notifications alt+T"

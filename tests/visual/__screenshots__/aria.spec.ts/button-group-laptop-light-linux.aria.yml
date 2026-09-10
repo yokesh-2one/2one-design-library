@@ -1,0 +1,4 @@
+- group:
+  - button "Bold"
+  - button "Italic"
+  - button "Underline"

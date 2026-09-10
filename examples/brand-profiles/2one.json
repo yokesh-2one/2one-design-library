@@ -1,0 +1,50 @@
+{
+  "$schema": "../../schema/brand-profile.schema.json",
+  "schemaVersion": "1.0.0",
+  "profileVersion": "1.0.0",
+  "brand": {
+    "name": "2one",
+    "wordmark": { "asset": "brand/logo/svg/2one-logo-black.svg", "assetDark": "brand/logo/svg/2one-logo-white.svg", "minWidthPx": 96 },
+    "voice": { "tone": ["minimalistic", "contemporary", "bold", "precise"], "emDash": "sparing" }
+  },
+  "color": {
+    "model": "mono-accent",
+    "neutral": { "tint": "cool" },
+    "accents": [
+      { "name": "brand", "seed": "#30A1FF", "role": "emphasis" }
+    ],
+    "validation": { "hues": ["danger", "success"] },
+    "derivation": { "textApcaMin": 60, "uiApcaMin": 15, "themes": ["light", "dark"] }
+  },
+  "typography": {
+    "pairing": "grotesk-humanist",
+    "scale": { "ratio": "major-third" },
+    "labelCase": "title"
+  },
+  "shape": { "language": "pill" },
+  "spacing": { "base": 4, "density": "comfortable" },
+  "elevation": "subtle",
+  "decoration": {
+    "gradients": "forbidden",
+    "glow": "forbidden",
+    "icons": { "library": "lucide" }
+  },
+  "motion": "functional",
+  "enforcement": {
+    "choices": {
+      "shape.language": "must",
+      "color.model": "must",
+      "color.accents.role": "must",
+      "decoration.gradients": "must",
+      "decoration.glow": "must",
+      "decoration.icons.library": "must",
+      "typography.pairing": "should",
+      "spacing.base": "must",
+      "brand.voice.emDash": "should"
+    },
+    "qualityFloor": {
+      "locked": true,
+      "includes": ["accessibility", "consistency", "anti-slop", "no-color-alone", "one-system"]
+    }
+  }
+}

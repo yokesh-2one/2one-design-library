@@ -1,5 +1,6 @@
 {
   "id": "pattern:pricing-page",
+  "implementation": "tsx",
   "label": "Pricing page",
   "tier": 3,
   "kind": "page-pattern",
@@ -15,8 +16,17 @@
     "CTA — reuses the marketing/cta-banner block"
   ],
   "composes": {
-    "blocks": ["marketing/faq", "marketing/cta-banner"],
-    "components": ["card", "button", "badge", "tabs", "table"]
+    "blocks": [
+      "marketing/faq",
+      "marketing/cta-banner"
+    ],
+    "components": [
+      "card",
+      "button",
+      "badge",
+      "tabs",
+      "table"
+    ]
   },
   "primary_action": "Exactly one filled Button — the recommended plan's CTA. All other plan CTAs are outline.",
   "responsive": "Plan cards are a 3-col grid at md+ and stack below; the comparison Table scrolls horizontally in an overflow-x-auto container.",
@@ -31,7 +41,13 @@
     "signalling 'included' by colour alone",
     "hard-coding prices so the billing toggle is decorative"
   ],
-  "governed_by": ["one-primary", "no-color-alone", "tokens-only", "pill-buttons", "width-by-content"],
+  "governed_by": [
+    "one-primary",
+    "no-color-alone",
+    "tokens-only",
+    "pill-buttons",
+    "width-by-content"
+  ],
   "assumptions": [
     "Prices, plan names and feature rows are PLACEHOLDER 2one content — replace with the real offering.",
     "The single primary action is the recommended (Team) plan's CTA; every other plan CTA is outline.",
@@ -41,8 +57,17 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships NO pricing/marketing/landing block — its canonical blocks are dashboard, sidebar, login and signup (https://ui.shadcn.com/blocks, checked 2026-08). So this pattern has no shadcn template to mirror and does not claim one. Its structure is composed from shadcn PRIMITIVES and existing 2one section blocks — every part traces to a real, in-repo source; nothing is invented.",
-    "shadcn_primitives": ["card", "button", "badge", "tabs", "table"],
-    "two_one_blocks": ["marketing/faq", "marketing/cta-banner"],
+    "shadcn_primitives": [
+      "card",
+      "button",
+      "badge",
+      "tabs",
+      "table"
+    ],
+    "two_one_blocks": [
+      "marketing/faq",
+      "marketing/cta-banner"
+    ],
     "checked_against": "https://ui.shadcn.com/blocks"
   }
 }

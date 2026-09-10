@@ -4,273 +4,1533 @@
   "description": "The part of the knowledge graph that cannot be derived from code: user intents, contexts, states, accessibility requirements, button variants, and the semantic decision edges (preferred_for, preferred_over, inappropriate_for, requires, ...). Rules themselves live in rules/ux-rules.json (the authoritative contract, with severity + precedence); this file references them by id. Everything here is provenance=explicit (authored policy). `source` on each item points at the real repository artifact that states or justifies it. build-graph.mjs merges this with the derived structural graph.",
   "default_confidence": "explicit",
   "default_provenance": "authored",
-
   "nodes": {
     "intent": [
-      { "id": "intent:present-pricing", "label": "Present pricing", "description": "Explain plans and convert a visitor to a paid plan.", "source": "src/patterns/pricing-page.tsx" },
-      { "id": "intent:primary-action", "label": "Primary action", "description": "The single most important action in a view or section.", "source": "recipes/build-an-app.md" },
-      { "id": "intent:low-emphasis-action", "label": "Low-emphasis action", "description": "A secondary/tertiary action that must not compete with the primary.", "source": "recipes/build-an-app.md" },
-      { "id": "intent:destructive-action", "label": "Destructive action", "description": "An action that deletes or irreversibly changes data.", "source": "docs/accessibility.md" },
-      { "id": "intent:confirm-action", "label": "Confirm an action", "description": "Ask the user to confirm before proceeding.", "source": "graph/decisions.json" },
-      { "id": "intent:submit-form", "label": "Submit a form", "description": "Send the data the user has entered.", "source": "recipes/build-an-app.md" },
-      { "id": "intent:authenticate", "label": "Authenticate", "description": "Sign in or sign up.", "source": "src/blocks/login-01.tsx" },
-      { "id": "intent:navigate", "label": "Navigate", "description": "Move between views or destinations.", "source": "docs/building-with-the-dls.md" },
-      { "id": "intent:supplementary-info", "label": "Show supplementary info", "description": "Reveal optional, non-essential helper information.", "source": "graph/decisions.json" },
-      { "id": "intent:essential-instruction", "label": "Convey essential information", "description": "Information the user MUST perceive to succeed (required, error, or instruction).", "source": "docs/accessibility.md" },
-      { "id": "intent:select-option", "label": "Select an option", "description": "Choose one or more values from a set.", "source": "graph/decisions.json" },
-      { "id": "intent:recover-error", "label": "Recover from an error", "description": "Understand and fix an invalid input.", "source": "docs/accessibility.md" },
-      { "id": "intent:signal-working", "label": "Signal the agent is working", "description": "Tell the user the agent is working right now, and on what.", "source": "src/ai-components/thinking-indicator.tsx" },
-      { "id": "intent:signal-composing", "label": "Signal the agent is composing", "description": "Lightweight presence cue that a reply is coming, with no named step.", "source": "src/ai-components/typing-indicator.tsx" },
-      { "id": "intent:stream-answer", "label": "Stream an answer", "description": "Show an assistant answer as its tokens arrive.", "source": "src/ai-components/streaming-text.tsx" },
-      { "id": "intent:show-reasoning", "label": "Show the reasoning trace", "description": "Reveal the model's intermediate steps without dominating the answer.", "source": "src/ai-components/reasoning-panel.tsx" },
-      { "id": "intent:report-effort", "label": "Report reasoning effort", "description": "Show how hard to think and how much of that budget was spent.", "source": "src/ai-components/reasoning-effort.tsx" },
-      { "id": "intent:hold-pending", "label": "Hold the frame before first output", "description": "Keep the frame while the model has nothing to show yet.", "source": "src/ai-components/loading-state.tsx" },
-      { "id": "intent:refuse-safely", "label": "Refuse with a safe alternative", "description": "Decline a request and offer the nearest thing the agent can do instead.", "source": "src/ai-components/guardrail-notice.tsx" },
-      { "id": "intent:post-to-feed", "label": "Post to a feed", "description": "Show one item in a social/activity feed — author, body, optional media, low-emphasis reactions.", "source": "rules/patterns/feed-item.json" },
-      { "id": "intent:show-profile", "label": "Show a profile", "description": "Introduce a person/account at the top of a profile — avatar, name, bio, stats, one primary relationship action.", "source": "rules/patterns/profile-header.json" },
-      { "id": "intent:show-comments", "label": "Show a comment thread", "description": "Show a thread of comments and let the reader add one.", "source": "rules/patterns/comment-thread.json" },
-      { "id": "intent:show-media-gallery", "label": "Show a media gallery", "description": "Show a set of images/videos as a browsable grid or carousel, with a lightbox.", "source": "rules/patterns/media-gallery.json" }
+      {
+        "id": "intent:present-pricing",
+        "label": "Present pricing",
+        "description": "Explain plans and convert a visitor to a paid plan.",
+        "source": "src/patterns/pricing-page.tsx"
+      },
+      {
+        "id": "intent:primary-action",
+        "label": "Primary action",
+        "description": "The single most important action in a view or section.",
+        "source": "recipes/build-an-app.md"
+      },
+      {
+        "id": "intent:low-emphasis-action",
+        "label": "Low-emphasis action",
+        "description": "A secondary/tertiary action that must not compete with the primary.",
+        "source": "recipes/build-an-app.md"
+      },
+      {
+        "id": "intent:destructive-action",
+        "label": "Destructive action",
+        "description": "An action that deletes or irreversibly changes data.",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "intent:confirm-action",
+        "label": "Confirm an action",
+        "description": "Ask the user to confirm before proceeding.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "intent:submit-form",
+        "label": "Submit a form",
+        "description": "Send the data the user has entered.",
+        "source": "recipes/build-an-app.md"
+      },
+      {
+        "id": "intent:authenticate",
+        "label": "Authenticate",
+        "description": "Sign in or sign up.",
+        "source": "src/blocks/login-01.tsx"
+      },
+      {
+        "id": "intent:navigate",
+        "label": "Navigate",
+        "description": "Move between views or destinations.",
+        "source": "docs/building-with-the-dls.md"
+      },
+      {
+        "id": "intent:supplementary-info",
+        "label": "Show supplementary info",
+        "description": "Reveal optional, non-essential helper information.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "intent:essential-instruction",
+        "label": "Convey essential information",
+        "description": "Information the user MUST perceive to succeed (required, error, or instruction).",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "intent:select-option",
+        "label": "Select an option",
+        "description": "Choose one or more values from a set.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "intent:recover-error",
+        "label": "Recover from an error",
+        "description": "Understand and fix an invalid input.",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "intent:signal-working",
+        "label": "Signal the agent is working",
+        "description": "Tell the user the agent is working right now, and on what.",
+        "source": "src/ai-components/thinking-indicator.tsx"
+      },
+      {
+        "id": "intent:signal-composing",
+        "label": "Signal the agent is composing",
+        "description": "Lightweight presence cue that a reply is coming, with no named step.",
+        "source": "src/ai-components/typing-indicator.tsx"
+      },
+      {
+        "id": "intent:stream-answer",
+        "label": "Stream an answer",
+        "description": "Show an assistant answer as its tokens arrive.",
+        "source": "src/ai-components/streaming-text.tsx"
+      },
+      {
+        "id": "intent:show-reasoning",
+        "label": "Show the reasoning trace",
+        "description": "Reveal the model's intermediate steps without dominating the answer.",
+        "source": "src/ai-components/reasoning-panel.tsx"
+      },
+      {
+        "id": "intent:report-effort",
+        "label": "Report reasoning effort",
+        "description": "Show how hard to think and how much of that budget was spent.",
+        "source": "src/ai-components/reasoning-effort.tsx"
+      },
+      {
+        "id": "intent:hold-pending",
+        "label": "Hold the frame before first output",
+        "description": "Keep the frame while the model has nothing to show yet.",
+        "source": "src/ai-components/loading-state.tsx"
+      },
+      {
+        "id": "intent:refuse-safely",
+        "label": "Refuse with a safe alternative",
+        "description": "Decline a request and offer the nearest thing the agent can do instead.",
+        "source": "src/ai-components/guardrail-notice.tsx"
+      },
+      {
+        "id": "intent:post-to-feed",
+        "label": "Post to a feed",
+        "description": "Show one item in a social/activity feed — author, body, optional media, low-emphasis reactions.",
+        "source": "rules/patterns/feed-item.json",
+        "aliases": [
+          "feed",
+          "feed item",
+          "activity feed",
+          "post"
+        ]
+      },
+      {
+        "id": "intent:show-profile",
+        "label": "Show a profile",
+        "description": "Introduce a person/account at the top of a profile — avatar, name, bio, stats, one primary relationship action.",
+        "source": "rules/patterns/profile-header.json",
+        "aliases": [
+          "profile",
+          "profile header",
+          "user profile",
+          "account header"
+        ]
+      },
+      {
+        "id": "intent:show-comments",
+        "label": "Show a comment thread",
+        "description": "Show a thread of comments and let the reader add one.",
+        "source": "rules/patterns/comment-thread.json",
+        "aliases": [
+          "comments",
+          "comment thread",
+          "replies",
+          "discussion"
+        ]
+      },
+      {
+        "id": "intent:show-media-gallery",
+        "label": "Show a media gallery",
+        "description": "Show a set of images/videos as a browsable grid or carousel, with a lightbox.",
+        "source": "rules/patterns/media-gallery.json",
+        "aliases": [
+          "media gallery",
+          "gallery",
+          "photo grid",
+          "image gallery"
+        ]
+      },
+      {
+        "id": "intent:app-shell",
+        "label": "App shell",
+        "description": "The top-level product frame — brand, navigation, and a content region.",
+        "source": "src/patterns/app-shell.tsx",
+        "aliases": [
+          "app shell",
+          "shell",
+          "application frame",
+          "app layout",
+          "navigation frame"
+        ]
+      },
+      {
+        "id": "intent:side-panel",
+        "label": "Show a side panel",
+        "description": "A secondary panel beside the main content — inline on desktop, a Sheet on mobile.",
+        "source": "graph/decisions.json",
+        "aliases": [
+          "side panel",
+          "detail panel",
+          "responsive side panel",
+          "info panel"
+        ]
+      },
+      {
+        "id": "intent:action-toolbar",
+        "label": "Action toolbar",
+        "description": "A row of controls where a critical action must stay reachable.",
+        "source": "src/components/ui/toolbar.tsx",
+        "aliases": [
+          "action toolbar",
+          "toolbar",
+          "control bar",
+          "action bar"
+        ]
+      },
+      {
+        "id": "intent:media-placeholder",
+        "label": "Show a media placeholder",
+        "description": "An on-brand stand-in where an image or video will go but none is loaded.",
+        "source": "src/components/media-placeholder.tsx",
+        "aliases": [
+          "media placeholder",
+          "image placeholder",
+          "no image",
+          "empty media",
+          "media preview"
+        ]
+      }
     ],
     "context": [
-      { "id": "context:web", "label": "Web", "description": "Any browser context.", "source": "recipes/build-an-app.md" },
-      { "id": "context:desktop", "label": "Desktop / md+", "description": "Viewport at the md breakpoint and above.", "source": "docs/building-with-the-dls.md" },
-      { "id": "context:mobile", "label": "Mobile", "description": "Below md; useIsMobile() is true.", "source": "docs/building-with-the-dls.md" },
-      { "id": "context:confirmation-flow", "label": "Confirmation flow", "description": "A step that gates an action behind explicit confirmation.", "source": "graph/decisions.json" }
+      {
+        "id": "context:web",
+        "label": "Web",
+        "description": "Any browser context.",
+        "source": "recipes/build-an-app.md"
+      },
+      {
+        "id": "context:desktop",
+        "label": "Desktop / md+",
+        "description": "Viewport at the md breakpoint and above.",
+        "source": "docs/building-with-the-dls.md"
+      },
+      {
+        "id": "context:mobile",
+        "label": "Mobile",
+        "description": "Below md; useIsMobile() is true.",
+        "source": "docs/building-with-the-dls.md"
+      },
+      {
+        "id": "context:confirmation-flow",
+        "label": "Confirmation flow",
+        "description": "A step that gates an action behind explicit confirmation.",
+        "source": "graph/decisions.json"
+      }
     ],
     "state": [
-      { "id": "state:default", "label": "Default", "source": "src/styles/globals.css" },
-      { "id": "state:hover", "label": "Hover", "source": "src/styles/globals.css" },
-      { "id": "state:focus", "label": "Focus", "source": "docs/accessibility.md" },
-      { "id": "state:active", "label": "Active", "source": "src/styles/globals.css" },
-      { "id": "state:selected", "label": "Selected", "source": "src/components/ui/checkbox.tsx" },
-      { "id": "state:disabled", "label": "Disabled", "source": "src/components/ui/button.tsx" },
-      { "id": "state:loading", "label": "Loading", "source": "src/components/ui/button.tsx" },
-      { "id": "state:error", "label": "Error / invalid", "source": "docs/accessibility.md" },
-      { "id": "state:success", "label": "Success", "source": "docs/accessibility.md" },
-      { "id": "state:empty", "label": "Empty", "source": "src/components/ui/empty.tsx" }
+      {
+        "id": "state:default",
+        "label": "Default",
+        "source": "src/styles/globals.css"
+      },
+      {
+        "id": "state:hover",
+        "label": "Hover",
+        "source": "src/styles/globals.css"
+      },
+      {
+        "id": "state:focus",
+        "label": "Focus",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "state:active",
+        "label": "Active",
+        "source": "src/styles/globals.css"
+      },
+      {
+        "id": "state:selected",
+        "label": "Selected",
+        "source": "src/components/ui/checkbox.tsx"
+      },
+      {
+        "id": "state:disabled",
+        "label": "Disabled",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "state:loading",
+        "label": "Loading",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "state:error",
+        "label": "Error / invalid",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "state:success",
+        "label": "Success",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "state:empty",
+        "label": "Empty",
+        "source": "src/components/ui/empty.tsx"
+      }
     ],
     "a11y": [
-      { "id": "a11y:contrast-apca", "label": "APCA + WCAG contrast", "description": "Text/UI pairs must clear their APCA Lc threshold, audited light and dark.", "source": "docs/accessibility.md" },
-      { "id": "a11y:non-color-signal", "label": "Never signal state by colour alone", "description": "State must carry an icon, label, or shape in addition to colour.", "source": "docs/accessibility.md" },
-      { "id": "a11y:visible-focus", "label": "Visible focus indicator", "description": "A focusable control must show a focus ring (Lc 15 non-text floor).", "source": "docs/accessibility.md" },
-      { "id": "a11y:accessible-label", "label": "Accessible label", "description": "Inputs and controls must have a programmatic label.", "source": "docs/accessibility.md" },
-      { "id": "a11y:keyboard-access", "label": "Keyboard operable", "description": "All interactive controls must be reachable and operable by keyboard.", "source": "graph/decisions.json" },
-      { "id": "a11y:focus-management", "label": "Focus management", "description": "Overlays must trap and restore focus.", "source": "graph/decisions.json" },
-      { "id": "a11y:reduced-motion", "label": "Reduced-motion support", "description": "Animation must respect prefers-reduced-motion.", "source": "graph/decisions.json" },
-      { "id": "a11y:scrim-over-media", "label": "Scrim behind text over media", "description": "Never place text directly over media — lay a scrim behind it.", "source": "docs/accessibility.md" }
+      {
+        "id": "a11y:contrast-apca",
+        "label": "APCA + WCAG contrast",
+        "description": "Text/UI pairs must clear their APCA Lc threshold, audited light and dark.",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "a11y:non-color-signal",
+        "label": "Never signal state by colour alone",
+        "description": "State must carry an icon, label, or shape in addition to colour.",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "a11y:visible-focus",
+        "label": "Visible focus indicator",
+        "description": "A focusable control must show a focus ring (Lc 15 non-text floor).",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "a11y:accessible-label",
+        "label": "Accessible label",
+        "description": "Inputs and controls must have a programmatic label.",
+        "source": "docs/accessibility.md"
+      },
+      {
+        "id": "a11y:keyboard-access",
+        "label": "Keyboard operable",
+        "description": "All interactive controls must be reachable and operable by keyboard.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "a11y:focus-management",
+        "label": "Focus management",
+        "description": "Overlays must trap and restore focus.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "a11y:reduced-motion",
+        "label": "Reduced-motion support",
+        "description": "Animation must respect prefers-reduced-motion.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "a11y:scrim-over-media",
+        "label": "Scrim behind text over media",
+        "description": "Never place text directly over media — lay a scrim behind it.",
+        "source": "docs/accessibility.md"
+      }
     ],
     "pattern": [
-      { "id": "pattern:pricing-page", "label": "Pricing page", "description": "Complete pricing-page composition: plans (Card + billing toggle + recommended) then comparison Table, FAQ and CTA. One primary action; included/excluded shown by icon + text.", "source": "src/patterns/pricing-page.tsx" },
-      { "id": "pattern:form-submission", "label": "Form submission", "description": "Label + Input + validation message, one primary submit.", "source": "recipes/build-an-app.md" },
-      { "id": "pattern:destructive-confirmation", "label": "Destructive confirmation", "description": "AlertDialog gating a destructive action, confirmed by a destructive button.", "source": "graph/decisions.json" },
-      { "id": "pattern:authentication", "label": "Authentication", "description": "Sign-in / sign-up composed from Card + Label + Input + Button.", "source": "src/blocks/login-01.tsx" },
-      { "id": "pattern:mobile-side-panel", "label": "Mobile side panel", "description": "A panel that renders inline on md+ and as a Sheet on mobile.", "source": "docs/building-with-the-dls.md" },
-      { "id": "pattern:feed-item", "label": "Feed item", "description": "One feed post: a Card with an author Item (Avatar), body, optional media placeholder, and a row of ghost reaction Buttons. No primary — reactions are low-emphasis.", "source": "rules/patterns/feed-item.json" },
-      { "id": "pattern:profile-header", "label": "Profile header", "description": "Profile top: large Avatar, name/handle, bio, a stats row, and exactly one primary relationship Button (Follow / Edit).", "source": "rules/patterns/profile-header.json" },
-      { "id": "pattern:comment-thread", "label": "Comment thread", "description": "A list of comment Items (Avatar + body) plus a single Textarea composer with one primary Post button.", "source": "rules/patterns/comment-thread.json" },
-      { "id": "pattern:media-gallery", "label": "Media gallery", "description": "Media as a grid/Carousel of Cards with a Dialog lightbox; Empty when there are none. Text over media sits on a scrim.", "source": "rules/patterns/media-gallery.json" }
+      {
+        "id": "pattern:pricing-page",
+        "label": "Pricing page",
+        "description": "Complete pricing-page composition: plans (Card + billing toggle + recommended) then comparison Table, FAQ and CTA. One primary action; included/excluded shown by icon + text.",
+        "source": "src/patterns/pricing-page.tsx"
+      },
+      {
+        "id": "pattern:form-submission",
+        "label": "Form submission",
+        "description": "Label + Input + validation message, one primary submit.",
+        "source": "recipes/build-an-app.md"
+      },
+      {
+        "id": "pattern:destructive-confirmation",
+        "label": "Destructive confirmation",
+        "description": "AlertDialog gating a destructive action, confirmed by a destructive button.",
+        "source": "graph/decisions.json"
+      },
+      {
+        "id": "pattern:authentication",
+        "label": "Authentication",
+        "description": "Sign-in / sign-up composed from Card + Label + Input + Button.",
+        "source": "src/blocks/login-01.tsx"
+      },
+      {
+        "id": "pattern:mobile-side-panel",
+        "label": "Mobile side panel",
+        "description": "A panel that renders inline on md+ and as a Sheet on mobile.",
+        "source": "docs/building-with-the-dls.md"
+      },
+      {
+        "id": "pattern:feed-item",
+        "label": "Feed item",
+        "description": "One feed post: a Card with an author Item (Avatar), body, optional media placeholder, and a row of ghost reaction Buttons. No primary — reactions are low-emphasis.",
+        "source": "rules/patterns/feed-item.json"
+      },
+      {
+        "id": "pattern:profile-header",
+        "label": "Profile header",
+        "description": "Profile top: large Avatar, name/handle, bio, a stats row, and exactly one primary relationship Button (Follow / Edit).",
+        "source": "rules/patterns/profile-header.json"
+      },
+      {
+        "id": "pattern:comment-thread",
+        "label": "Comment thread",
+        "description": "A list of comment Items (Avatar + body) plus a single Textarea composer with one primary Post button.",
+        "source": "rules/patterns/comment-thread.json"
+      },
+      {
+        "id": "pattern:media-gallery",
+        "label": "Media gallery",
+        "description": "Media as a grid/Carousel of Cards with a Dialog lightbox; Empty when there are none. Text over media sits on a scrim.",
+        "source": "rules/patterns/media-gallery.json"
+      }
     ],
     "variant": [
-      { "id": "variant:button-primary", "label": "Primary Button", "description": "Button variant=default — the one solid primary action.", "specializes": "component:button", "source": "src/components/ui/button.tsx" },
-      { "id": "variant:button-secondary", "label": "Secondary Button", "description": "Button variant=secondary.", "specializes": "component:button", "source": "src/components/ui/button.tsx" },
-      { "id": "variant:button-outline", "label": "Outline Button", "description": "Button variant=outline.", "specializes": "component:button", "source": "src/components/ui/button.tsx" },
-      { "id": "variant:button-ghost", "label": "Ghost Button", "description": "Button variant=ghost — lowest emphasis.", "specializes": "component:button", "source": "src/components/ui/button.tsx" },
-      { "id": "variant:button-destructive", "label": "Destructive Button", "description": "Button variant=destructive — validation/destructive only.", "specializes": "component:button", "source": "src/components/ui/button.tsx" },
-      { "id": "variant:button-link", "label": "Link Button", "description": "Button variant=link.", "specializes": "component:button", "source": "src/components/ui/button.tsx" }
+      {
+        "id": "variant:button-primary",
+        "label": "Primary Button",
+        "description": "Button variant=default — the one solid primary action.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "variant:button-secondary",
+        "label": "Secondary Button",
+        "description": "Button variant=secondary.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "variant:button-outline",
+        "label": "Outline Button",
+        "description": "Button variant=outline.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "variant:button-ghost",
+        "label": "Ghost Button",
+        "description": "Button variant=ghost — lowest emphasis.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "variant:button-destructive",
+        "label": "Destructive Button",
+        "description": "Button variant=destructive — validation/destructive only.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      },
+      {
+        "id": "variant:button-link",
+        "label": "Link Button",
+        "description": "Button variant=link.",
+        "specializes": "component:button",
+        "source": "src/components/ui/button.tsx"
+      }
     ],
     "ai-component": [
-      { "id": "ai-component:thinking-indicator", "label": "Thinking indicator", "description": "A live status line naming the current step, with elapsed time. Reasoning category.", "source": "src/ai-components/thinking-indicator.tsx" },
-      { "id": "ai-component:typing-indicator", "label": "Typing indicator", "description": "Three grayscale dots signalling the assistant is composing. Reasoning category.", "source": "src/ai-components/typing-indicator.tsx" },
-      { "id": "ai-component:streaming-text", "label": "Streaming text", "description": "Answer tokens revealed over time; the leading edge carries the brand accent, then settles to ink. Reasoning category.", "source": "src/ai-components/streaming-text.tsx" },
-      { "id": "ai-component:reasoning-panel", "label": "Reasoning panel", "description": "A collapsible timeline of reasoning steps that settles into a summary. Reasoning category.", "source": "src/ai-components/reasoning-panel.tsx" },
-      { "id": "ai-component:reasoning-effort", "label": "Reasoning effort", "description": "Effort level (label + segment shape) and budget spent vs allotted. Reasoning category.", "source": "src/ai-components/reasoning-effort.tsx" },
-      { "id": "ai-component:loading-state", "label": "Loading state", "description": "A pixel matrix + Skeleton holding the frame before the first token. Reasoning category.", "source": "src/ai-components/loading-state.tsx" },
-      { "id": "ai-component:guardrail-notice", "label": "Guardrail notice", "description": "A refusal in its own (grayscale) shape, offering the nearest safe alternative. Reasoning category.", "source": "src/ai-components/guardrail-notice.tsx" }
+      {
+        "id": "ai-component:thinking-indicator",
+        "label": "Thinking indicator",
+        "description": "A live status line naming the current step, with elapsed time. Reasoning category.",
+        "source": "src/ai-components/thinking-indicator.tsx"
+      },
+      {
+        "id": "ai-component:typing-indicator",
+        "label": "Typing indicator",
+        "description": "Three grayscale dots signalling the assistant is composing. Reasoning category.",
+        "source": "src/ai-components/typing-indicator.tsx"
+      },
+      {
+        "id": "ai-component:streaming-text",
+        "label": "Streaming text",
+        "description": "Answer tokens revealed over time; the leading edge carries the brand accent, then settles to ink. Reasoning category.",
+        "source": "src/ai-components/streaming-text.tsx"
+      },
+      {
+        "id": "ai-component:reasoning-panel",
+        "label": "Reasoning panel",
+        "description": "A collapsible timeline of reasoning steps that settles into a summary. Reasoning category.",
+        "source": "src/ai-components/reasoning-panel.tsx"
+      },
+      {
+        "id": "ai-component:reasoning-effort",
+        "label": "Reasoning effort",
+        "description": "Effort level (label + segment shape) and budget spent vs allotted. Reasoning category.",
+        "source": "src/ai-components/reasoning-effort.tsx"
+      },
+      {
+        "id": "ai-component:loading-state",
+        "label": "Loading state",
+        "description": "A pixel matrix + Skeleton holding the frame before the first token. Reasoning category.",
+        "source": "src/ai-components/loading-state.tsx"
+      },
+      {
+        "id": "ai-component:guardrail-notice",
+        "label": "Guardrail notice",
+        "description": "A refusal in its own (grayscale) shape, offering the nearest safe alternative. Reasoning category.",
+        "source": "src/ai-components/guardrail-notice.tsx"
+      }
     ]
   },
-
   "edges": [
-    { "source": "intent:present-pricing", "target": "pattern:pricing-page", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "component:card", "type": "preferred_composition", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "component:button", "type": "preferred_composition", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "component:badge", "type": "preferred_composition", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "component:tabs", "type": "preferred_composition", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "component:table", "type": "preferred_composition", "source_ref": "src/patterns/pricing-page.tsx" },
-    { "source": "pattern:pricing-page", "target": "rule:one-primary", "type": "governed_by", "source_ref": "rules/patterns/pricing-page.json" },
-    { "source": "pattern:pricing-page", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/patterns/pricing-page.json" },
-    { "source": "pattern:pricing-page", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/patterns/pricing-page.json" },
-    { "source": "pattern:pricing-page", "target": "rule:pill-buttons", "type": "governed_by", "source_ref": "rules/patterns/pricing-page.json" },
-    { "source": "pattern:pricing-page", "target": "rule:width-by-content", "type": "governed_by", "source_ref": "rules/patterns/pricing-page.json" },
-    { "source": "intent:primary-action", "target": "variant:button-primary", "type": "realized_by", "priority": "PREFERRED", "source_ref": "recipes/build-an-app.md" },
-    { "source": "intent:low-emphasis-action", "target": "variant:button-ghost", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "intent:destructive-action", "target": "pattern:destructive-confirmation", "type": "realized_by", "priority": "PREFERRED", "source_ref": "graph/decisions.json" },
-    { "source": "intent:confirm-action", "target": "component:alert-dialog", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/components/ui/alert-dialog.tsx" },
-    { "source": "intent:submit-form", "target": "pattern:form-submission", "type": "realized_by", "priority": "PREFERRED", "source_ref": "recipes/build-an-app.md" },
-    { "source": "intent:authenticate", "target": "pattern:authentication", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "intent:supplementary-info", "target": "component:tooltip", "type": "realized_by", "priority": "PREFERRED", "source_ref": "graph/decisions.json" },
-    { "source": "intent:select-option", "target": "component:select", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/components/ui/select.tsx" },
-
-    { "source": "variant:button-primary", "target": "intent:primary-action", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "recipes/build-an-app.md" },
-    { "source": "variant:button-ghost", "target": "intent:low-emphasis-action", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "variant:button-destructive", "target": "intent:destructive-action", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "docs/accessibility.md" },
-    { "source": "component:tooltip", "target": "intent:supplementary-info", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "graph/decisions.json" },
-    { "source": "component:alert-dialog", "target": "intent:confirm-action", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "src/components/ui/alert-dialog.tsx" },
-    { "source": "component:select", "target": "intent:select-option", "type": "preferred_for", "priority": "PREFERRED", "source_ref": "src/components/ui/select.tsx" },
-
-    { "source": "variant:button-outline", "target": "intent:low-emphasis-action", "type": "appropriate_for", "priority": "ALLOWED", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "variant:button-secondary", "target": "intent:primary-action", "type": "appropriate_for", "priority": "ALTERNATIVE", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "component:sheet", "target": "context:mobile", "type": "appropriate_for", "priority": "PREFERRED", "source_ref": "docs/building-with-the-dls.md" },
-    { "source": "component:dialog", "target": "context:desktop", "type": "appropriate_for", "priority": "PREFERRED", "source_ref": "docs/building-with-the-dls.md" },
-
-    { "source": "variant:button-destructive", "target": "intent:navigate", "type": "inappropriate_for", "priority": "FORBIDDEN", "source_ref": "docs/accessibility.md" },
-    { "source": "component:tooltip", "target": "intent:essential-instruction", "type": "inappropriate_for", "priority": "FORBIDDEN", "source_ref": "docs/accessibility.md" },
-    { "source": "component:sonner", "target": "intent:essential-instruction", "type": "inappropriate_for", "priority": "AVOID", "source_ref": "docs/accessibility.md" },
-    { "source": "component:dialog", "target": "context:mobile", "type": "inappropriate_for", "priority": "AVOID", "source_ref": "docs/building-with-the-dls.md" },
-
-    { "source": "component:sheet", "target": "component:dialog", "type": "preferred_over", "priority": "PREFERRED", "applies_when": "context:mobile", "source_ref": "docs/building-with-the-dls.md" },
-    { "source": "variant:button-primary", "target": "variant:button-secondary", "type": "preferred_over", "priority": "PREFERRED", "applies_when": "context:web", "source_ref": "recipes/build-an-app.md" },
-
-    { "source": "variant:button-secondary", "target": "variant:button-primary", "type": "alternative_to", "priority": "ALTERNATIVE", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "component:drawer", "target": "component:sheet", "type": "alternative_to", "priority": "ALTERNATIVE", "source_ref": "src/components/ui/drawer.tsx" },
-
-    { "source": "variant:button-link", "target": "pattern:destructive-confirmation", "type": "forbidden_with", "priority": "FORBIDDEN", "source_ref": "graph/decisions.json" },
-
-    { "source": "component:button", "target": "a11y:keyboard-access", "type": "requires", "source_ref": "graph/decisions.json" },
-    { "source": "component:button", "target": "a11y:visible-focus", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:input", "target": "a11y:accessible-label", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:input", "target": "a11y:non-color-signal", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:field", "target": "a11y:accessible-label", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:select", "target": "a11y:accessible-label", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:checkbox", "target": "a11y:non-color-signal", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:switch", "target": "a11y:non-color-signal", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:dialog", "target": "a11y:focus-management", "type": "requires", "source_ref": "graph/decisions.json" },
-    { "source": "component:alert-dialog", "target": "a11y:focus-management", "type": "requires", "source_ref": "graph/decisions.json" },
-    { "source": "component:sheet", "target": "a11y:focus-management", "type": "requires", "source_ref": "graph/decisions.json" },
-    { "source": "component:tooltip", "target": "a11y:keyboard-access", "type": "requires", "source_ref": "graph/decisions.json" },
-    { "source": "component:chart", "target": "a11y:non-color-signal", "type": "requires", "source_ref": "docs/accessibility.md" },
-    { "source": "component:carousel", "target": "a11y:reduced-motion", "type": "requires", "source_ref": "graph/decisions.json" },
-
-    { "source": "component:button", "target": "state:loading", "type": "supports_state", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "component:button", "target": "state:disabled", "type": "supports_state", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "component:button", "target": "state:hover", "type": "supports_state", "source_ref": "src/styles/globals.css" },
-    { "source": "component:button", "target": "state:focus", "type": "supports_state", "source_ref": "src/styles/globals.css" },
-    { "source": "component:input", "target": "state:error", "type": "supports_state", "source_ref": "docs/accessibility.md" },
-    { "source": "component:input", "target": "state:disabled", "type": "supports_state", "source_ref": "src/components/ui/input.tsx" },
-    { "source": "component:input", "target": "state:focus", "type": "supports_state", "source_ref": "src/styles/globals.css" },
-    { "source": "component:field", "target": "state:error", "type": "supports_state", "source_ref": "src/components/ui/field.tsx" },
-    { "source": "component:select", "target": "state:selected", "type": "supports_state", "source_ref": "src/components/ui/select.tsx" },
-    { "source": "component:checkbox", "target": "state:selected", "type": "supports_state", "source_ref": "src/components/ui/checkbox.tsx" },
-    { "source": "component:switch", "target": "state:selected", "type": "supports_state", "source_ref": "src/components/ui/switch.tsx" },
-    { "source": "component:empty", "target": "state:empty", "type": "supports_state", "source_ref": "src/components/ui/empty.tsx" },
-
-    { "source": "pattern:form-submission", "target": "component:label", "type": "preferred_composition", "source_ref": "recipes/build-an-app.md" },
-    { "source": "pattern:form-submission", "target": "component:input", "type": "preferred_composition", "source_ref": "recipes/build-an-app.md" },
-    { "source": "pattern:form-submission", "target": "component:field", "type": "preferred_composition", "source_ref": "src/components/ui/field.tsx" },
-    { "source": "pattern:form-submission", "target": "variant:button-primary", "type": "preferred_composition", "source_ref": "recipes/build-an-app.md" },
-    { "source": "pattern:authentication", "target": "component:card", "type": "preferred_composition", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "pattern:authentication", "target": "component:label", "type": "preferred_composition", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "pattern:authentication", "target": "component:input", "type": "preferred_composition", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "pattern:authentication", "target": "variant:button-primary", "type": "preferred_composition", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "pattern:destructive-confirmation", "target": "component:alert-dialog", "type": "preferred_composition", "source_ref": "src/components/ui/alert-dialog.tsx" },
-    { "source": "pattern:destructive-confirmation", "target": "variant:button-destructive", "type": "preferred_composition", "source_ref": "src/components/ui/button.tsx" },
-    { "source": "pattern:mobile-side-panel", "target": "component:sheet", "type": "preferred_composition", "source_ref": "docs/building-with-the-dls.md" },
-
-    { "source": "block:login-01", "target": "pattern:authentication", "type": "demonstrates", "source_ref": "src/blocks/login-01.tsx" },
-    { "source": "block:login-02", "target": "pattern:authentication", "type": "demonstrates", "source_ref": "src/blocks/login-02.tsx" },
-    { "source": "block:login-03", "target": "pattern:authentication", "type": "demonstrates", "source_ref": "src/blocks/login-03.tsx" },
-    { "source": "block:signup-01", "target": "pattern:authentication", "type": "demonstrates", "source_ref": "src/blocks/signup-01.tsx" },
-    { "source": "block:login-01", "target": "intent:authenticate", "type": "demonstrates", "source_ref": "src/blocks/login-01.tsx" },
-
-    { "source": "rule:mobile-sheet-over-dialog", "target": "context:mobile", "type": "applies_when", "source_ref": "docs/building-with-the-dls.md" },
-    { "source": "rule:validation-only", "target": "rule:grayscale", "type": "overrides", "source_ref": "tokens/colors.json" },
-
-    { "source": "intent:signal-working", "target": "ai-component:thinking-indicator", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/thinking-indicator.tsx" },
-    { "source": "intent:signal-composing", "target": "ai-component:typing-indicator", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/typing-indicator.tsx" },
-    { "source": "intent:stream-answer", "target": "ai-component:streaming-text", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/streaming-text.tsx" },
-    { "source": "intent:show-reasoning", "target": "ai-component:reasoning-panel", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/reasoning-panel.tsx" },
-    { "source": "intent:report-effort", "target": "ai-component:reasoning-effort", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/reasoning-effort.tsx" },
-    { "source": "intent:hold-pending", "target": "ai-component:loading-state", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/loading-state.tsx" },
-    { "source": "intent:refuse-safely", "target": "ai-component:guardrail-notice", "type": "realized_by", "priority": "PREFERRED", "source_ref": "src/ai-components/guardrail-notice.tsx" },
-
-    { "source": "ai-component:thinking-indicator", "target": "component:spinner", "type": "preferred_composition", "source_ref": "src/ai-components/thinking-indicator.tsx" },
-    { "source": "ai-component:reasoning-panel", "target": "component:collapsible", "type": "preferred_composition", "source_ref": "src/ai-components/reasoning-panel.tsx" },
-    { "source": "ai-component:reasoning-panel", "target": "component:button", "type": "preferred_composition", "source_ref": "src/ai-components/reasoning-panel.tsx" },
-    { "source": "ai-component:reasoning-panel", "target": "component:separator", "type": "preferred_composition", "source_ref": "src/ai-components/reasoning-panel.tsx" },
-    { "source": "ai-component:reasoning-effort", "target": "component:progress", "type": "preferred_composition", "source_ref": "src/ai-components/reasoning-effort.tsx" },
-    { "source": "ai-component:reasoning-effort", "target": "component:badge", "type": "preferred_composition", "source_ref": "src/ai-components/reasoning-effort.tsx" },
-    { "source": "ai-component:loading-state", "target": "component:skeleton", "type": "preferred_composition", "source_ref": "src/ai-components/loading-state.tsx" },
-    { "source": "ai-component:guardrail-notice", "target": "component:alert", "type": "preferred_composition", "source_ref": "src/ai-components/guardrail-notice.tsx" },
-    { "source": "ai-component:guardrail-notice", "target": "component:button", "type": "preferred_composition", "source_ref": "src/ai-components/guardrail-notice.tsx" },
-
-    { "source": "ai-component:thinking-indicator", "target": "rule:loading-state", "type": "governed_by", "source_ref": "rules/ai-components/thinking-indicator.json" },
-    { "source": "ai-component:thinking-indicator", "target": "rule:reduced-motion", "type": "governed_by", "source_ref": "rules/ai-components/thinking-indicator.json" },
-    { "source": "ai-component:thinking-indicator", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/thinking-indicator.json" },
-    { "source": "ai-component:thinking-indicator", "target": "rule:build-from-library", "type": "governed_by", "source_ref": "rules/ai-components/thinking-indicator.json" },
-    { "source": "ai-component:typing-indicator", "target": "rule:reduced-motion", "type": "governed_by", "source_ref": "rules/ai-components/typing-indicator.json" },
-    { "source": "ai-component:typing-indicator", "target": "rule:grayscale", "type": "governed_by", "source_ref": "rules/ai-components/typing-indicator.json" },
-    { "source": "ai-component:typing-indicator", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/typing-indicator.json" },
-    { "source": "ai-component:streaming-text", "target": "rule:brand-accent", "type": "governed_by", "source_ref": "rules/ai-components/streaming-text.json" },
-    { "source": "ai-component:streaming-text", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/ai-components/streaming-text.json" },
-    { "source": "ai-component:streaming-text", "target": "rule:reduced-motion", "type": "governed_by", "source_ref": "rules/ai-components/streaming-text.json" },
-    { "source": "ai-component:streaming-text", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/streaming-text.json" },
-    { "source": "ai-component:reasoning-panel", "target": "rule:reduced-motion", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-panel.json" },
-    { "source": "ai-component:reasoning-panel", "target": "rule:build-from-library", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-panel.json" },
-    { "source": "ai-component:reasoning-panel", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-panel.json" },
-    { "source": "ai-component:reasoning-panel", "target": "rule:one-primary", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-panel.json" },
-    { "source": "ai-component:reasoning-effort", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-effort.json" },
-    { "source": "ai-component:reasoning-effort", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-effort.json" },
-    { "source": "ai-component:reasoning-effort", "target": "rule:build-from-library", "type": "governed_by", "source_ref": "rules/ai-components/reasoning-effort.json" },
-    { "source": "ai-component:loading-state", "target": "rule:loading-state", "type": "governed_by", "source_ref": "rules/ai-components/loading-state.json" },
-    { "source": "ai-component:loading-state", "target": "rule:reduced-motion", "type": "governed_by", "source_ref": "rules/ai-components/loading-state.json" },
-    { "source": "ai-component:loading-state", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/ai-components/loading-state.json" },
-    { "source": "ai-component:guardrail-notice", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/ai-components/guardrail-notice.json" },
-    { "source": "ai-component:guardrail-notice", "target": "rule:one-primary", "type": "governed_by", "source_ref": "rules/ai-components/guardrail-notice.json" },
-    { "source": "ai-component:guardrail-notice", "target": "rule:pill-buttons", "type": "governed_by", "source_ref": "rules/ai-components/guardrail-notice.json" },
-    { "source": "ai-component:guardrail-notice", "target": "rule:build-from-library", "type": "governed_by", "source_ref": "rules/ai-components/guardrail-notice.json" },
-
-    { "source": "intent:post-to-feed", "target": "pattern:feed-item", "type": "realized_by", "priority": "PREFERRED", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "intent:show-profile", "target": "pattern:profile-header", "type": "realized_by", "priority": "PREFERRED", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "intent:show-comments", "target": "pattern:comment-thread", "type": "realized_by", "priority": "PREFERRED", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "intent:show-media-gallery", "target": "pattern:media-gallery", "type": "realized_by", "priority": "PREFERRED", "source_ref": "rules/patterns/media-gallery.json" },
-
-    { "source": "pattern:feed-item", "target": "component:card", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "component:avatar", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "component:item", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "component:button", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "component:badge", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "component:separator", "type": "preferred_composition", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/patterns/feed-item.json" },
-    { "source": "pattern:feed-item", "target": "rule:pill-buttons", "type": "governed_by", "source_ref": "rules/patterns/feed-item.json" },
-
-    { "source": "pattern:profile-header", "target": "component:card", "type": "preferred_composition", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "component:avatar", "type": "preferred_composition", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "component:button", "type": "preferred_composition", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "component:badge", "type": "preferred_composition", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "component:separator", "type": "preferred_composition", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "rule:one-primary", "type": "governed_by", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/patterns/profile-header.json" },
-    { "source": "pattern:profile-header", "target": "rule:pill-buttons", "type": "governed_by", "source_ref": "rules/patterns/profile-header.json" },
-
-    { "source": "pattern:comment-thread", "target": "component:item", "type": "preferred_composition", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "component:avatar", "type": "preferred_composition", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "component:textarea", "type": "preferred_composition", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "component:button", "type": "preferred_composition", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "component:separator", "type": "preferred_composition", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "rule:one-primary", "type": "governed_by", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/patterns/comment-thread.json" },
-    { "source": "pattern:comment-thread", "target": "rule:pill-buttons", "type": "governed_by", "source_ref": "rules/patterns/comment-thread.json" },
-
-    { "source": "pattern:media-gallery", "target": "component:card", "type": "preferred_composition", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "component:carousel", "type": "preferred_composition", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "component:dialog", "type": "preferred_composition", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "component:button", "type": "preferred_composition", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "component:empty", "type": "preferred_composition", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "rule:no-color-alone", "type": "governed_by", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "rule:tokens-only", "type": "governed_by", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "rule:width-by-content", "type": "governed_by", "source_ref": "rules/patterns/media-gallery.json" },
-    { "source": "pattern:media-gallery", "target": "a11y:scrim-over-media", "type": "requires", "source_ref": "rules/patterns/media-gallery.json" }
+    {
+      "source": "intent:present-pricing",
+      "target": "pattern:pricing-page",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:card",
+      "type": "preferred_composition",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:badge",
+      "type": "preferred_composition",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:tabs",
+      "type": "preferred_composition",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "component:table",
+      "type": "preferred_composition",
+      "source_ref": "src/patterns/pricing-page.tsx"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/pricing-page.json"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/pricing-page.json"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/pricing-page.json"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "rule:pill-buttons",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/pricing-page.json"
+    },
+    {
+      "source": "pattern:pricing-page",
+      "target": "rule:width-by-content",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/pricing-page.json"
+    },
+    {
+      "source": "intent:primary-action",
+      "target": "variant:button-primary",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "intent:low-emphasis-action",
+      "target": "variant:button-ghost",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "intent:destructive-action",
+      "target": "pattern:destructive-confirmation",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "intent:confirm-action",
+      "target": "component:alert-dialog",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/alert-dialog.tsx"
+    },
+    {
+      "source": "intent:submit-form",
+      "target": "pattern:form-submission",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "intent:authenticate",
+      "target": "pattern:authentication",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "intent:supplementary-info",
+      "target": "component:tooltip",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "intent:select-option",
+      "target": "component:select",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/select.tsx"
+    },
+    {
+      "source": "variant:button-primary",
+      "target": "intent:primary-action",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "variant:button-ghost",
+      "target": "intent:low-emphasis-action",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "variant:button-destructive",
+      "target": "intent:destructive-action",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:tooltip",
+      "target": "intent:supplementary-info",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:alert-dialog",
+      "target": "intent:confirm-action",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/alert-dialog.tsx"
+    },
+    {
+      "source": "component:select",
+      "target": "intent:select-option",
+      "type": "preferred_for",
+      "priority": "PREFERRED",
+      "source_ref": "src/components/ui/select.tsx"
+    },
+    {
+      "source": "variant:button-outline",
+      "target": "intent:low-emphasis-action",
+      "type": "appropriate_for",
+      "priority": "ALLOWED",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "variant:button-secondary",
+      "target": "intent:primary-action",
+      "type": "appropriate_for",
+      "priority": "ALTERNATIVE",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "component:sheet",
+      "target": "context:mobile",
+      "type": "appropriate_for",
+      "priority": "PREFERRED",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "component:dialog",
+      "target": "context:desktop",
+      "type": "appropriate_for",
+      "priority": "PREFERRED",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "variant:button-destructive",
+      "target": "intent:navigate",
+      "type": "inappropriate_for",
+      "priority": "FORBIDDEN",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:tooltip",
+      "target": "intent:essential-instruction",
+      "type": "inappropriate_for",
+      "priority": "FORBIDDEN",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:sonner",
+      "target": "intent:essential-instruction",
+      "type": "inappropriate_for",
+      "priority": "AVOID",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:dialog",
+      "target": "context:mobile",
+      "type": "inappropriate_for",
+      "priority": "AVOID",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "component:sheet",
+      "target": "component:dialog",
+      "type": "preferred_over",
+      "priority": "PREFERRED",
+      "applies_when": "context:mobile",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "variant:button-primary",
+      "target": "variant:button-secondary",
+      "type": "preferred_over",
+      "priority": "PREFERRED",
+      "applies_when": "context:web",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "variant:button-secondary",
+      "target": "variant:button-primary",
+      "type": "alternative_to",
+      "priority": "ALTERNATIVE",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "component:drawer",
+      "target": "component:sheet",
+      "type": "alternative_to",
+      "priority": "ALTERNATIVE",
+      "source_ref": "src/components/ui/drawer.tsx"
+    },
+    {
+      "source": "variant:button-link",
+      "target": "pattern:destructive-confirmation",
+      "type": "forbidden_with",
+      "priority": "FORBIDDEN",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:button",
+      "target": "a11y:keyboard-access",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:button",
+      "target": "a11y:visible-focus",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:input",
+      "target": "a11y:accessible-label",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:input",
+      "target": "a11y:non-color-signal",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:field",
+      "target": "a11y:accessible-label",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:select",
+      "target": "a11y:accessible-label",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:checkbox",
+      "target": "a11y:non-color-signal",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:switch",
+      "target": "a11y:non-color-signal",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:dialog",
+      "target": "a11y:focus-management",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:alert-dialog",
+      "target": "a11y:focus-management",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:sheet",
+      "target": "a11y:focus-management",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:tooltip",
+      "target": "a11y:keyboard-access",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:chart",
+      "target": "a11y:non-color-signal",
+      "type": "requires",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:carousel",
+      "target": "a11y:reduced-motion",
+      "type": "requires",
+      "source_ref": "graph/decisions.json"
+    },
+    {
+      "source": "component:button",
+      "target": "state:loading",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "component:button",
+      "target": "state:disabled",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "component:button",
+      "target": "state:hover",
+      "type": "supports_state",
+      "source_ref": "src/styles/globals.css"
+    },
+    {
+      "source": "component:button",
+      "target": "state:focus",
+      "type": "supports_state",
+      "source_ref": "src/styles/globals.css"
+    },
+    {
+      "source": "component:input",
+      "target": "state:error",
+      "type": "supports_state",
+      "source_ref": "docs/accessibility.md"
+    },
+    {
+      "source": "component:input",
+      "target": "state:disabled",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/input.tsx"
+    },
+    {
+      "source": "component:input",
+      "target": "state:focus",
+      "type": "supports_state",
+      "source_ref": "src/styles/globals.css"
+    },
+    {
+      "source": "component:field",
+      "target": "state:error",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/field.tsx"
+    },
+    {
+      "source": "component:select",
+      "target": "state:selected",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/select.tsx"
+    },
+    {
+      "source": "component:checkbox",
+      "target": "state:selected",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/checkbox.tsx"
+    },
+    {
+      "source": "component:switch",
+      "target": "state:selected",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/switch.tsx"
+    },
+    {
+      "source": "component:empty",
+      "target": "state:empty",
+      "type": "supports_state",
+      "source_ref": "src/components/ui/empty.tsx"
+    },
+    {
+      "source": "pattern:form-submission",
+      "target": "component:label",
+      "type": "preferred_composition",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "pattern:form-submission",
+      "target": "component:input",
+      "type": "preferred_composition",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "pattern:form-submission",
+      "target": "component:field",
+      "type": "preferred_composition",
+      "source_ref": "src/components/ui/field.tsx"
+    },
+    {
+      "source": "pattern:form-submission",
+      "target": "variant:button-primary",
+      "type": "preferred_composition",
+      "source_ref": "recipes/build-an-app.md"
+    },
+    {
+      "source": "pattern:authentication",
+      "target": "component:card",
+      "type": "preferred_composition",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "pattern:authentication",
+      "target": "component:label",
+      "type": "preferred_composition",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "pattern:authentication",
+      "target": "component:input",
+      "type": "preferred_composition",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "pattern:authentication",
+      "target": "variant:button-primary",
+      "type": "preferred_composition",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "pattern:destructive-confirmation",
+      "target": "component:alert-dialog",
+      "type": "preferred_composition",
+      "source_ref": "src/components/ui/alert-dialog.tsx"
+    },
+    {
+      "source": "pattern:destructive-confirmation",
+      "target": "variant:button-destructive",
+      "type": "preferred_composition",
+      "source_ref": "src/components/ui/button.tsx"
+    },
+    {
+      "source": "pattern:mobile-side-panel",
+      "target": "component:sheet",
+      "type": "preferred_composition",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "block:login-01",
+      "target": "pattern:authentication",
+      "type": "demonstrates",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "block:login-02",
+      "target": "pattern:authentication",
+      "type": "demonstrates",
+      "source_ref": "src/blocks/login-02.tsx"
+    },
+    {
+      "source": "block:login-03",
+      "target": "pattern:authentication",
+      "type": "demonstrates",
+      "source_ref": "src/blocks/login-03.tsx"
+    },
+    {
+      "source": "block:signup-01",
+      "target": "pattern:authentication",
+      "type": "demonstrates",
+      "source_ref": "src/blocks/signup-01.tsx"
+    },
+    {
+      "source": "block:login-01",
+      "target": "intent:authenticate",
+      "type": "demonstrates",
+      "source_ref": "src/blocks/login-01.tsx"
+    },
+    {
+      "source": "rule:mobile-sheet-over-dialog",
+      "target": "context:mobile",
+      "type": "applies_when",
+      "source_ref": "docs/building-with-the-dls.md"
+    },
+    {
+      "source": "rule:validation-only",
+      "target": "rule:grayscale",
+      "type": "overrides",
+      "source_ref": "tokens/colors.json"
+    },
+    {
+      "source": "intent:signal-working",
+      "target": "ai-component:thinking-indicator",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/thinking-indicator.tsx"
+    },
+    {
+      "source": "intent:signal-composing",
+      "target": "ai-component:typing-indicator",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/typing-indicator.tsx"
+    },
+    {
+      "source": "intent:stream-answer",
+      "target": "ai-component:streaming-text",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/streaming-text.tsx"
+    },
+    {
+      "source": "intent:show-reasoning",
+      "target": "ai-component:reasoning-panel",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "source": "intent:report-effort",
+      "target": "ai-component:reasoning-effort",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/reasoning-effort.tsx"
+    },
+    {
+      "source": "intent:hold-pending",
+      "target": "ai-component:loading-state",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/loading-state.tsx"
+    },
+    {
+      "source": "intent:refuse-safely",
+      "target": "ai-component:guardrail-notice",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "src/ai-components/guardrail-notice.tsx"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "component:spinner",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/thinking-indicator.tsx"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:collapsible",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "component:separator",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/reasoning-panel.tsx"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "component:progress",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/reasoning-effort.tsx"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "component:badge",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/reasoning-effort.tsx"
+    },
+    {
+      "source": "ai-component:loading-state",
+      "target": "component:skeleton",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/loading-state.tsx"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "component:alert",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/guardrail-notice.tsx"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "src/ai-components/guardrail-notice.tsx"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "rule:loading-state",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/thinking-indicator.json"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "rule:reduced-motion",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/thinking-indicator.json"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/thinking-indicator.json"
+    },
+    {
+      "source": "ai-component:thinking-indicator",
+      "target": "rule:build-from-library",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/thinking-indicator.json"
+    },
+    {
+      "source": "ai-component:typing-indicator",
+      "target": "rule:reduced-motion",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/typing-indicator.json"
+    },
+    {
+      "source": "ai-component:typing-indicator",
+      "target": "rule:grayscale",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/typing-indicator.json"
+    },
+    {
+      "source": "ai-component:typing-indicator",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/typing-indicator.json"
+    },
+    {
+      "source": "ai-component:streaming-text",
+      "target": "rule:brand-accent",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/streaming-text.json"
+    },
+    {
+      "source": "ai-component:streaming-text",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/streaming-text.json"
+    },
+    {
+      "source": "ai-component:streaming-text",
+      "target": "rule:reduced-motion",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/streaming-text.json"
+    },
+    {
+      "source": "ai-component:streaming-text",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/streaming-text.json"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "rule:reduced-motion",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-panel.json"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "rule:build-from-library",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-panel.json"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-panel.json"
+    },
+    {
+      "source": "ai-component:reasoning-panel",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-panel.json"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-effort.json"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-effort.json"
+    },
+    {
+      "source": "ai-component:reasoning-effort",
+      "target": "rule:build-from-library",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/reasoning-effort.json"
+    },
+    {
+      "source": "ai-component:loading-state",
+      "target": "rule:loading-state",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/loading-state.json"
+    },
+    {
+      "source": "ai-component:loading-state",
+      "target": "rule:reduced-motion",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/loading-state.json"
+    },
+    {
+      "source": "ai-component:loading-state",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/loading-state.json"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/guardrail-notice.json"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/guardrail-notice.json"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "rule:pill-buttons",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/guardrail-notice.json"
+    },
+    {
+      "source": "ai-component:guardrail-notice",
+      "target": "rule:build-from-library",
+      "type": "governed_by",
+      "source_ref": "rules/ai-components/guardrail-notice.json"
+    },
+    {
+      "source": "intent:post-to-feed",
+      "target": "pattern:feed-item",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "intent:show-profile",
+      "target": "pattern:profile-header",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "intent:show-comments",
+      "target": "pattern:comment-thread",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "intent:show-media-gallery",
+      "target": "pattern:media-gallery",
+      "type": "realized_by",
+      "priority": "PREFERRED",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:card",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:avatar",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:item",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:badge",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "component:separator",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:feed-item",
+      "target": "rule:pill-buttons",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/feed-item.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:card",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:avatar",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:badge",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "component:separator",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:profile-header",
+      "target": "rule:pill-buttons",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/profile-header.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:item",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:avatar",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:textarea",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "component:separator",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "rule:one-primary",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:comment-thread",
+      "target": "rule:pill-buttons",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/comment-thread.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:card",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:carousel",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:dialog",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:button",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "component:empty",
+      "type": "preferred_composition",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "rule:no-color-alone",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "rule:tokens-only",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "rule:width-by-content",
+      "type": "governed_by",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "pattern:media-gallery",
+      "target": "a11y:scrim-over-media",
+      "type": "requires",
+      "source_ref": "rules/patterns/media-gallery.json"
+    },
+    {
+      "source": "intent:app-shell",
+      "target": "pattern:app-shell",
+      "type": "realized_by"
+    },
+    {
+      "source": "intent:side-panel",
+      "target": "pattern:mobile-side-panel",
+      "type": "realized_by"
+    },
+    {
+      "source": "intent:action-toolbar",
+      "target": "component:toolbar",
+      "type": "realized_by"
+    },
+    {
+      "source": "intent:media-placeholder",
+      "target": "component-2one:media-placeholder",
+      "type": "realized_by"
+    }
   ]
 }

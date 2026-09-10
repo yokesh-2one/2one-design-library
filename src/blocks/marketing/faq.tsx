@@ -2,11 +2,11 @@ import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 const FAQS = [
-  { q: "Is it really just grayscale?", a: "Grayscale is the foundation, with one disciplined brand accent (2one Blue) for emphasis — links, focus, selection. Structure and primary actions stay grayscale; danger and success stay reserved for validation. That restraint is what keeps every screen looking like one system." },
-  { q: "Does it support dark mode?", a: "It ships two audited themes — light and dark — that are contrast-checked on every change. Wrap your app in the ThemeProvider to switch between them." },
+  { q: "Is it really just grayscale?", a: "Grayscale is the foundation, with one disciplined brand accent (2one Blue) for emphasis: links, focus, selection. Structure and primary actions stay grayscale; danger and success stay reserved for validation. That restraint is what keeps every screen looking like one system." },
+  { q: "Does it support dark mode?", a: "It ships two audited themes, light and dark, that are contrast-checked on every change. Wrap your app in the ThemeProvider to switch between them." },
   { q: "How do I use it with AI tools?", a: "Point your assistant at the repo. A machine-readable manifest, a knowledge graph and a rules file let Claude, Cursor, Copilot or Gemini build on-brand without re-explaining the system." },
-  { q: "Can I change the components?", a: "They're standard shadcn/ui components re-skinned to the tokens, so you extend them the normal way — and templates in src/blocks are copy-in starting points you own." },
-  { q: "What does it cost?", a: "The Starter tier is free. Paid tiers add templates, impact analysis and support — see pricing above." },
+  { q: "Can I change the components?", a: "They're standard shadcn/ui components re-skinned to the tokens, so you extend them the normal way, and templates in src/blocks are copy-in starting points you own." },
+  { q: "What does it cost?", a: "The Starter tier is free. Paid tiers add templates, impact analysis and support. See pricing above." },
 ]
 
 // FAQ — questions answered through the existing Accordion component.

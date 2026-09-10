@@ -1,5 +1,6 @@
 {
   "id": "pattern:app-shell",
+  "implementation": "tsx",
   "label": "App shell",
   "tier": 3,
   "kind": "page-pattern",
@@ -14,7 +15,12 @@
     "One responsive component (useIsMobile) switches between the two so the same destinations drive both."
   ],
   "composes": {
-    "components": ["sidebar", "app-bar", "bottom-nav-item", "logo"]
+    "components": [
+      "sidebar",
+      "app-bar",
+      "bottom-nav-item",
+      "logo"
+    ]
   },
   "primary_action": "None — chrome carries NO primary Button, so the app's own primary action (inside the content) is never shadowed. The active destination is marked by aria-current + weight/background, never colour alone.",
   "responsive": "A single breakpoint (useIsMobile): desktop shows the Sidebar + inset; mobile shows the AppBar + bottom nav. Content scrolls within its region; the chrome does not.",
@@ -29,7 +35,12 @@
     "a filled primary Button in the shell chrome (it competes with the screen's real primary)",
     "marking the active destination by colour alone with no aria-current / weight change"
   ],
-  "governed_by": ["no-color-alone", "tokens-only", "logo-untouchable", "one-primary"],
+  "governed_by": [
+    "no-color-alone",
+    "tokens-only",
+    "logo-untouchable",
+    "one-primary"
+  ],
   "assumptions": [
     "Destinations are PLACEHOLDER (Home / Search / Alerts / Profile) — replace with the product's real sections.",
     "The brand is the 2one Logo; swap in your own via the same slot when this is built for another brand.",
@@ -38,7 +49,9 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships a sidebar block but no full app shell with a mobile bottom-nav counterpart (its canonical blocks are dashboard, sidebar, login, signup — https://ui.shadcn.com/blocks). So this pattern composes the shadcn Sidebar PRIMITIVE with the 2one-authored AppBar / BottomNavItem / Logo — every part a real, in-repo component; nothing invented.",
-    "shadcn_primitives": ["sidebar"],
+    "shadcn_primitives": [
+      "sidebar"
+    ],
     "two_one_blocks": [],
     "checked_against": "https://ui.shadcn.com/blocks"
   }

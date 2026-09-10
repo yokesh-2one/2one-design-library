@@ -1,0 +1,6 @@
+- dialog "Invite teammates":
+  - heading "Invite teammates" [level=2]
+  - paragraph: Send an invite link to your team.
+  - button "Cancel"
+  - button "Send invite"
+  - button "Close"

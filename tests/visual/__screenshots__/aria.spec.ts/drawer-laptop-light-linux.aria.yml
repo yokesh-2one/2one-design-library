@@ -1,0 +1,5 @@
+- dialog "Filters":
+  - heading "Filters" [level=2]
+  - paragraph: Refine the results below.
+  - button "Apply"
+  - button "Cancel"

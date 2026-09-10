@@ -1,0 +1,6 @@
+- text: Email
+- textbox "Email":
+  - /placeholder: you@example.com
+  - text: ada@example.com
+- paragraph: We'll never share it.
+- button "Save"

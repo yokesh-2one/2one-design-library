@@ -1,0 +1,9 @@
+- region:
+  - group:
+    - img "Slide 1"
+  - group:
+    - img "Slide 2"
+  - group:
+    - img "Slide 3"
+  - button "Previous slide" [disabled]
+  - button "Next slide"

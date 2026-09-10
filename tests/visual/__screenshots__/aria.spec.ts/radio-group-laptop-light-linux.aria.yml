@@ -1,0 +1,7 @@
+- radiogroup:
+  - radio "Free"
+  - text: Free
+  - radio "Team" [checked]
+  - text: Team
+  - radio "Enterprise"
+  - text: Enterprise

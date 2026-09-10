@@ -1,5 +1,6 @@
 {
   "id": "ai-component:thinking-indicator",
+  "implementation": "tsx",
   "label": "Thinking indicator",
   "tier": 3,
   "kind": "assistant-element",
@@ -14,7 +15,12 @@
     "A named current step in foreground text",
     "Elapsed time in tabular-nums"
   ],
-  "composes": { "components": ["spinner"], "blocks": [] },
+  "composes": {
+    "components": [
+      "spinner"
+    ],
+    "blocks": []
+  },
   "responsive": "A single inline row; wraps naturally in a narrow column.",
   "accessibility": [
     "role=status + aria-live=polite so the step and time are announced without stealing focus",
@@ -24,7 +30,12 @@
     "an unlabelled spinner that names no step",
     "colouring the whole row to signal 'busy' — busy is not a state worth a hue"
   ],
-  "governed_by": ["loading-state", "reduced-motion", "tokens-only", "build-from-library"],
+  "governed_by": [
+    "loading-state",
+    "reduced-motion",
+    "tokens-only",
+    "build-from-library"
+  ],
   "assumptions": [
     "The label and elapsed time are DEMO values — wire them to the real run's current step and start time.",
     "`running` is driven here by a timer; in production it reflects the runtime's in-flight state."
@@ -32,8 +43,12 @@
   "references": {
     "shadcn_block": null,
     "note": "assistant-ui's Elements catalogue (https://www.assistant-ui.com/elements, checked 2026-08) is the CONCEPTUAL reference for this interface state; no code is copied. shadcn ships no assistant/AI-interface block, so this element is composed from a real DLS primitive (Spinner) plus tokens.",
-    "shadcn_primitives": ["spinner"],
-    "dls_components": ["spinner"],
+    "shadcn_primitives": [
+      "spinner"
+    ],
+    "dls_components": [
+      "spinner"
+    ],
     "checked_against": "https://www.assistant-ui.com/elements"
   }
 }

@@ -67,7 +67,7 @@ for (const name of cases) {
   const fired = new Set(findings.map((f) => f.rule))
 
   if (name.includes('.fail.')) {
-    const expected = src.match(/@expect\s+([a-z-]+)/)?.[1]
+    const expected = src.match(/@expect\s+([a-z0-9-]+)/)?.[1]
     if (!expected) {
       failures.push(`${name} — a .fail case must declare "// @expect <rule-id>"`)
       continue

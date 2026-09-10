@@ -1,0 +1,69 @@
+{
+  "id": "pattern:marketing-site",
+  "implementation": "tsx",
+  "label": "Marketing site shell",
+  "tier": 3,
+  "kind": "page-pattern",
+  "file": "src/patterns/marketing-site.tsx",
+  "export": "MarketingSite",
+  "purpose": "The chrome a multi-page marketing site needs — a sticky brand header with navigation and a theme toggle, plus the shared footer — so a builder wraps page content once instead of hand-rolling site chrome on every page.",
+  "when_to_use": "A multi-page marketing/website surface (product, pricing, docs, about) that needs consistent header + footer chrome around per-page content.",
+  "when_not_to_use": "An application's top-level frame — use the app-shell pattern. A single price call-out or one marketing section — use the marketing/* block directly.",
+  "composition": [
+    "SiteHeader — sticky top bar: the brand Logo as the home link (never typeset), a text nav whose labels are the product's sections, a ThemeToggle, and exactly one OUTLINE Contact action. No primary fill in the chrome.",
+    "Content — a <main> region the page fills with the existing marketing blocks (hero, feature-grid, stats, cta-banner, …) and, where a page is pushed, a Breadcrumb crumb.",
+    "Footer — the shared MarketingFooter block, reused (one footer, not a competing second one).",
+    "The active nav destination is marked with aria-current + a weight change, never colour alone."
+  ],
+  "composes": {
+    "blocks": [
+      "marketing/footer"
+    ],
+    "components": [
+      "logo",
+      "button",
+      "theme-toggle"
+    ]
+  },
+  "primary_action": "None in the chrome — the Contact action is OUTLINE, so a page's own primary Button (inside its hero or CTA block) is never shadowed. This matches app-shell: chrome never carries the primary.",
+  "responsive": "The text nav shows at md+ and is hidden below; the brand, theme toggle and Contact action stay. Content and footer are full-width with a max-w-7xl inner column.",
+  "accessibility": [
+    "the brand is the Logo COMPONENT (never typeset text), theme-adaptive black/white, and a labelled home link",
+    "the nav is <nav aria-label='Primary'>; the current page carries aria-current='page' plus a weight change, never colour alone",
+    "nav links are underlined on hover with --brand for emphasis — never distinguished by colour alone; the same href keeps the same label across header and footer",
+    "the ThemeToggle is an icon Button with an aria-label and aria-pressed reflecting the theme"
+  ],
+  "content": "Ships a realistic four-destination nav (Product / Pricing / Docs / About) as PLACEHOLDER structure — adapt the destinations and page content, keep the chrome.",
+  "anti_patterns": [
+    "typesetting the wordmark as text, or setting the product name beside the Logo instead of as a nav label",
+    "a filled primary Button in the header (it competes with the page's real primary)",
+    "adding a second, different footer instead of reusing the shared MarketingFooter block",
+    "marking the active nav item by colour alone with no aria-current / weight change"
+  ],
+  "governed_by": [
+    "logo-untouchable",
+    "one-primary",
+    "no-color-alone",
+    "tokens-only",
+    "fixed-vs-theme-color",
+    "link-text-descriptive",
+    "link-label-consistency"
+  ],
+  "assumptions": [
+    "Nav destinations are PLACEHOLDER (Product / Pricing / Docs / About) — replace with the site's real sections.",
+    "The brand is the 2one Logo; swap in your own via the same slot when this is built for another brand.",
+    "Navigation is plain <a href> here; wire it to your router or MPA links in a real site, keeping the same href → same label rule.",
+    "Page sections (hero, CTA, crumb) are composed by the page from the existing marketing blocks and the Breadcrumb primitive — the shell is chrome only."
+  ],
+  "references": {
+    "shadcn_block": null,
+    "note": "shadcn ships canonical blocks for dashboard / sidebar / login / signup only (https://ui.shadcn.com/blocks) — there is no marketing-site shell. So this pattern composes the shadcn Button PRIMITIVE with the 2one-authored Logo and ThemeToggle and the existing marketing/footer block — every part a real, in-repo source; nothing invented.",
+    "shadcn_primitives": [
+      "button"
+    ],
+    "two_one_blocks": [
+      "marketing/footer"
+    ],
+    "checked_against": "https://ui.shadcn.com/blocks"
+  }
+}

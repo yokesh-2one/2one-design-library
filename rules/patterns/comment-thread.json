@@ -1,5 +1,6 @@
 {
   "id": "pattern:comment-thread",
+  "implementation": "spec-only",
   "label": "Comment thread",
   "tier": 3,
   "kind": "section-pattern",
@@ -12,7 +13,13 @@
     "Separators between the thread and the composer"
   ],
   "composes": {
-    "components": ["item", "avatar", "textarea", "button", "separator"]
+    "components": [
+      "item",
+      "avatar",
+      "textarea",
+      "button",
+      "separator"
+    ]
   },
   "primary_action": "Exactly one filled Button — Post/Reply on the composer. Per-comment actions (reply, like) are ghost.",
   "responsive": "Full-width in the reading column; nested replies indent by a fixed step and never force horizontal scroll.",
@@ -27,7 +34,12 @@
     "a submit control with no accessible label",
     "signalling 'liked'/'resolved' by colour alone"
   ],
-  "governed_by": ["one-primary", "no-color-alone", "tokens-only", "pill-buttons"],
+  "governed_by": [
+    "one-primary",
+    "no-color-alone",
+    "tokens-only",
+    "pill-buttons"
+  ],
   "assumptions": [
     "Comments, authors and timestamps are PLACEHOLDER 2one content — replace with real data.",
     "The single primary action is Post/Reply on the composer.",
@@ -36,7 +48,13 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships no comments block (canonical blocks are dashboard, sidebar, login, signup — https://ui.shadcn.com/blocks). Composed from shadcn PRIMITIVES (Item, Avatar, Textarea, Button, Separator); every part a real, in-repo component.",
-    "shadcn_primitives": ["item", "avatar", "textarea", "button", "separator"],
+    "shadcn_primitives": [
+      "item",
+      "avatar",
+      "textarea",
+      "button",
+      "separator"
+    ],
     "two_one_blocks": [],
     "checked_against": "https://ui.shadcn.com/blocks"
   }

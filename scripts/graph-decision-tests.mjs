@@ -13,12 +13,30 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const decide = (args) => JSON.parse(execFileSync('node', [join(root, 'scripts/graph-decide.mjs'), ...args, '--json'], { encoding: 'utf8' }))
+// graph-decide prints its JSON result and then exits non-zero on a no-match (a valid
+// "nothing resolved, here are suggestions" response), so parse stdout even when
+// execFileSync throws on the exit code.
+const decide = (args) => {
+  try { return JSON.parse(execFileSync('node', [join(root, 'scripts/graph-decide.mjs'), ...args, '--json'], { encoding: 'utf8' })) }
+  catch (e) { if (e.stdout) { try { return JSON.parse(e.stdout) } catch { /* fall through */ } } throw e }
+}
 
 const cases = [
   { name: 'primary action → Primary Button',
     run: () => decide(['decide', 'primary-action']),
     expect: (r) => r.decision === 'variant:button-primary' },
+
+  { name: '"app shell" (free text) → app-shell pattern (D1 fuzzy + D2 intent)',
+    run: () => decide(['decide', 'app shell']),
+    expect: (r) => r.decision === 'pattern:app-shell' },
+
+  { name: '"show profile" → profile-header pattern (D1: articles/order-agnostic)',
+    run: () => decide(['decide', 'show profile']),
+    expect: (r) => r.decision === 'pattern:profile-header' },
+
+  { name: 'unknown domain intent → no decision, but extension guidance (D3)',
+    run: () => decide(['decide', 'render a spreadsheet pivot table']),
+    expect: (r) => !r.decision && /domain pack/.test(r.guidance || '') },
 
   { name: 'submit a form → form-submission pattern, composed with Input+Label+Primary Button',
     run: () => decide(['decide', 'submit-form']),

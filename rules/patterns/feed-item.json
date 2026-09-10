@@ -1,5 +1,6 @@
 {
   "id": "pattern:feed-item",
+  "implementation": "spec-only",
   "label": "Feed item",
   "tier": 3,
   "kind": "section-pattern",
@@ -12,7 +13,14 @@
     "Actions — a Separator, then a row of ghost Buttons (like / comment / share), each an icon + a count, never colour alone"
   ],
   "composes": {
-    "components": ["card", "avatar", "item", "button", "badge", "separator"]
+    "components": [
+      "card",
+      "avatar",
+      "item",
+      "button",
+      "badge",
+      "separator"
+    ]
   },
   "primary_action": "None — a feed item deliberately has no primary. Its reactions are all low-emphasis (ghost) Buttons so no single item competes with the app's primary action.",
   "responsive": "Full-width within the feed column; the media slot keeps its aspect ratio (aspect-video) and never exceeds the card width.",
@@ -27,7 +35,11 @@
     "signalling 'liked' by colour alone with no icon/label change",
     "embedding an invented stock photo instead of the sanctioned media placeholder"
   ],
-  "governed_by": ["no-color-alone", "tokens-only", "pill-buttons"],
+  "governed_by": [
+    "no-color-alone",
+    "tokens-only",
+    "pill-buttons"
+  ],
   "assumptions": [
     "Author, timestamp and body are PLACEHOLDER 2one content — replace with real data.",
     "Reactions are like / comment / share; adjust to the product's real actions.",
@@ -36,7 +48,14 @@
   "references": {
     "shadcn_block": null,
     "note": "shadcn ships no feed/social block (canonical blocks are dashboard, sidebar, login, signup — https://ui.shadcn.com/blocks). So this pattern mirrors no shadcn template; it composes shadcn PRIMITIVES (Card, Avatar, Item, Button, Badge, Separator) — every part a real, in-repo component.",
-    "shadcn_primitives": ["card", "avatar", "item", "button", "badge", "separator"],
+    "shadcn_primitives": [
+      "card",
+      "avatar",
+      "item",
+      "button",
+      "badge",
+      "separator"
+    ],
     "two_one_blocks": [],
     "checked_against": "https://ui.shadcn.com/blocks"
   }

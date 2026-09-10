@@ -12,3 +12,11 @@ fixtures/*/acme-manifest.json
 fixtures/*/acme-graph.json
 storybook-static
 site
+
+# Playwright visual/a11y runner output. The BASELINES under
+# tests/visual/__screenshots__/ ARE committed on purpose; only the run artefacts
+# (actual/diff images, HTML report, traces) are ignored.
+test-results
+playwright-report
+blob-report
+playwright/.cache

@@ -1,0 +1,4 @@
+- combobox "Plan":
+  - option "Free"
+  - option "Team" [selected]
+  - option "Enterprise"

@@ -1,0 +1,32 @@
+name: Release
+
+# On a version tag, build the library ONCE in CI and publish a PREBUILT tarball to
+# the GitHub Release. Consumers install that tarball and run no library compilation
+# (a tarball install does not run the `prepare` build — unlike the `github:` install).
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # The full gate — never ship a tarball that fails verify.
+      - run: npm run verify
+      # dist/ is built by verify; pack it WITHOUT re-running prepare.
+      - name: Pack the prebuilt tarball
+        run: npm pack --ignore-scripts
+      - name: Publish the release with the prebuilt tarball
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.tgz'
+          generate_release_notes: true

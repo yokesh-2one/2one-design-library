@@ -1,5 +1,6 @@
 {
   "id": "ai-component:reasoning-effort",
+  "implementation": "tsx",
   "label": "Reasoning effort",
   "tier": 3,
   "kind": "assistant-element",
@@ -14,7 +15,13 @@
     "A secondary Badge naming the level",
     "A DLS Progress bar for budget spent vs allotted"
   ],
-  "composes": { "components": ["progress", "badge"], "blocks": [] },
+  "composes": {
+    "components": [
+      "progress",
+      "badge"
+    ],
+    "blocks": []
+  },
   "responsive": "Caps at a readable max width; the header row wraps under it.",
   "accessibility": [
     "effort is carried by the label + the number of filled segments, never by colour alone (no-color-alone)",
@@ -24,7 +31,11 @@
     "using colour (e.g. red = high) as the only signal of effort",
     "showing spend without the budget it is measured against"
   ],
-  "governed_by": ["no-color-alone", "tokens-only", "build-from-library"],
+  "governed_by": [
+    "no-color-alone",
+    "tokens-only",
+    "build-from-library"
+  ],
   "assumptions": [
     "Level, spent and budget are DEMO values — wire them to the real run.",
     "Three effort levels (low/medium/high); adjust to the surface's actual dial."
@@ -32,8 +43,14 @@
   "references": {
     "shadcn_block": null,
     "note": "assistant-ui's Elements catalogue (https://www.assistant-ui.com/elements, checked 2026-08) is the CONCEPTUAL reference; no code is copied. Composed from real DLS primitives (Progress + Badge) plus a token-only segment meter.",
-    "shadcn_primitives": ["progress", "badge"],
-    "dls_components": ["progress", "badge"],
+    "shadcn_primitives": [
+      "progress",
+      "badge"
+    ],
+    "dls_components": [
+      "progress",
+      "badge"
+    ],
     "checked_against": "https://www.assistant-ui.com/elements"
   }
 }

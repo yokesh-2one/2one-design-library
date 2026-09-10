@@ -70,3 +70,27 @@ export * from './components/logo'
 export * from './components/app-bar'
 export * from './components/bottom-nav-item'
 export * from './components/media-placeholder'
+export * from './components/theme-toggle'
+
+// Tier-3 page patterns — importable compositions. For a lean import that skips the
+// rest of the barrel, use the subpath: '@2one/design-library/patterns/app-shell'.
+// (Spec-only patterns — feed-item, profile-header, … — live in rules/patterns/.)
+export * from './patterns/app-shell'
+export * from './patterns/pricing-page'
+export * from './patterns/marketing-site'
+
+// Marketing section blocks — the sections a marketing site is built from. Exported
+// so a site can compose them (and, via preserveModules, so each is reachable as a
+// lean subpath import: '@2one/design-library/blocks/marketing/hero'). Named exports
+// tree-shake, so importing one from the barrel does not pull the rest.
+export * from './blocks/marketing/hero'
+export * from './blocks/marketing/feature-grid'
+export * from './blocks/marketing/stats'
+export * from './blocks/marketing/pricing'
+export * from './blocks/marketing/faq'
+export * from './blocks/marketing/client-faq'
+export * from './blocks/marketing/cta-banner'
+export * from './blocks/marketing/logo-cloud'
+export * from './blocks/marketing/testimonial'
+export * from './blocks/marketing/footer'
+export * from './blocks/marketing/page'

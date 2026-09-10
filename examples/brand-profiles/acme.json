@@ -1,0 +1,51 @@
+{
+  "$schema": "../../schema/brand-profile.schema.json",
+  "schemaVersion": "1.0.0",
+  "profileVersion": "1.0.0",
+  "brand": {
+    "name": "Acme",
+    "wordmark": { "asset": "brand/acme-logo.svg", "minWidthPx": 88 },
+    "voice": { "tone": ["friendly", "energetic"], "emDash": "sparing" }
+  },
+  "color": {
+    "model": "dual-accent",
+    "neutral": { "tint": "warm" },
+    "accents": [
+      { "name": "brand", "seed": "#7C3AED", "role": "primary-fill" },
+      { "name": "secondary", "seed": "#EC4899", "role": "emphasis" }
+    ],
+    "validation": { "hues": ["danger", "success", "warning"] },
+    "derivation": { "textApcaMin": 60, "uiApcaMin": 15, "themes": ["light", "dark"] }
+  },
+  "typography": {
+    "pairing": "geometric-editorial",
+    "scale": { "ratio": "perfect-fourth" },
+    "labelCase": "sentence"
+  },
+  "shape": { "language": "rounded" },
+  "spacing": { "base": 8, "density": "spacious" },
+  "elevation": "layered",
+  "decoration": {
+    "gradients": "emphasis-only",
+    "glow": "forbidden",
+    "icons": { "library": "phosphor" }
+  },
+  "motion": "expressive",
+  "enforcement": {
+    "choices": {
+      "shape.language": "must",
+      "color.model": "must",
+      "color.accents.role": "should",
+      "decoration.gradients": "should",
+      "decoration.glow": "must",
+      "decoration.icons.library": "must",
+      "typography.pairing": "should",
+      "spacing.base": "must",
+      "brand.voice.emDash": "should"
+    },
+    "qualityFloor": {
+      "locked": true,
+      "includes": ["accessibility", "consistency", "anti-slop", "no-color-alone", "one-system"]
+    }
+  }
+}

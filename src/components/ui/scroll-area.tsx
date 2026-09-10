@@ -18,6 +18,10 @@ function ScrollArea({
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
+        // Keyboard users must be able to reach and scroll an overflowing region
+        // (axe: scrollable-region-focusable, serious). The focus-visible ring
+        // styles below already anticipate focus; tabIndex was the missing piece.
+        tabIndex={0}
         className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
       >
         {children}

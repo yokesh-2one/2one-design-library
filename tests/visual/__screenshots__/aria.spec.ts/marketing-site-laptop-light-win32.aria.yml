@@ -1,0 +1,77 @@
+- banner:
+  - link "2one":
+    - /url: /
+    - img "2one"
+  - navigation "Primary":
+    - link "Product":
+      - /url: /product
+    - link "Pricing":
+      - /url: /pricing
+    - link "Docs":
+      - /url: /docs
+    - link "About":
+      - /url: /about
+  - button "Switch theme"
+  - link "Contact":
+    - /url: /contact
+- main:
+  - heading "Ship on-brand product, faster." [level=1]
+  - paragraph: "One source of truth for every piece 2one builds: components, tokens and brand, so people and AI create products that look and feel like 2one."
+  - button "Get started"
+  - button "Read the docs"
+  - text: Product preview
+  - heading "Everything you need to stay on-brand" [level=2]
+  - paragraph: The building blocks and the guardrails, in one place.
+  - heading "Real components" [level=3]
+  - paragraph: /\d+ shadcn\/ui primitives re-skinned to the 2one tokens, not screenshots\./
+  - heading "One token system" [level=3]
+  - paragraph: Grayscale by design. Change a token in one place and every screen follows.
+  - heading "Accessible by default" [level=3]
+  - paragraph: Radix primitives and an APCA contrast audit that runs on every change.
+  - heading "Light + dark" [level=3]
+  - paragraph: Two audited themes ship together, with no third palette to maintain.
+  - heading "AI-legible" [level=3]
+  - paragraph: A manifest, knowledge graph and rules so any AI builds on-brand, first try.
+  - heading "Impact analysis" [level=3]
+  - paragraph: Ask what a token change touches before you ship it. Change-safety at scale.
+  - heading "Build products that look like they belong together." [level=2]
+  - paragraph: Start with the free tier — the full component set, both themes, no card required.
+  - button "Get started"
+- contentinfo:
+  - img "2one"
+  - paragraph: One place for every piece 2one builds — so people and AI create products that look and feel like 2one.
+  - navigation "Product":
+    - heading "Product" [level=3]
+    - link "Components":
+      - /url: "#"
+    - link "Templates":
+      - /url: "#"
+    - link "Pricing":
+      - /url: "#"
+    - link "Changelog":
+      - /url: "#"
+  - navigation "Resources":
+    - heading "Resources" [level=3]
+    - link "Docs":
+      - /url: "#"
+    - link "Recipes":
+      - /url: "#"
+    - link "Knowledge graph":
+      - /url: "#"
+    - link "Accessibility":
+      - /url: "#"
+  - navigation "Company":
+    - heading "Company" [level=3]
+    - link "About":
+      - /url: "#"
+    - link "Brand":
+      - /url: "#"
+    - link "Contact":
+      - /url: "#"
+    - link "Careers":
+      - /url: "#"
+  - text: /© \d+ 2one Solutions\. All rights reserved\./
+  - link "Privacy":
+    - /url: "#"
+  - link "Terms":
+    - /url: "#"

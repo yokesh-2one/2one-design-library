@@ -1,0 +1,17 @@
+- text: Login to your account Enter your email below to login to your account
+- group:
+  - text: Email
+  - textbox "Email":
+    - /placeholder: team@2one.solutions
+- group:
+  - text: Password
+  - link "Forgot your password?":
+    - /url: "#"
+  - textbox "Password"
+- group:
+  - button "Login"
+  - button "Login with Google"
+  - paragraph:
+    - text: Don't have an account?
+    - link "Sign up":
+      - /url: "#"

@@ -37,12 +37,21 @@
       "Be minimal and contemporary — say it in fewer words.",
       "Lead with the customer/user outcome.",
       "Be factual and specific; show, don't hype.",
-      "Stay empathetic where the reader might be uncertain; be bold where a decision is needed."
+      "Stay empathetic where the reader might be uncertain; be bold where a decision is needed.",
+      "On the web, put the outcome first: the H1 and opening line say what the page is and the one thing to do (inverted pyramid).",
+      "Write headings that stand alone out of context, in words people search for — no clever or colon (\"Topic: subtitle\") titles.",
+      "Keep one idea per paragraph and use lists for features, files, and steps, so the page is scannable.",
+      "Name every link by its destination (\"GitHub repository\", \"live manifest.json\") and give the same destination the same label everywhere.",
+      "Write for the web in the active voice, second person, with contractions."
     ],
     "dont": [
       "Don't add filler, jargon, or generic marketing fluff.",
       "Don't overstate or invent capabilities.",
-      "Don't use colour or emphasis as the only way to make a point."
+      "Don't use colour or emphasis as the only way to make a point.",
+      "Don't use link text like \"click here\" or \"read more\", and don't show a raw URL as the link label.",
+      "Don't pad with AI slop — em-dash piles, \"not just X, but Y\" contrasts, tricolons for their own sake, or bait words (delve, leverage, unlock, elevate, seamless, robust, spearhead, tapestry, landscape, journey, battle-tested) unless the word is a real term from a repo file.",
+      "Don't state a capability, price, or metric that isn't backed by a repo file, a command, or a human-provided number.",
+      "Don't open with welcome filler (\"Welcome to our site\") or claim \"people don't scroll\"."
     ]
   },
   "source": "brand/BRAND.md",
