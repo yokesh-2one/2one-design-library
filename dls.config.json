@@ -42,7 +42,7 @@
       "success"
     ],
     "signature": "Buttons use radius-full (the 2one signature). Everything else uses xs–2xl.",
-    "primaryRamp": "neutral",
+    "neutralRamp": "neutral",
     "ownComponentsInUi": [
       "toolbar"
     ],

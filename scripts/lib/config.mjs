@@ -67,6 +67,9 @@ const DEFAULTS = {
       simply named something else.
     */
     neutralRamp: 'neutral',
+    // Alias of neutralRamp, resolved in loadConfig. Kept so a payload written
+    // against the older name still builds.
+    primaryRamp: 'neutral',
     iconLibrary: 'lucide-react',
     iconLibraryLabel: 'lucide',
     spacingBase: 4,
@@ -116,6 +119,41 @@ export function loadConfig(root = findPayloadRoot()) {
   const file = join(root, 'dls.config.json')
   const raw = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {}
   const cfg = merge(DEFAULTS, raw)
+
+  /*
+    ---- neutralRamp and primaryRamp are one concept ----
+
+    They arrived separately. validate asked for `neutralRamp` to check that the
+    ramp every neutral surface is built from is deep enough; build-tokens later
+    added `primaryRamp` to stop the Canva brand kit picking a ramp by CSS
+    declaration order. Its own comment gives the game away: it calls the thing it
+    is naming "the 'neutral ramp' in the brand kit". Two names, one idea.
+
+    Keeping both was a silent trap. This payload set only `primaryRamp`, so
+    validate ran on the DEFAULT while build-tokens ran on the configured value.
+    They agree here only because both happen to be "neutral". A payload whose
+    ramp is called "slate" would set one, miss the other, and get a validated
+    system built on a ramp that does not exist.
+
+    `neutralRamp` is canonical. "Primary" is the wrong word for a system whose
+    thesis is that there is no primary colour: the brand accent is for emphasis
+    and is explicitly never a primary fill, so naming the foundation ramp
+    "primary" invites the exact misreading the brand rules forbid.
+
+    `primaryRamp` still resolves, so a payload written against the old name
+    keeps working. Setting both to DIFFERENT values is refused rather than
+    silently resolved, because there is no correct guess and every downstream
+    artifact would be built on the loser.
+  */
+  const authored = raw.rules ?? {}
+  if (authored.primaryRamp && authored.neutralRamp && authored.primaryRamp !== authored.neutralRamp) {
+    throw new Error(
+      `dls.config.json: rules.neutralRamp ("${authored.neutralRamp}") and rules.primaryRamp ("${authored.primaryRamp}") name different ramps. ` +
+        'They are the same setting under two names. Keep neutralRamp and delete primaryRamp.',
+    )
+  }
+  if (authored.primaryRamp && !authored.neutralRamp) cfg.rules.neutralRamp = authored.primaryRamp
+  cfg.rules.primaryRamp = cfg.rules.neutralRamp
 
   /** Resolve a dotted key from `paths` to an absolute path. */
   const path = (key) => {

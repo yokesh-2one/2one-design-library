@@ -170,12 +170,13 @@
         },
         "neutralRamp": {
           "type": "string",
-          "description": "Name of the ramp every neutral surface is built from. Read by validate. Keep this and primaryRamp in agreement unless the payload genuinely separates them.",
+          "description": "Name of the ramp this system is founded on: the ramp every neutral surface is built from, and the ramp published in integrations. The canonical key.",
           "default": "neutral"
         },
         "primaryRamp": {
           "type": "string",
-          "description": "Name of the ramp the token build treats as primary. Read by build-tokens, which falls back to the first declared ramp when absent. Distinct from neutralRamp: setting one and not the other is the most common payload mistake."
+          "description": "Deprecated alias of neutralRamp, resolved to the same value at load. Setting both to different values is refused. Prefer neutralRamp.",
+          "deprecated": true
         },
         "brandAccent": {
           "type": "string",

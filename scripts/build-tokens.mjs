@@ -173,8 +173,9 @@ if (canvaOut) {
   const mark = cfg.rules.wordmark ?? cfg.name
   // Named in config. Taking ramps[0] silently depended on CSS declaration
   // order — 2one declares `accent` first, so the 'neutral ramp' in the brand
-  // kit would have quietly become the accent one.
-  const primaryRamp = cfg.rules.primaryRamp ?? Object.keys(colors.ramps)[0]
+  // kit would have quietly become the accent one. loadConfig always resolves
+  // this, so there is no fallback to get wrong.
+  const primaryRamp = cfg.rules.neutralRamp
 
   const canva = {
     name: cfg.name,
