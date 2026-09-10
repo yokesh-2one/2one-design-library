@@ -590,8 +590,17 @@ const RULES = [
       // TrendingDown/ArrowDown icon is not colour-alone (rule: validation-only).
       const hasSignal = SIGNAL.test(stripComments(src))
       if (hasSignal) return []
+      /*
+        `data-[variant=destructive]:` scopes the colour to a destructive ACTION
+        variant, not to a validation state. A Delete menu item already says
+        "Delete"; the colour is not carrying the meaning alone, and the rule
+        that governs it is destructive-intent. chromatic-decoration already
+        exempts the same case by tag; this is the same exemption expressed the
+        way a Radix variant writes it.
+      */
+      const ACTION_VARIANT = /data-\[variant=destructive\]/
       return lines.flatMap((l, i) =>
-        /\b(?:border|text|ring)-destructive\b/.test(l)
+        /\b(?:border|text|ring)-destructive\b/.test(l) && !ACTION_VARIANT.test(l)
           ? [{ line: i + 1, detail: 'destructive styling with no aria-invalid / error text nearby' }]
           : []
       )
@@ -637,8 +646,23 @@ const RULES = [
         rather than matching also fixes the same `[^>]*` truncation that
         handrolled-control hit.
       */
+      /*
+        A tag can be an import alias. sonner.tsx does
+        `import { Toaster as Sonner } from 'sonner'` and renders `<Sonner>`, so
+        the exemption for a Toaster never matched the name in the markup. Read
+        the aliases and test what the component actually IS.
+      */
+      const alias = new Map(
+        [...code.matchAll(/import\s*\{([^}]*)\}\s*from/g)]
+          .flatMap((m) => m[1].split(','))
+          .map((p) => p.trim().match(/^([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)$/))
+          .filter(Boolean)
+          .map((m) => [m[2], m[1]]),
+      )
+      const identity = (tag) => { const last = tag.split('.').pop(); return alias.get(last) ?? last }
+
       return jsxOpenTags(code, ['[A-Z][\\w]*(?:\\.[A-Z][\\w]*)*'])
-        .filter((t) => !VALIDATION_HOSTS.test(t.tag.split('.').pop()) && hue.test(t.attrs))
+        .filter((t) => !VALIDATION_HOSTS.test(identity(t.tag)) && hue.test(t.attrs))
         .map((t) => ({
           line: code.slice(0, t.index).split('\n').length,
           detail: `<${t.tag}> is styled with a validation hue but carries no validation state`,
@@ -758,9 +782,24 @@ const RULES = [
     why: 'Removing the outline without providing a focus-visible replacement makes the UI unusable by keyboard. This is the most common accessibility regression in generated code because the outline is the first thing that looks wrong.',
     test: ({ src, lines }) => {
       if (/focus-visible:/.test(stripComments(src))) return []
+      /*
+        The replacement has to be on the SAME ELEMENT, and it does not have to
+        be spelled `focus-visible:`.
+
+        Asking only whether the FILE mentions `focus-visible:` reported three
+        library components that each provide a visible focus treatment on the
+        very line that clears the outline: menubar uses `focus:bg-accent`,
+        which is the correct Radix pattern for a roving-tabindex item, and
+        input-otp drives `ring-ring/50` from a data attribute. Both are
+        keyboard-visible; neither uses the literal the check looked for.
+
+        What stays flagged is an element that clears its outline and puts
+        nothing back, which is the actual defect.
+      */
+      const REPLACEMENT = /focus-visible:|focus:|\bring-/
       return lines.flatMap((l, i) =>
-        /\boutline-none\b|\boutline:\s*none\b/.test(l)
-          ? [{ line: i + 1, detail: 'outline removed with no focus-visible: replacement in this file' }]
+        /\boutline-none\b|\boutline:\s*none\b/.test(l) && !REPLACEMENT.test(l)
+          ? [{ line: i + 1, detail: 'outline cleared on this element with no visible focus treatment to replace it' }]
           : []
       )
     },
