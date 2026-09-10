@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path'
 import { config as cfg } from './lib/config.mjs'
 
 const root = cfg.root
-const barrel = readFileSync(join(root, 'src/index.ts'), 'utf8')
+const barrel = readFileSync(join(root, cfg.rel('barrel')), 'utf8')
 
 const tsx = (rel) =>
   readdirSync(join(root, rel))

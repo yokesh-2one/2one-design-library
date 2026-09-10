@@ -157,7 +157,7 @@ const doc = {
   dimension,
 }
 
-writeFileSync(join(root, 'tokens/tokens.dtcg.json'), JSON.stringify(doc, null, 2) + '\n')
+writeFileSync(join(root, cfg.rel('out.dtcg')), JSON.stringify(doc, null, 2) + '\n')
 
 const count = (o) => Object.keys(o).filter((k) => !k.startsWith('$')).length
 console.log('  wrote tokens/tokens.dtcg.json')
