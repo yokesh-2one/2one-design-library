@@ -29,11 +29,22 @@ an unresolvable one is a startup failure.
 ## 1. Health check
 
 Closing stdin ends the transport cleanly, which makes the whole startup path a
-one-liner:
+one-liner. **The syntax depends on your shell**, and the wrong one fails in a
+way that looks like a broken server when it is not:
 
 ```bash
+# bash, zsh, Git Bash
 node scripts/mcp.mjs --payload . < /dev/null
 ```
+
+```powershell
+# PowerShell
+$null | node scripts/mcp.mjs --payload .
+```
+
+In PowerShell the bash form is a **parse error** — `The '<' operator is reserved
+for future use` — raised before node runs at all. Both forms above have been run
+on Windows and produce the same output.
 
 ```
   2one mcp — serving "2one" from D:\...\2one-design-library
@@ -48,13 +59,24 @@ config parsed, the engine imported, and the transport opened and closed.
 
 ### The three refusals
 
-Each should exit 1 with an explanation, not a stack trace:
+Each should exit 1 with an explanation rather than a stack trace, and write
+nothing to stdout. None of them reads stdin, so no redirect is needed:
 
 ```bash
-node scripts/mcp.mjs                                  # no payload at all
-node scripts/mcp.mjs --payload /tmp                   # a directory with no dls.config.json
-node scripts/mcp.mjs --payload ./nowhere              # a path that does not exist
+node scripts/mcp.mjs                              # no payload at all
+node scripts/mcp.mjs --payload "$(mktemp -d)"     # a directory with no dls.config.json
+node scripts/mcp.mjs --payload ./nowhere          # a path that does not exist
 ```
+
+```powershell
+node scripts/mcp.mjs                              # no payload at all
+node scripts/mcp.mjs --payload $env:TEMP          # a directory with no dls.config.json
+node scripts/mcp.mjs --payload ./nowhere          # a path that does not exist
+```
+
+The middle case needs a directory that **exists**. An earlier version of this
+page used `/tmp`, which does not exist on Windows, so it triggered the
+missing-path refusal instead and appeared to test something it did not.
 
 A refusal that prints to stdout would be a bug: the transport owns stdout even
 when the server is failing.
@@ -233,6 +255,10 @@ Point it at a **different payload**:
 
 ```bash
 node scripts/mcp.mjs --payload /path/to/another-design-system < /dev/null
+```
+
+```powershell
+$null | node scripts/mcp.mjs --payload C:\path\to\another-design-system
 ```
 
 Everything above proves the server works against the system it was written
