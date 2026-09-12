@@ -26,6 +26,116 @@ an unresolvable one is a startup failure.
 
 ---
 
+## Setting up a new client, from an empty folder
+
+**The client never starts the server.** They add one entry to their AI tool's
+settings, and the tool launches the server in the background every time it
+opens, the same way Figma or Canva MCP work. There is no app to run, no port,
+and nothing to keep open.
+
+What differs from Figma or Canva: those serve a design that lives in the
+vendor's cloud. This one serves a design system that lives in the client's
+project, because what the AI produces is code that imports these components. So
+the design system is installed first, and the server reads it from there.
+
+Steps 2 and 4 were run end to end: a packed build installed into an empty folder,
+then the server started exactly as step 4 configures it and asked what a new
+client would ask. The Vite scaffold, the style wiring, and a real AI tool
+connecting have not been run as part of that test.
+
+### Before you start
+
+- Node.js 20 or later
+- An MCP-capable AI tool: Claude Desktop, Claude Code, or Cursor
+
+### 1. Create the app
+
+```bash
+npm create vite@latest acme-app -- --template react-ts
+cd acme-app
+```
+
+### 2. Install the design system
+
+```bash
+npm install github:yokesh-2one/2one-design-library react react-dom
+```
+
+This one install brings everything: the components, the tokens and brand, the
+rules, and the MCP server. It lands in `node_modules/@2one/design-library`, and
+that folder is a complete design system the server can read. There is nothing to
+generate.
+
+Do **not** run `npx 2one init` here. `init` onboards a repository that already has
+its own design system. On an empty app it stops with "no config written" because
+there is nothing to read.
+
+Until PR #50 is merged, `main` does not contain the MCP server. Install from a
+packed tarball (`docs/consuming.md`, option B) until then.
+
+### 3. Wire the styles
+
+Follow `docs/consuming.md` steps 2 and 3: the Tailwind `@source` line and the
+`ThemeProvider`. Skipping `@source` renders every component unstyled with no
+error, which is the most common silent failure.
+
+### 4. Register the server in the AI tool
+
+Point `--payload` at the installed design system. The server works out by itself
+that the app is the folder that owns `node_modules`, so there is no second path to
+configure.
+
+**Claude Desktop.** Edit `claude_desktop_config.json` (`%APPDATA%\Claude\` on
+Windows, `~/Library/Application Support/Claude/` on macOS). Use absolute paths,
+because the app does not start the server from your project folder:
+
+```json
+{
+  "mcpServers": {
+    "2one-dls": {
+      "command": "node",
+      "args": [
+        "C:/Users/you/projects/acme-app/node_modules/@2one/design-library/scripts/mcp.mjs",
+        "--payload",
+        "C:/Users/you/projects/acme-app/node_modules/@2one/design-library"
+      ]
+    }
+  }
+}
+```
+
+Then fully quit and reopen the app. Reloading a window does not start the server.
+
+**Claude Code**, from inside the app folder:
+
+```bash
+claude mcp add 2one-dls --scope project -- node ./node_modules/@2one/design-library/scripts/mcp.mjs --payload ./node_modules/@2one/design-library
+```
+
+Only if the app lives somewhere the server cannot derive, name it explicitly with
+`--project <dir>` or `DLS_PROJECT`.
+
+### 5. Build with it
+
+Ask the AI tool, in this order:
+
+1. "What design system is available?" It should report a **consuming project**
+   and give `import { Button } from '@2one/design-library'`.
+2. "Build me a sign-up page."
+3. "Check the files you just wrote."
+
+If the first answer says "inside the 2one repo", the server is pointed at the
+design-system repository instead of an installed copy.
+
+### Not turnkey yet: a client's own tokens and brand
+
+The installed package carries 2one's tokens and brand, and `init` does not create
+a design system from nothing. A client who wants these components under their own
+colours, type and logo has no one-command path today. A payload seeded from 2one
+that a client can rebrand is the next piece to build.
+
+---
+
 ## 1. Health check
 
 Closing stdin ends the transport cleanly, which makes the whole startup path a
@@ -202,16 +312,24 @@ argument is its own array element rather than a shell string.
 `private: true` and deliberately unpublished, so npx resolves it against the
 registry and gets a 404. Invoke it by path.
 
-For a client who installed from git, the server is inside the package and the
-payload is the project around it — two different paths, both required:
+For a client who installed the package, the payload is the **installed copy** of
+the design system, not their app. The server derives the app as the folder that
+owns `node_modules`, so there is one path to configure. See "Setting up a new
+client, from an empty folder" above.
 
 ```json
 {
   "command": "node",
-  "args": ["/abs/path/to/their-app/node_modules/@2one/design-library/scripts/mcp.mjs"],
-  "env": { "DLS_PAYLOAD": "/abs/path/to/their-app" }
+  "args": [
+    "/abs/path/to/their-app/node_modules/@2one/design-library/scripts/mcp.mjs",
+    "--payload",
+    "/abs/path/to/their-app/node_modules/@2one/design-library"
+  ]
 }
 ```
+
+An earlier version of this page set `DLS_PAYLOAD` to the app folder itself. That
+fails: the app has no `dls.config.json`, so the server refuses to start.
 
 ### Claude Code
 
