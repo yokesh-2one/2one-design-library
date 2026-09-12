@@ -33,10 +33,20 @@ import { dirname, join } from 'node:path'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const casesDir = join(root, 'evals/cases')
 
+/*
+  `--no-global-guards` is load-bearing.
+
+  A payload can discharge a rule once in its stylesheet — 2one's theme now
+  carries a prefers-reduced-motion block, which gates every animation it ships.
+  `check` rightly stops asking each file about it. But these cases exist to
+  prove the DETECTOR still bites, and a detector that goes quiet because the
+  payload happens to satisfy the rule is indistinguishable from one that
+  rotted. The evals test the mechanism, so they opt out of the discharge.
+*/
 const check = (file) => {
   const r = spawnSync(
     process.execPath,
-    [join(root, 'scripts/check-usage.mjs'), file, '--json'],
+    [join(root, 'scripts/check-usage.mjs'), file, '--json', '--no-global-guards'],
     { cwd: root, encoding: 'utf8' },
   )
   try {

@@ -296,3 +296,37 @@
 [data-slot="drawer-trigger"][data-variant],
 [data-slot="hover-card-trigger"][data-variant],
 [data-slot="collapsible-trigger"][data-variant] { border-radius: var(--radius-full); }
+
+/* ---- prefers-reduced-motion ----
+
+   The rule `reduced-motion` is a `must`, and nothing in the shipped styles
+   honoured it. 17 Radix overlays ship `data-[state=open]:animate-in` and the
+   Spinner ships `animate-spin`, all ungated: pointing `2one check` at
+   src/components reported 26 real violations of this system's own rule.
+
+   Gating each component with Tailwind's `motion-reduce:` variant would mean 26
+   edits and does not compose cleanly with Radix's `data-[state]:animate-*`.
+   A stylesheet-level guard is the standard remedy and covers consumers too,
+   since they @import these styles.
+
+   Motion is stilled rather than removed: a near-zero duration lets animation
+   and transition end events still fire, so a component that waits on
+   `animationend` before unmounting (Radix does) still unmounts. Setting
+   `animation: none` would strand those.
+
+   `scroll-behavior: auto` belongs here for the same reason smooth scrolling is
+   opt-in under `no-preference` elsewhere in the system.
+
+   NOTE for anyone reading a green `2one check`: because this guard exists,
+   `unguarded-motion` now reports as satisfied globally rather than firing per
+   file. The coverage line names this file so that is visible, not silent. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

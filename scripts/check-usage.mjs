@@ -184,6 +184,44 @@ const authored = (() => {
 const SEVERITY = { must: 'error', forbidden: 'error', should: 'warn', may: 'warn' }
 
 /*
+  ---- rules a payload satisfies globally ----
+
+  Some rules can be discharged once, in the stylesheet, for everything the
+  payload ships and everything a consumer builds on top of it. A
+  `@media (prefers-reduced-motion: reduce)` block in the theme gates every
+  animation in the system, so asking each FILE for a `motion-reduce:` variant
+  is asking the wrong question.
+
+  The danger is obvious and is the failure this whole checker exists to avoid:
+  a rule that stops firing looks exactly like a rule that passes. So a global
+  guard does not silently disable a detector — it moves the rule into a third
+  reported state. The output says which rule, and which file discharges it.
+
+  `--no-global-guards` turns this off. run-evals uses it, because the evals
+  prove the DETECTOR still works and would otherwise go quiet the moment the
+  payload adopted a guard.
+*/
+const GLOBAL_GUARDS = [
+  {
+    rule: 'reduced-motion',
+    pathKey: 'theme',
+    pattern: /@media[^{]*prefers-reduced-motion\s*:\s*reduce/,
+    note: 'every animation is stilled under prefers-reduced-motion',
+  },
+]
+
+const satisfiedGlobally = new Map()
+if (!args.includes('--no-global-guards')) {
+  for (const g of GLOBAL_GUARDS) {
+    try {
+      if (g.pattern.test(readFileSync(cfg.path(g.pathKey), 'utf8'))) {
+        satisfiedGlobally.set(g.rule, { where: cfg.rel(g.pathKey), note: g.note })
+      }
+    } catch { /* payload has no such stylesheet — the rule stays per-file */ }
+  }
+}
+
+/*
   Blank out comment bodies, preserving every byte offset so reported line
   numbers still point at the real source.
 
@@ -978,6 +1016,9 @@ const RULES = [
 const ACTIVE = RULES.map((r) => {
   const a = authored?.get(r.implements)
   if (authored && !a) return null
+  // Discharged once in the stylesheet, so the per-file question no longer
+  // applies. Reported by name below rather than just going quiet.
+  if (satisfiedGlobally.has(r.implements)) return null
   if (!a) return r
   return {
     ...r,
@@ -997,9 +1038,20 @@ const ACTIVE = RULES.map((r) => {
   invisible into merely unenforced, which is a different and honest claim.
 */
 const covered = new Set(ACTIVE.map((r) => r.implements).filter(Boolean))
-const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id)) : []
+const globallySatisfied = authored
+  ? [...satisfiedGlobally].filter(([id]) => authored.has(id)).map(([id, g]) => ({ id, ...g, label: authored.get(id).label }))
+  : []
+// A globally satisfied rule is neither checked nor advisory — it is discharged,
+// so it must not be counted among the rules nobody is looking at.
+const globalIds = new Set(globallySatisfied.map((g) => g.id))
+const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id) && !globalIds.has(r.id)) : []
 const coverage = authored
-  ? { total: authored.size, checked: covered.size, advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })) }
+  ? {
+      total: authored.size,
+      checked: covered.size,
+      satisfied_globally: globallySatisfied,
+      advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })),
+    }
   : null
 
 // ---- collect files ----
@@ -1237,6 +1289,12 @@ if (isMain) {
         console.log(`                 ${f.why}`)
       }
       console.log(`\n  ${errors.length} error(s), ${warns.length} warning(s)\n`)
+    }
+
+    // Named, not silent. A rule that stopped firing because the payload
+    // discharged it must not look like a rule that simply passed.
+    for (const g of coverage?.satisfied_globally ?? []) {
+      console.log(`  ${g.id} is SATISFIED GLOBALLY by ${g.where} — ${g.note}. Not checked per file.`)
     }
 
     if (coverage?.advisory.length) {

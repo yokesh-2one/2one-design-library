@@ -31,7 +31,7 @@ function BackButton({ onBack }: { onBack: () => void }) {
       type="button"
       onClick={onBack}
       aria-label="Back"
-      className="flex items-center justify-center rounded-lg p-2 text-foreground hover:bg-accent"
+      className="flex items-center justify-center rounded-lg p-2 text-foreground transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-accent/80 disabled:pointer-events-none disabled:opacity-50"
     >
       <ChevronLeft className="size-[18px]" />
     </button>
