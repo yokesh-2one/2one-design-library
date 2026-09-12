@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { INTERACTIVE } from './interactive-components.mjs'
 
-import { config as cfg } from './lib/config.mjs'
+import { config as cfg, CONFIG_FILE } from './lib/config.mjs'
 
 const root = cfg.root
 const load = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'))
@@ -98,7 +98,7 @@ if (existsSync(join(root, schemaDir))) {
 if (cfg.configured) {
   try {
     const schema = load(`${schemaDir}/config.schema.json`)
-    const raw = load('dls.config.json')
+    const raw = load(CONFIG_FILE)
     const unknown = []
     const walkKeys = (node, sch, path) => {
       if (!sch || sch.additionalProperties !== false || !sch.properties) return

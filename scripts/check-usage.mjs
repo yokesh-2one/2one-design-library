@@ -184,6 +184,163 @@ const authored = (() => {
 const SEVERITY = { must: 'error', forbidden: 'error', should: 'warn', may: 'warn' }
 
 /*
+  ---- rules a payload satisfies globally ----
+
+  Some rules can be discharged once, in the stylesheet, for everything the
+  payload ships and everything a consumer builds on top of it. A
+  `@media (prefers-reduced-motion: reduce)` block in the theme gates every
+  animation in the system, so asking each FILE for a `motion-reduce:` variant
+  is asking the wrong question.
+
+  The danger is obvious and is the failure this whole checker exists to avoid:
+  a rule that stops firing looks exactly like a rule that passes. So a global
+  guard does not silently disable a detector — it moves the rule into a third
+  reported state. The output says which rule, and which file discharges it.
+
+  `--no-global-guards` turns this off. run-evals uses it, because the evals
+  prove the DETECTOR still works and would otherwise go quiet the moment the
+  payload adopted a guard.
+*/
+const GLOBAL_GUARDS = (() => {
+  const rel = cfg.rel('globalGuards')
+  if (!rel) return []
+  try {
+    const raw = JSON.parse(readFileSync(join(root, rel), 'utf8'))
+    return Array.isArray(raw?.guards) ? raw.guards : []
+  } catch { return [] } // absent → every rule is asked of every file, as before
+})()
+
+/*
+  Resolving the guards is a FUNCTION of whether the caller wants them, not a
+  module-scope constant read from process.argv.
+
+  It was the latter, and that leaked: an embedder importing this module got
+  different answers depending on whether the string `--no-global-guards`
+  happened to appear in its own host's command line. Same failure the ignore
+  globs had. A library decides nothing from the argv of the process that
+  imported it.
+*/
+const resolveGuards = (enabled) => {
+  const found = new Map()
+  if (!enabled) return found
+  for (const g of GLOBAL_GUARDS) {
+    try {
+      if (new RegExp(g.pattern, g.flags ?? '').test(readFileSync(cfg.path(g.path), 'utf8'))) {
+        found.set(g.rule, { where: cfg.rel(g.path), note: g.note })
+      }
+    } catch { /* payload has no such file, so the rule stays per-file */ }
+  }
+  return found
+}
+
+/*
+  ---- findings this payload has decided to accept ----
+
+  Some findings are correct reports of things that should not change. The dialog
+  focus container is the worked example: the rule is right in general, the code
+  is right in this instance, and the detector cannot tell a focus container from
+  a control by reading a class string.
+
+  Without somewhere to put that, the options are both bad. Leave it and the gate
+  never goes green, so people stop reading it. Loosen the rule and every case
+  nobody has looked at goes quiet with it.
+
+  So a payload may declare a finding KNOWN. Three properties keep that from
+  decaying into a suppression file:
+
+    - an entry names one file and one rule, never a pattern, and carries the
+      reason in full plus a pointer to the record that argued it.
+    - an entry declares how many findings it expects. A second finding of the
+      same rule in the same file is NOT covered, because that one has not been
+      looked at.
+    - an entry that stops matching FAILS. A suppression that outlives its cause
+      is exactly how a checker rots: the code gets fixed, the exemption stays,
+      and it silently covers the next real defect in that file.
+
+  Known findings are reported by name on every run. Being accepted and being
+  invisible are different things.
+*/
+const KNOWN_FINDINGS = (() => {
+  const rel = cfg.rel('knownFindings')
+  if (!rel) return []
+  try {
+    const raw = JSON.parse(readFileSync(join(root, rel), 'utf8'))
+    return Array.isArray(raw?.findings) ? raw.findings : []
+  } catch { return [] } // absent → every finding is actionable, as before
+})()
+
+/**
+ * Split findings into the ones a payload has decided to accept and the ones it
+ * has not, and report on the health of the decisions themselves.
+ *
+ * `drift` is the part that matters: it holds entries that matched a different
+ * number of findings than they claimed, including zero. Those are failures, not
+ * notices, because a stale entry is an exemption nobody is accounting for.
+ */
+const partitionKnown = (findings, scanned) => {
+  /*
+    Drift is only meaningful for entries whose file was actually LOOKED AT.
+
+    Without this, `2one check src/one-file.tsx` reported every other accepted
+    finding as stale, because none of them fired in a scan that never opened
+    their file. That would have made a targeted check fail for reasons entirely
+    unrelated to the file the user asked about. An entry out of scope is neither
+    matched nor stale: it was not examined.
+  */
+  const inScope = (k) => scanned.has(k.file)
+  const matchedBy = new Map(KNOWN_FINDINGS.map((k, i) => [i, []]).filter(([i]) => inScope(KNOWN_FINDINGS[i])))
+  const known = []
+  const actionable = []
+
+  for (const f of findings) {
+    const i = KNOWN_FINDINGS.findIndex((k) => inScope(k) && k.file === f.file && k.rule === f.rule)
+    if (i === -1) { actionable.push(f); continue }
+    matchedBy.get(i).push(f)
+  }
+
+  const drift = []
+  for (const [i, hits] of matchedBy) {
+    const k = KNOWN_FINDINGS[i]
+    const want = k.count ?? 1
+    if (hits.length === want) {
+      for (const f of hits) known.push({ ...f, known: { reason: k.reason, record: k.record ?? null } })
+      continue
+    }
+    /*
+      Any mismatch is a failure, but they mean opposite things, so say which.
+      Fewer than expected (usually zero) means the code changed and the entry
+      should go. More means something new appeared behind a decided one.
+    */
+    drift.push({
+      file: k.file,
+      rule: k.rule,
+      expected: want,
+      found: hits.length,
+      record: k.record ?? null,
+      detail: hits.length < want
+        ? `no longer fires ${want === 1 ? 'at all' : `${want} time(s)`} — remove this entry, or say what replaced it`
+        : `fires ${hits.length} times where ${want} was accepted — the extra one has not been reviewed`,
+    })
+    // The extras are treated as actionable rather than swallowed.
+    for (const f of hits) actionable.push(f)
+  }
+
+  /*
+    A record pointer that does not resolve is the same class of rot: the
+    justification is the only thing making this an exemption rather than a
+    silenced rule, so it has to exist.
+  */
+  for (const k of KNOWN_FINDINGS.filter(inScope)) {
+    if (!k.record) { drift.push({ file: k.file, rule: k.rule, expected: 0, found: 0, record: null, detail: 'no decision record named — an accepted finding carries its justification or it is a silenced rule' }); continue }
+    if (!existsSync(join(root, k.record))) {
+      drift.push({ file: k.file, rule: k.rule, expected: 0, found: 0, record: k.record, detail: `decision record "${k.record}" does not exist` })
+    }
+  }
+
+  return { known, actionable, drift }
+}
+
+/*
   Blank out comment bodies, preserving every byte offset so reported line
   numbers still point at the real source.
 
@@ -261,13 +418,40 @@ const RULES = [
     implements: 'tokens-only',
     severity: 'error',
     why: 'Hard-coded colour drifts from the tokens and breaks re-theming. Use the semantic utilities (bg-primary, text-muted-foreground, border).',
-    test: ({ lines }) =>
-      lines.flatMap((l, i) =>
-        // hex in a className or style, but not inside an SVG path/fill of a brand asset
+    test: ({ src, lines }) => {
+      /*
+        A brand mark paints a FIXED fill by design — fixed-vs-theme-color is a
+        `must` rule that requires it, and mechanises the same idea for <Logo>
+        usage. So the file that DEFINES the mark legitimately hardcodes black
+        and white, and flagging it puts two of this system's own rules in
+        direct contradiction.
+
+        The intent was already here as a per-LINE test for `.svg|viewBox|d="M`,
+        but logo.tsx picks its fill on an ordinary line —
+        `const fill = variant === 'white' ? '#ffffff' : '#000000'` — which no
+        per-line SVG check can see. The question is about the FILE.
+      */
+      const marksBrand = /<svg\b|viewBox=/.test(src)
+      const ACHROMATIC = /^#(?:fff(?:fff)?|000(?:000)?)$/i
+
+      return lines.flatMap((l, i) =>
         [...l.matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-          .filter(() => !/\.svg|viewBox|d="M/.test(l))
+          .filter((m) => {
+            if (/\.svg|viewBox|d="M/.test(l)) return false
+            if (marksBrand && ACHROMATIC.test(m[0])) return false
+            /*
+              A hex inside a Tailwind arbitrary variant is a SELECTOR, not a
+              value: `[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border`
+              matches the colour Recharts hardcodes in its own inline SVG in
+              order to replace it with a token. That is the rule being obeyed,
+              not broken, and chart.tsx was reported five times for it.
+            */
+            const around = l.slice(Math.max(0, m.index - 40), m.index + m[0].length + 3)
+            return !new RegExp(`\\[[\\w-]+=['"]${m[0]}['"]\\]`).test(around)
+          })
           .map((m) => ({ line: i + 1, detail: `hard-coded ${m[0]}` }))
-      ),
+      )
+    },
   },
   {
     id: 'foreign-palette',
@@ -563,8 +747,17 @@ const RULES = [
       // TrendingDown/ArrowDown icon is not colour-alone (rule: validation-only).
       const hasSignal = SIGNAL.test(stripComments(src))
       if (hasSignal) return []
+      /*
+        `data-[variant=destructive]:` scopes the colour to a destructive ACTION
+        variant, not to a validation state. A Delete menu item already says
+        "Delete"; the colour is not carrying the meaning alone, and the rule
+        that governs it is destructive-intent. chromatic-decoration already
+        exempts the same case by tag; this is the same exemption expressed the
+        way a Radix variant writes it.
+      */
+      const ACTION_VARIANT = /data-\[variant=destructive\]/
       return lines.flatMap((l, i) =>
-        /\b(?:border|text|ring)-destructive\b/.test(l)
+        /\b(?:border|text|ring)-destructive\b/.test(l) && !ACTION_VARIANT.test(l)
           ? [{ line: i + 1, detail: 'destructive styling with no aria-invalid / error text nearby' }]
           : []
       )
@@ -597,14 +790,39 @@ const RULES = [
         colour is decoration, which is what the rule forbids.
       */
       const VALIDATION_HOSTS = /^(?:Alert|FormMessage|FieldError|Toast|Toaster|Button)|(?:Item|Action|Trigger)$/
-      if (SIGNAL.test(stripComments(src)) || /FormMessage/.test(stripComments(src))) return []
+      const code = stripComments(src)
+      if (SIGNAL.test(code) || /FormMessage/.test(code)) return []
       if (!VALIDATION_NAMES.length) return []
       const hue = new RegExp(`\\b(?:${VALIDATION_NAMES.join('|')})\\b`)
-      return [...src.matchAll(/<([A-Z][\w]*)\b([^>]*)>/g)]
-        .filter((m) => !VALIDATION_HOSTS.test(m[1]) && hue.test(m[2]))
-        .map((m) => ({
-          line: src.slice(0, m.index).split('\n').length,
-          detail: `<${m[1]}> is styled with a validation hue but carries no validation state`,
+      /*
+        Radix components arrive as member expressions: `<ContextMenuPrimitive.Item>`.
+        Matching `<([A-Z][\w]*)` captured `ContextMenuPrimitive` and dropped the
+        `.Item`, so the Item/Action/Trigger exemption never matched and every
+        destructive menu item in the library was reported as decoration. The
+        exemption keys on what the tag IS, which is its last segment. Walking
+        rather than matching also fixes the same `[^>]*` truncation that
+        handrolled-control hit.
+      */
+      /*
+        A tag can be an import alias. sonner.tsx does
+        `import { Toaster as Sonner } from 'sonner'` and renders `<Sonner>`, so
+        the exemption for a Toaster never matched the name in the markup. Read
+        the aliases and test what the component actually IS.
+      */
+      const alias = new Map(
+        [...code.matchAll(/import\s*\{([^}]*)\}\s*from/g)]
+          .flatMap((m) => m[1].split(','))
+          .map((p) => p.trim().match(/^([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)$/))
+          .filter(Boolean)
+          .map((m) => [m[2], m[1]]),
+      )
+      const identity = (tag) => { const last = tag.split('.').pop(); return alias.get(last) ?? last }
+
+      return jsxOpenTags(code, ['[A-Z][\\w]*(?:\\.[A-Z][\\w]*)*'])
+        .filter((t) => !VALIDATION_HOSTS.test(identity(t.tag)) && hue.test(t.attrs))
+        .map((t) => ({
+          line: code.slice(0, t.index).split('\n').length,
+          detail: `<${t.tag}> is styled with a validation hue but carries no validation state`,
         }))
     },
   },
@@ -721,9 +939,24 @@ const RULES = [
     why: 'Removing the outline without providing a focus-visible replacement makes the UI unusable by keyboard. This is the most common accessibility regression in generated code because the outline is the first thing that looks wrong.',
     test: ({ src, lines }) => {
       if (/focus-visible:/.test(stripComments(src))) return []
+      /*
+        The replacement has to be on the SAME ELEMENT, and it does not have to
+        be spelled `focus-visible:`.
+
+        Asking only whether the FILE mentions `focus-visible:` reported three
+        library components that each provide a visible focus treatment on the
+        very line that clears the outline: menubar uses `focus:bg-accent`,
+        which is the correct Radix pattern for a roving-tabindex item, and
+        input-otp drives `ring-ring/50` from a data attribute. Both are
+        keyboard-visible; neither uses the literal the check looked for.
+
+        What stays flagged is an element that clears its outline and puts
+        nothing back, which is the actual defect.
+      */
+      const REPLACEMENT = /focus-visible:|focus:|\bring-/
       return lines.flatMap((l, i) =>
-        /\boutline-none\b|\boutline:\s*none\b/.test(l)
-          ? [{ line: i + 1, detail: 'outline removed with no focus-visible: replacement in this file' }]
+        /\boutline-none\b|\boutline:\s*none\b/.test(l) && !REPLACEMENT.test(l)
+          ? [{ line: i + 1, detail: 'outline cleared on this element with no visible focus treatment to replace it' }]
           : []
       )
     },
@@ -899,9 +1132,12 @@ const RULES = [
   whose rule the payload does not carry is dropped: shipping a rules file and
   leaving a rule out of it is how a payload declines that rule.
 */
-const ACTIVE = RULES.map((r) => {
+const activeRules = (guards) => RULES.map((r) => {
   const a = authored?.get(r.implements)
   if (authored && !a) return null
+  // Discharged once in the stylesheet, so the per-file question no longer
+  // applies. Reported by name below rather than just going quiet.
+  if (guards.has(r.implements)) return null
   if (!a) return r
   return {
     ...r,
@@ -920,11 +1156,33 @@ const ACTIVE = RULES.map((r) => {
   were broken". Reporting the uncovered rules turns the advisory ones from
   invisible into merely unenforced, which is a different and honest claim.
 */
-const covered = new Set(ACTIVE.map((r) => r.implements).filter(Boolean))
-const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id)) : []
-const coverage = authored
-  ? { total: authored.size, checked: covered.size, advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })) }
-  : null
+const buildCoverage = (guards, active) => {
+  const covered = new Set(active.map((r) => r.implements).filter(Boolean))
+  const globallySatisfied = authored
+    ? [...guards].filter(([id]) => authored.has(id)).map(([id, g]) => ({ id, ...g, label: authored.get(id).label }))
+    : []
+  // A globally satisfied rule is neither checked nor advisory — it is discharged,
+  // so it must not be counted among the rules nobody is looking at.
+  const globalIds = new Set(globallySatisfied.map((g) => g.id))
+  const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id) && !globalIds.has(r.id)) : []
+  return authored
+    ? {
+        total: authored.size,
+        checked: covered.size,
+        satisfied_globally: globallySatisfied,
+        advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })),
+      }
+    : null
+}
+
+/*
+  The default view: guards on. Computed once because that is what the CLI, the
+  `ruleset` export and almost every call want, so the common path costs nothing.
+  A caller asking for guards OFF gets a freshly built pair instead.
+*/
+const DEFAULT_GUARDS = resolveGuards(true)
+const ACTIVE = activeRules(DEFAULT_GUARDS)
+const coverage = buildCoverage(DEFAULT_GUARDS, ACTIVE)
 
 // ---- collect files ----
 const CODE = new Set(['.tsx', '.jsx', '.ts', '.js', '.html'])
@@ -1004,8 +1262,13 @@ const inNodeModules = (p) => p.replace(/\\/g, '/').includes('/node_modules/')
  * @param {string[]} [opts.targets] paths to audit; empty means the default target
  * @param {string[]} [opts.ignore] extra ignore globs, as `--ignore` would supply
  * @param {string} [opts.cwd] directory that relative targets resolve from
+ * @param {boolean} [opts.globalGuards] honour the rules this payload discharges
+ *   globally (default true). Pass false to make every rule per-file again, which
+ *   is what the evals need to prove a detector still bites.
  */
-export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = {}) {
+export function checkUsage({ targets = [], ignore = [], cwd = process.cwd(), globalGuards = true } = {}) {
+  const active = globalGuards ? ACTIVE : activeRules(new Map())
+  const cov = globalGuards ? coverage : buildCoverage(new Map(), active)
   const resolveTarget = (t) => (t.startsWith('/') || /^[A-Za-z]:/.test(t) ? t : join(cwd, t))
   const isIgnored = makeIsIgnored(collectIgnoreGlobs(ignore, cwd))
 
@@ -1015,7 +1278,14 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
     inputs = targets.map(resolveTarget)
     scannedLabel = targets.join(', ')
   } else {
-    const payloadDirs = ['blocks', 'patterns', 'aiComponents']
+    /*
+      The primitives and the payload's own components are in the DEFAULT scan.
+      They were left out while the checker still produced false positives
+      against them, which meant the 58 components the rules govern were the one
+      thing the rules never ran on. Findings this payload has examined are
+      declared known; everything else is actionable.
+    */
+    const payloadDirs = ['components', 'ownComponents', 'blocks', 'patterns', 'aiComponents']
       .map((k) => { try { return join(root, cfg.rel(k)) } catch { return null } })
       .filter((d) => d && existsSync(d) && !inNodeModules(d))
     if (payloadDirs.length) { inputs = payloadDirs; scannedLabel = 'the design system’s own templates' }
@@ -1028,12 +1298,27 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
 
   // Shape stays identical on the failure paths so a caller can read `coverage`
   // and `scannedLabel` off a failed result without special-casing it.
-  const blank = { scanned: 0, scannedLabel, findings: [], errors: [], warnings: [], degraded: !coverage, coverage }
+  const blank = { scanned: 0, scannedLabel, findings: [], known: [], drift: [], errors: [], warnings: [], degraded: !cov, coverage: cov }
 
+  /*
+    A file is scanned ONCE however many roots contain it.
+
+    Scan roots legitimately overlap: the default set includes both `components`
+    and `ownComponents`, and in this payload the first sits inside the second.
+    Without the dedupe every file under the nested root was scanned twice and
+    every finding in it reported twice, which silently doubles the error count
+    and makes an accepted-finding tally wrong. A payload pointing two keys at
+    the same directory would do the same thing.
+  */
+  const seen = new Set()
   const files = []
   for (const p of inputs) {
     try {
-      files.push(...walk(p, isIgnored))
+      for (const file of walk(p, isIgnored)) {
+        if (seen.has(file)) continue
+        seen.add(file)
+        files.push(file)
+      }
     } catch (e) {
       if (e.code === 'ENOENT') {
         return { ok: false, error: { code: 'ENOENT', message: `no such file or directory: ${p}`, path: p }, ...blank }
@@ -1050,7 +1335,7 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
   for (const file of files) {
     const src = readFileSync(file, 'utf8')
     const lines = src.split('\n')
-    for (const rule of ACTIVE) {
+    for (const rule of active) {
       for (const hit of rule.test({ src, lines, file })) {
         findings.push({
           file: relative(root, file).replace(/\\/g, '/'),
@@ -1067,16 +1352,21 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
     }
   }
 
+  const scannedRel = new Set(files.map((p) => relative(root, p).split(String.fromCharCode(92)).join('/')))
+  const { known, actionable, drift } = partitionKnown(findings, scannedRel)
+
   return {
     ok: true,
     error: null,
     scanned: files.length,
     scannedLabel,
     findings,
-    errors: findings.filter((f) => f.severity === 'error'),
-    warnings: findings.filter((f) => f.severity === 'warn'),
-    degraded: !coverage,
-    coverage,
+    known,
+    drift,
+    errors: actionable.filter((f) => f.severity === 'error'),
+    warnings: actionable.filter((f) => f.severity === 'warn'),
+    degraded: !cov,
+    coverage: cov,
   }
 }
 
@@ -1109,7 +1399,8 @@ if (isMain) {
     if (!args[i].startsWith('--')) positional.push(args[i])
   }
 
-  const result = checkUsage({ targets: positional, ignore })
+  const result = checkUsage({ targets: positional, ignore, globalGuards: !args.includes('--no-global-guards') })
+  const cov = result.coverage
 
   if (!result.ok) {
     if (result.error.code === 'ENOENT') {
@@ -1125,16 +1416,17 @@ if (isMain) {
   }
 
   const { findings, errors, warnings: warns, scanned } = result
+  const { known, drift } = result
 
   if (asJson) {
-    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, degraded: !coverage, coverage, findings }, null, 2))
+    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, known: known.length, drift, degraded: !cov, coverage: cov, findings }, null, 2))
   } else {
-    const scope = coverage ? `${coverage.checked} of ${coverage.total} ${cfg.name} rules` : `the ${cfg.name} rules`
+    const scope = cov ? `${cov.checked} of ${cov.total} ${cfg.name} rules` : `the ${cfg.name} rules`
     console.log(`\n  check-usage — ${scanned} file(s) scanned against ${scope}\n`)
     // Degraded mode: the payload's rules file couldn't be resolved from `root`, so
     // only the built-in detectors ran — a REDUCED set. Say so loudly; a silent
     // "the N rules" (with no count) reads like full coverage when it isn't.
-    if (!coverage) {
+    if (!cov) {
       const rel = cfg.rel('rules')
       console.log(
         `  ⚠ Degraded coverage — no ${cfg.name} rules file resolved` +
@@ -1148,7 +1440,7 @@ if (isMain) {
     if (!findings.length) {
       // Never "✓ no violations" unqualified — that is the sentence that made an
       // inert rule look like a passing one for weeks.
-      console.log(coverage ? `  ✓ no violations of the ${coverage.checked} checkable rules\n` : '  ✓ no violations\n')
+      console.log(cov ? `  ✓ no violations of the ${cov.checked} checkable rules\n` : '  ✓ no violations\n')
     } else {
       let current = ''
       for (const f of [...errors, ...warns]) {
@@ -1163,10 +1455,36 @@ if (isMain) {
       console.log(`\n  ${errors.length} error(s), ${warns.length} warning(s)\n`)
     }
 
-    if (coverage?.advisory.length) {
-      const musts = coverage.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
+    // Named, not silent. A rule that stopped firing because the payload
+    // discharged it must not look like a rule that simply passed.
+    if (known.length) {
+      console.log(`  ${known.length} finding(s) ACCEPTED by this payload — reported every run, never silent:`)
+      for (const k of known) {
+        console.log(`    ${k.file}:${k.line}  ${k.rule}`)
+        console.log(`        ${k.known.record ?? 'no record'}`)
+      }
+      console.log('')
+    }
+    if (drift.length) {
+      console.error(`  ✗ ${drift.length} accepted finding(s) no longer match what was accepted:\n`)
+      for (const d of drift) {
+        console.error(`    ${d.file}  ${d.rule}`)
+        console.error(`        ${d.detail}`)
+      }
+      console.error(`
+  An accepted finding is a decision about code that exists. When the code
+  changes the decision has to be revisited, or the entry silently covers the
+  next real defect in that file. Update ${cfg.rel('knownFindings')}.
+`)
+    }
+    for (const g of cov?.satisfied_globally ?? []) {
+      console.log(`  ${g.id} is SATISFIED GLOBALLY by ${g.where} — ${g.note}. Not checked per file.`)
+    }
+
+    if (cov?.advisory.length) {
+      const musts = cov.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
       console.log(
-        `  ${coverage.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
+        `  ${cov.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
           (musts.length ? `, ${musts.length} of them "must"` : '') + '.',
       )
       if (draft && musts.length) {
@@ -1176,7 +1494,7 @@ if (isMain) {
         for (const r of musts) console.log(`    ☐ ${r.id.padEnd(24)} ${r.label}`)
         console.log('')
       } else if (args.includes('--coverage')) {
-        for (const r of coverage.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
+        for (const r of cov.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
       } else {
         console.log('  Re-run with --coverage to list them, or --draft for a review checklist of the "must" rules. A clean run does not mean these hold.\n')
       }
@@ -1191,5 +1509,5 @@ if (isMain) {
     rule 16). "Passes the checks" is not "looks right".\n`)
   }
 
-  process.exit(errors.length || (strict && warns.length) ? 1 : 0)
+  process.exit(errors.length || drift.length || (strict && warns.length) ? 1 : 0)
 }

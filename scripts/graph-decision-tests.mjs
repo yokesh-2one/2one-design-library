@@ -12,6 +12,8 @@ import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
+import { config as cfg } from './lib/config.mjs'
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 // graph-decide prints its JSON result and then exits non-zero on a no-match (a valid
 // "nothing resolved, here are suggestions" response), so parse stdout even when
@@ -71,7 +73,7 @@ const cases = [
 
   { name: 'Sheet is preferred over Dialog, sourced to the DLS docs',
     run: () => decide(['why', 'component:sheet', 'component:dialog']),
-    expect: (r) => r.edges.some((e) => e.type === 'preferred_over' && e.evidence === 'docs/building-with-the-dls.md') },
+    expect: (r) => r.edges.some((e) => e.type === 'preferred_over' && e.evidence === cfg.rel('docs.guide')) },
 
   { name: 'Button carries the mandatory no-color-alone + pill rules',
     run: () => decide(['rules', 'component:button']),

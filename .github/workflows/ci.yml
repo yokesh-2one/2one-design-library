@@ -19,35 +19,24 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Public API is complete
-        run: npm run check:exports
-
-      - name: No stale capability claims
-        run: npm run check:claims
-
-      - name: Machine-readable data is valid
-        run: npm run validate
-
-      # Audits OUTPUT (the blocks clients copy) against the 2one rules, rather
-      # than the system itself. Errors fail; warnings are advisory.
-      - name: Blocks obey the design rules
-        run: npm run check:usage
-
-      - name: Accessibility (APCA/WCAG) thresholds
-        run: npm run a11y
-
-      - name: Generated files are in sync with sources
-        run: npm run check:meta
-
-      # Runs the engine against a second, deliberately unlike-2one payload and
-      # asserts none of 2one's data appears in its output. Running against 2one
-      # alone cannot detect a 2one-shaped assumption — the run succeeds either
-      # way. Temporary: moves with the engine when it leaves this repo.
-      - name: Engine works against a payload that is not 2one
-        run: npm run test:fixture
-
-      - name: Library build
-        run: npm run build
+      # One step, on purpose.
+      #
+      # This workflow used to list the checks it ran by hand. The list stopped
+      # being updated on 2026-08-23 while `npm run verify` kept growing, and by
+      # the time anyone compared them CI ran 10 of verify's 25 checks and skipped
+      # 15. The skipped ones included check:api, check:seam and check:mcp, so the
+      # MCP server had never been tested on Linux, and a pull request could merge
+      # with the engine/payload seam leaking again while CI stayed green.
+      #
+      # Running verify itself makes CI and a local run the same gate by
+      # construction: a check added to package.json is enforced here the moment
+      # it lands, with nothing to remember. The cost is one step in the Actions UI
+      # instead of many. The log still names the failing check, because each one
+      # prints its own pass or fail line before the chain stops.
+      #
+      # Among what this includes, test:fixture runs the engine against a second,
+      # deliberately unlike-2one payload and asserts none of 2one's data appears
+      # in its output. Running against 2one alone cannot detect a 2one-shaped
+      # assumption, because that run succeeds either way.
+      - name: Verify (the same gate as npm run verify locally)
+        run: npm run verify

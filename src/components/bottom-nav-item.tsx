@@ -20,7 +20,7 @@ export function BottomNavItem({ icon, label, selected = false, className, ...pro
       data-slot="bottom-nav-item"
       aria-current={selected ? 'page' : undefined}
       className={cn(
-        'flex flex-1 flex-col items-center gap-1 px-2 py-2 active:bg-accent',
+        'flex flex-1 flex-col items-center gap-1 px-2 py-2 transition-colors outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-accent disabled:pointer-events-none disabled:opacity-50',
         selected ? 'text-foreground' : 'text-muted-foreground',
         className,
       )}

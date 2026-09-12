@@ -112,7 +112,7 @@ ${gaps.length ? gaps.map((g) => `- ${g}`).join('\n') : '_none_'}
 _These are covered indirectly (e.g. inside a pattern/composition) or are structural. Add a\ndedicated case if you want per-component screenshot + ARIA coverage._
 `
 
-writeFileSync(join(root, 'docs/visual-coverage.md'), md)
+writeFileSync(join(root, cfg.rel('docs.visualCoverage')), md)
 console.log(
   `\n  visual-coverage: ${allCases.length} cases · ${screenshots.size} screenshots · ${stateMap.size} state-shot · ${ariaSet.size} aria · ${rtlSet.size} rtl · ${fcSet.size} forced-colors`,
 )

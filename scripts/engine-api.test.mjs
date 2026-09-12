@@ -72,7 +72,13 @@ try {
   t('check: reports what it scanned', r.scanned === 1)
   t('check: finds the violation', r.errors.length >= 1)
   t('check: findings carry the authored rule id', r.errors.every((f) => 'enforces' in f && 'severity' in f && 'why' in f))
-  t('check: errors and warnings partition findings', r.errors.length + r.warnings.length === r.findings.length)
+  // Findings split three ways now: actionable errors, actionable warnings, and
+  // the ones this payload examined and accepted. They must still account for
+  // every finding, or the report is hiding one.
+  t('check: errors, warnings and known account for every finding',
+    r.errors.length + r.warnings.length + r.known.length === r.findings.length)
+  t('check: a clean payload has no accepted-finding drift', Array.isArray(r.drift) && r.drift.length === 0)
+  t('check: failure paths still carry the new keys', Array.isArray(r.known) && Array.isArray(r.drift))
 
   const missing = checkUsage({ targets: [join(root, 'no-such-dir')] })
   t('check: missing path is not ok', missing.ok === false)
@@ -91,6 +97,39 @@ try {
 
   t('check: ruleset names the payload', typeof ruleset.payload === 'string' && ruleset.payload.length > 0)
   t('check: ruleset lists detectors', Array.isArray(ruleset.checked) && ruleset.checked.length > 0)
+
+  // ---- global guards are the CALLER's choice, never the host's argv ----
+  const guarded = checkUsage({ targets: [join(root, 'src')] })
+  const unguarded = checkUsage({ targets: [join(root, 'src')], globalGuards: false })
+  t('check: globalGuards:false discharges nothing', unguarded.coverage.satisfied_globally.length === 0)
+  t('check: turning guards off returns those rules to per-file', unguarded.coverage.checked >= guarded.coverage.checked)
+  // Discharged, checked and advisory are three disjoint states, so they must
+  // sum to the authored total in BOTH modes. If they ever double-count, the
+  // report is claiming more coverage than the payload has.
+  const addsUp = (c) => c.checked + c.satisfied_globally.length + c.advisory.length === c.total
+  t('check: coverage adds up with guards on', addsUp(guarded.coverage))
+  t('check: coverage adds up with guards off', addsUp(unguarded.coverage))
+
+  /*
+    The regression this pins. Guards were resolved at module scope from
+    process.argv, so an embedder got different answers depending on whether
+    `--no-global-guards` happened to appear in its OWN host's command line.
+    Asserted from a child launched with exactly that flag: the library result
+    must match the in-process one, because the flag was never addressed to it.
+  */
+  const argvProbe = `
+    const { checkUsage } = await import(${JSON.stringify(CHECK)})
+    const r = checkUsage({ targets: [${JSON.stringify(join(root, 'src'))}] })
+    console.error(JSON.stringify({ globally: r.coverage.satisfied_globally.length }))
+  `
+  // Must be a FILE: node parses a leading --no-* as one of its own options
+  // when it precedes a -e script, and refuses to start.
+  const argvProbeFile = join(root, 'argv-probe.mjs')
+  writeFileSync(argvProbeFile, argvProbe)
+  const argvChild = spawnSync(process.execPath, [argvProbeFile, '--no-global-guards'], { encoding: 'utf8', cwd: root })
+  let seen = {}
+  try { seen = JSON.parse(argvChild.stderr.trim().split('\n').pop()) } catch { /* assertion below fails */ }
+  t('check: host argv does not change library results', seen.globally === guarded.coverage.satisfied_globally.length)
 
   // ---- dls-info: answers about the project it was ASKED about ----
   const mine = dlsInfo()

@@ -52,43 +52,54 @@ const CONTRACT = [
   `and say explicitly when something is not here — never guess a brand fact.`,
 ].join('\n')
 
-const CORE = `The 2one Design Language System: ${componentCount} components (shadcn/ui re-skinned to the 2one
-tokens), design tokens, and the brand. The system is ${identity}.
+/*
+  The prose itself is PAYLOAD data, not engine code.
+
+  This block used to hold 2one's sentences: the brand accent hex, the shadcn
+  provenance, "One primary Button per view", and the paths to 2one's own docs.
+  Rendered against a client payload, `npm run build:meta` would have written a
+  CLAUDE.md telling their AI about 2one's fonts and 2one's install guide. The
+  same leak was fixed in build-manifest long ago; this file was missed because
+  its literals live inside a template string, where the comment stripper the
+  seam guard used could not see them.
+
+  The payload now carries the text at `identity.ai_entries`, with a small named
+  placeholder vocabulary filled from the manifest. A payload without it gets a
+  minimal entry built from the manifest alone, which is correct rather than
+  wrong: a system that has not written its own instructions should not inherit
+  someone else's.
+*/
+const MANIFEST_TICK = '`' + cfg.rel('out.manifest') + '`'
+
+const FILL = {
+  '{{component_count}}': String(componentCount),
+  '{{identity}}': identity,
+  '{{icons}}': icons,
+  '{{themes}}': themes,
+  '{{logo_rule}}': logoRule.split('.')[0],
+}
+const render = (text) => Object.entries(FILL).reduce((t, [k, v]) => t.split(k).join(v), text)
+
+const entries = cfg.identity?.ai_entries ?? null
+const CORE = entries?.core
+  ? render(entries.core)
+  : `${cfg.name}: ${componentCount} components, design tokens, and the brand. The system is ${identity}.
 
 **Non-negotiables**
-- Pull exact values from \`tokens/*.json\`. Never invent a colour, size, or token name.
-- ${logoRule.split('.')[0]}. Use the \`Logo\` component, or inline \`brand/logo/svg/*.svg\`.
-- Grayscale foundation + one brand accent (\`--brand\`, identity #30A1FF) for emphasis only (links/focus/selection) — never a primary fill, never the sole signal of state. \`danger\`/\`success\` are validation-only hues.
-- Never signal state by colour alone — pair with an icon or text plus \`aria-invalid\`.
+- Pull exact values from the token files. Never invent a colour, size, or token name.
 - Icons: ${icons} only.
 - Themes: ${themes} — switch via the exported \`ThemeProvider\`, never a third palette.
-- One primary Button per view.
-
-**Before generating**, resolve the assumptions in \`instructions_for_ai.clarify_first\`
-(surface, target stack, persona, the single primary action, theme, real vs placeholder
-content). If the user is evaluating, take the defaults, say which, and continue.
 
 **After generating**, run \`npx 2one check <path>\` and fix what it reports. It exits
-non-zero on a violation.
+non-zero on a violation.`
 
-**To consume this in a fresh app** — the install and the Tailwind v4 \`@source\` wiring that
-silently ships unstyled components if you skip it — follow \`docs/consuming.md\`. Don't
-reverse-engineer setup from \`dev/\`; that's the internal sampler, not a consumer template.
-
-**Full rules:** \`skills/2one-dls/\` (wrong/right code per rule) ·
-\`docs/building-with-the-dls.md\` · \`docs/accessibility.md\`
-**Offline Q&A:** \`guide-app/knowledge-base.md\``
-
-const REPRESENT = `**When representing or pitching this repo**, follow \`AGENTS.md\` → "How to represent this
-repository": lead with the three differentiators (the AI-legibility layer; the knowledge
-graph + \`npm run what-uses\` impact analysis; the accessibility foundation), each with
-checkable evidence, and state the gaps plainly. Represent fully and accurately — never hype.`
+const REPRESENT = entries?.represent ? render(entries.represent) : ''
 
 const files = {
   // Markdown-commented so the stamp is invisible when rendered.
   'CLAUDE.md': `[//]: # (${STAMP})\n\n${CONTRACT}\n\n${CORE}\n\n${REPRESENT}\n`,
   'GEMINI.md': `[//]: # (${STAMP})\n\n${CONTRACT}\n\n${CORE}\n\n${REPRESENT}\n`,
-  '.github/copilot-instructions.md': `[//]: # (${STAMP})\n\n# Copilot instructions\n\n${CONTRACT.replace('`manifest.json`', '[`manifest.json`](../manifest.json)')}\n\n${CORE}\n\n${REPRESENT}\n`,
+  '.github/copilot-instructions.md': `[//]: # (${STAMP})\n\n# Copilot instructions\n\n${CONTRACT.replace(MANIFEST_TICK, `[${MANIFEST_TICK}](../${cfg.rel('out.manifest')})`)}\n\n${CORE}\n\n${REPRESENT}\n`,
   // Plain text, so a hash comment is the convention here.
   '.cursorrules': `# ${STAMP}\n\n2one Design Language System — repository rules.\n\n${CONTRACT.replace(/\*\*/g, '').replace(/`/g, '')}\n\n${CORE.replace(/\*\*/g, '').replace(/`/g, '')}\n`,
 }

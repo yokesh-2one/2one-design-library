@@ -21,10 +21,12 @@ import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
+import { config as cfg, CONFIG_FILE } from './lib/config.mjs'
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 let packageName = pkg.name
-try { packageName = JSON.parse(readFileSync(join(root, 'dls.config.json'), 'utf8')).packageName || packageName } catch { /* config optional */ }
+try { packageName = JSON.parse(readFileSync(join(root, CONFIG_FILE), 'utf8')).packageName || packageName } catch { /* config optional */ }
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const errors = []
 
@@ -46,7 +48,8 @@ if (scoped) {
 }
 
 // ---- P4: the compatibility matrix must match package.json ----
-const consuming = join(root, 'docs/consuming.md')
+const consumingRel = cfg.rel('docs.consuming')
+const consuming = join(root, consumingRel)
 if (existsSync(consuming)) {
   const text = readFileSync(consuming, 'utf8')
   const allDeps = { ...(pkg.peerDependencies || {}), ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) }
@@ -61,9 +64,9 @@ if (existsSync(consuming)) {
     const docMajor = Number(m[1])
     const realMajor = majorOf(allDeps[dep])
     if (realMajor && docMajor !== realMajor)
-      errors.push(`docs/consuming.md: compatibility matrix says ${label} ${docMajor}, but package.json has ${dep}@${allDeps[dep]} (major ${realMajor}). Update the matrix.`)
+      errors.push(`${consumingRel}: compatibility matrix says ${label} ${docMajor}, but package.json has ${dep}@${allDeps[dep]} (major ${realMajor}). Update the matrix.`)
   }
-  if (rows === 0) errors.push('docs/consuming.md: no "Compatibility (tested)" matrix rows found to check (React/Vite/Tailwind CSS/TypeScript).')
+  if (rows === 0) errors.push(`${consumingRel}: no "Compatibility (tested)" matrix rows found to check (React/Vite/Tailwind CSS/TypeScript).`)
 }
 
 if (errors.length) {
