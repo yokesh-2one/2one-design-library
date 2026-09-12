@@ -234,6 +234,113 @@ const resolveGuards = (enabled) => {
 }
 
 /*
+  ---- findings this payload has decided to accept ----
+
+  Some findings are correct reports of things that should not change. The dialog
+  focus container is the worked example: the rule is right in general, the code
+  is right in this instance, and the detector cannot tell a focus container from
+  a control by reading a class string.
+
+  Without somewhere to put that, the options are both bad. Leave it and the gate
+  never goes green, so people stop reading it. Loosen the rule and every case
+  nobody has looked at goes quiet with it.
+
+  So a payload may declare a finding KNOWN. Three properties keep that from
+  decaying into a suppression file:
+
+    - an entry names one file and one rule, never a pattern, and carries the
+      reason in full plus a pointer to the record that argued it.
+    - an entry declares how many findings it expects. A second finding of the
+      same rule in the same file is NOT covered, because that one has not been
+      looked at.
+    - an entry that stops matching FAILS. A suppression that outlives its cause
+      is exactly how a checker rots: the code gets fixed, the exemption stays,
+      and it silently covers the next real defect in that file.
+
+  Known findings are reported by name on every run. Being accepted and being
+  invisible are different things.
+*/
+const KNOWN_FINDINGS = (() => {
+  const rel = cfg.rel('knownFindings')
+  if (!rel) return []
+  try {
+    const raw = JSON.parse(readFileSync(join(root, rel), 'utf8'))
+    return Array.isArray(raw?.findings) ? raw.findings : []
+  } catch { return [] } // absent → every finding is actionable, as before
+})()
+
+/**
+ * Split findings into the ones a payload has decided to accept and the ones it
+ * has not, and report on the health of the decisions themselves.
+ *
+ * `drift` is the part that matters: it holds entries that matched a different
+ * number of findings than they claimed, including zero. Those are failures, not
+ * notices, because a stale entry is an exemption nobody is accounting for.
+ */
+const partitionKnown = (findings, scanned) => {
+  /*
+    Drift is only meaningful for entries whose file was actually LOOKED AT.
+
+    Without this, `2one check src/one-file.tsx` reported every other accepted
+    finding as stale, because none of them fired in a scan that never opened
+    their file. That would have made a targeted check fail for reasons entirely
+    unrelated to the file the user asked about. An entry out of scope is neither
+    matched nor stale: it was not examined.
+  */
+  const inScope = (k) => scanned.has(k.file)
+  const matchedBy = new Map(KNOWN_FINDINGS.map((k, i) => [i, []]).filter(([i]) => inScope(KNOWN_FINDINGS[i])))
+  const known = []
+  const actionable = []
+
+  for (const f of findings) {
+    const i = KNOWN_FINDINGS.findIndex((k) => inScope(k) && k.file === f.file && k.rule === f.rule)
+    if (i === -1) { actionable.push(f); continue }
+    matchedBy.get(i).push(f)
+  }
+
+  const drift = []
+  for (const [i, hits] of matchedBy) {
+    const k = KNOWN_FINDINGS[i]
+    const want = k.count ?? 1
+    if (hits.length === want) {
+      for (const f of hits) known.push({ ...f, known: { reason: k.reason, record: k.record ?? null } })
+      continue
+    }
+    /*
+      Any mismatch is a failure, but they mean opposite things, so say which.
+      Fewer than expected (usually zero) means the code changed and the entry
+      should go. More means something new appeared behind a decided one.
+    */
+    drift.push({
+      file: k.file,
+      rule: k.rule,
+      expected: want,
+      found: hits.length,
+      record: k.record ?? null,
+      detail: hits.length < want
+        ? `no longer fires ${want === 1 ? 'at all' : `${want} time(s)`} — remove this entry, or say what replaced it`
+        : `fires ${hits.length} times where ${want} was accepted — the extra one has not been reviewed`,
+    })
+    // The extras are treated as actionable rather than swallowed.
+    for (const f of hits) actionable.push(f)
+  }
+
+  /*
+    A record pointer that does not resolve is the same class of rot: the
+    justification is the only thing making this an exemption rather than a
+    silenced rule, so it has to exist.
+  */
+  for (const k of KNOWN_FINDINGS.filter(inScope)) {
+    if (!k.record) { drift.push({ file: k.file, rule: k.rule, expected: 0, found: 0, record: null, detail: 'no decision record named — an accepted finding carries its justification or it is a silenced rule' }); continue }
+    if (!existsSync(join(root, k.record))) {
+      drift.push({ file: k.file, rule: k.rule, expected: 0, found: 0, record: k.record, detail: `decision record "${k.record}" does not exist` })
+    }
+  }
+
+  return { known, actionable, drift }
+}
+
+/*
   Blank out comment bodies, preserving every byte offset so reported line
   numbers still point at the real source.
 
@@ -1171,7 +1278,14 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd(), glo
     inputs = targets.map(resolveTarget)
     scannedLabel = targets.join(', ')
   } else {
-    const payloadDirs = ['blocks', 'patterns', 'aiComponents']
+    /*
+      The primitives and the payload's own components are in the DEFAULT scan.
+      They were left out while the checker still produced false positives
+      against them, which meant the 58 components the rules govern were the one
+      thing the rules never ran on. Findings this payload has examined are
+      declared known; everything else is actionable.
+    */
+    const payloadDirs = ['components', 'ownComponents', 'blocks', 'patterns', 'aiComponents']
       .map((k) => { try { return join(root, cfg.rel(k)) } catch { return null } })
       .filter((d) => d && existsSync(d) && !inNodeModules(d))
     if (payloadDirs.length) { inputs = payloadDirs; scannedLabel = 'the design system’s own templates' }
@@ -1184,12 +1298,27 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd(), glo
 
   // Shape stays identical on the failure paths so a caller can read `coverage`
   // and `scannedLabel` off a failed result without special-casing it.
-  const blank = { scanned: 0, scannedLabel, findings: [], errors: [], warnings: [], degraded: !cov, coverage: cov }
+  const blank = { scanned: 0, scannedLabel, findings: [], known: [], drift: [], errors: [], warnings: [], degraded: !cov, coverage: cov }
 
+  /*
+    A file is scanned ONCE however many roots contain it.
+
+    Scan roots legitimately overlap: the default set includes both `components`
+    and `ownComponents`, and in this payload the first sits inside the second.
+    Without the dedupe every file under the nested root was scanned twice and
+    every finding in it reported twice, which silently doubles the error count
+    and makes an accepted-finding tally wrong. A payload pointing two keys at
+    the same directory would do the same thing.
+  */
+  const seen = new Set()
   const files = []
   for (const p of inputs) {
     try {
-      files.push(...walk(p, isIgnored))
+      for (const file of walk(p, isIgnored)) {
+        if (seen.has(file)) continue
+        seen.add(file)
+        files.push(file)
+      }
     } catch (e) {
       if (e.code === 'ENOENT') {
         return { ok: false, error: { code: 'ENOENT', message: `no such file or directory: ${p}`, path: p }, ...blank }
@@ -1223,14 +1352,19 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd(), glo
     }
   }
 
+  const scannedRel = new Set(files.map((p) => relative(root, p).split(String.fromCharCode(92)).join('/')))
+  const { known, actionable, drift } = partitionKnown(findings, scannedRel)
+
   return {
     ok: true,
     error: null,
     scanned: files.length,
     scannedLabel,
     findings,
-    errors: findings.filter((f) => f.severity === 'error'),
-    warnings: findings.filter((f) => f.severity === 'warn'),
+    known,
+    drift,
+    errors: actionable.filter((f) => f.severity === 'error'),
+    warnings: actionable.filter((f) => f.severity === 'warn'),
     degraded: !cov,
     coverage: cov,
   }
@@ -1282,9 +1416,10 @@ if (isMain) {
   }
 
   const { findings, errors, warnings: warns, scanned } = result
+  const { known, drift } = result
 
   if (asJson) {
-    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, degraded: !cov, coverage: cov, findings }, null, 2))
+    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, known: known.length, drift, degraded: !cov, coverage: cov, findings }, null, 2))
   } else {
     const scope = cov ? `${cov.checked} of ${cov.total} ${cfg.name} rules` : `the ${cfg.name} rules`
     console.log(`\n  check-usage — ${scanned} file(s) scanned against ${scope}\n`)
@@ -1322,6 +1457,26 @@ if (isMain) {
 
     // Named, not silent. A rule that stopped firing because the payload
     // discharged it must not look like a rule that simply passed.
+    if (known.length) {
+      console.log(`  ${known.length} finding(s) ACCEPTED by this payload — reported every run, never silent:`)
+      for (const k of known) {
+        console.log(`    ${k.file}:${k.line}  ${k.rule}`)
+        console.log(`        ${k.known.record ?? 'no record'}`)
+      }
+      console.log('')
+    }
+    if (drift.length) {
+      console.error(`  ✗ ${drift.length} accepted finding(s) no longer match what was accepted:\n`)
+      for (const d of drift) {
+        console.error(`    ${d.file}  ${d.rule}`)
+        console.error(`        ${d.detail}`)
+      }
+      console.error(`
+  An accepted finding is a decision about code that exists. When the code
+  changes the decision has to be revisited, or the entry silently covers the
+  next real defect in that file. Update ${cfg.rel('knownFindings')}.
+`)
+    }
     for (const g of cov?.satisfied_globally ?? []) {
       console.log(`  ${g.id} is SATISFIED GLOBALLY by ${g.where} — ${g.note}. Not checked per file.`)
     }
@@ -1354,5 +1509,5 @@ if (isMain) {
     rule 16). "Passes the checks" is not "looks right".\n`)
   }
 
-  process.exit(errors.length || (strict && warns.length) ? 1 : 0)
+  process.exit(errors.length || drift.length || (strict && warns.length) ? 1 : 0)
 }

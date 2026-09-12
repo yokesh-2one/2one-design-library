@@ -72,7 +72,13 @@ try {
   t('check: reports what it scanned', r.scanned === 1)
   t('check: finds the violation', r.errors.length >= 1)
   t('check: findings carry the authored rule id', r.errors.every((f) => 'enforces' in f && 'severity' in f && 'why' in f))
-  t('check: errors and warnings partition findings', r.errors.length + r.warnings.length === r.findings.length)
+  // Findings split three ways now: actionable errors, actionable warnings, and
+  // the ones this payload examined and accepted. They must still account for
+  // every finding, or the report is hiding one.
+  t('check: errors, warnings and known account for every finding',
+    r.errors.length + r.warnings.length + r.known.length === r.findings.length)
+  t('check: a clean payload has no accepted-finding drift', Array.isArray(r.drift) && r.drift.length === 0)
+  t('check: failure paths still carry the new keys', Array.isArray(r.known) && Array.isArray(r.drift))
 
   const missing = checkUsage({ targets: [join(root, 'no-such-dir')] })
   t('check: missing path is not ok', missing.ok === false)

@@ -64,6 +64,7 @@ const DEFAULTS = {
     rules: 'rules/ux-rules.json',
     staleClaims: 'rules/stale-claims.json',
     globalGuards: 'rules/global-guards.json',
+    knownFindings: 'rules/known-findings.json',
     ontology: 'graph/ontology.json',
     decisions: 'graph/decisions.json',
     /*

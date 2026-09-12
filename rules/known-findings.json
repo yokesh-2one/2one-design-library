@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "description": "Findings this payload has examined and decided to accept. NOT a suppression list. Each entry names one file and one rule, states the reason in full, points at the decision record that argued it, and declares how many findings it expects. An entry that stops matching, or matches a different number of times, FAILS the build: a suppression that outlives its cause is how a checker rots, and an entry that silently absorbs a second finding is how a real defect hides behind a decided one.",
+  "findings": [
+    {
+      "file": "src/components/ui/dialog.tsx",
+      "rule": "suppressed-focus-ring",
+      "count": 1,
+      "reason": "DialogPrimitive.Content is a focus container Radix focuses programmatically on open, not a control anyone tabs to. A visible ring here would outline the whole panel every time any dialog opens, which trains people to ignore focus rings and is worse than the thing the rule protects. Exempting it properly needs a container signal the detector cannot read from a class string.",
+      "record": "docs/decisions/focus-ring-on-focus-containers.md"
+    }
+  ]
+}
