@@ -56,7 +56,12 @@ const shipped = (() => {
   // --ignore-scripts because `prepare` runs the full library build, and its
   // output lands on stdout ahead of the JSON. We only want the file list the
   // `files` globs resolve to, which does not need a build.
-  // shell:true on Windows — npm is a .cmd shim and execFile cannot spawn it
+  // npm 10 (Node 20, what CI runs) ignores that flag for `prepare` on pack and
+  // builds anyway, so stdout can still start with vite's coloured log. Its ANSI
+  // escapes contain '[', which is why the JSON is found as the LAST line that
+  // opens with an unindented '[': pretty-printed JSON puts one there only at
+  // its top level, and the build log always comes before it.
+  // shell:true on Windows, since npm is a .cmd shim and execFile cannot spawn it
   // directly on current Node. Every argument here is a literal constant, so
   // there is nothing user-supplied for the shell to re-interpret.
   const out = execFileSync(
@@ -64,7 +69,8 @@ const shipped = (() => {
     ['pack', '--dry-run', '--json', '--ignore-scripts'],
     { cwd: root, encoding: 'utf8', shell: process.platform === 'win32', stdio: ['ignore', 'pipe', 'ignore'] },
   )
-  const files = JSON.parse(out.slice(out.indexOf('[')))[0]?.files ?? []
+  const start = out.startsWith('[') ? 0 : out.lastIndexOf('\n[') + 1
+  const files = JSON.parse(out.slice(start))[0]?.files ?? []
   return new Set(files.map((f) => f.path.split('\\').join('/')))
 })()
 
