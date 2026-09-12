@@ -201,24 +201,36 @@ const SEVERITY = { must: 'error', forbidden: 'error', should: 'warn', may: 'warn
   prove the DETECTOR still works and would otherwise go quiet the moment the
   payload adopted a guard.
 */
-const GLOBAL_GUARDS = [
-  {
-    rule: 'reduced-motion',
-    pathKey: 'theme',
-    pattern: /@media[^{]*prefers-reduced-motion\s*:\s*reduce/,
-    note: 'every animation is stilled under prefers-reduced-motion',
-  },
-]
+const GLOBAL_GUARDS = (() => {
+  const rel = cfg.rel('globalGuards')
+  if (!rel) return []
+  try {
+    const raw = JSON.parse(readFileSync(join(root, rel), 'utf8'))
+    return Array.isArray(raw?.guards) ? raw.guards : []
+  } catch { return [] } // absent → every rule is asked of every file, as before
+})()
 
-const satisfiedGlobally = new Map()
-if (!args.includes('--no-global-guards')) {
+/*
+  Resolving the guards is a FUNCTION of whether the caller wants them, not a
+  module-scope constant read from process.argv.
+
+  It was the latter, and that leaked: an embedder importing this module got
+  different answers depending on whether the string `--no-global-guards`
+  happened to appear in its own host's command line. Same failure the ignore
+  globs had. A library decides nothing from the argv of the process that
+  imported it.
+*/
+const resolveGuards = (enabled) => {
+  const found = new Map()
+  if (!enabled) return found
   for (const g of GLOBAL_GUARDS) {
     try {
-      if (g.pattern.test(readFileSync(cfg.path(g.pathKey), 'utf8'))) {
-        satisfiedGlobally.set(g.rule, { where: cfg.rel(g.pathKey), note: g.note })
+      if (new RegExp(g.pattern, g.flags ?? '').test(readFileSync(cfg.path(g.path), 'utf8'))) {
+        found.set(g.rule, { where: cfg.rel(g.path), note: g.note })
       }
-    } catch { /* payload has no such stylesheet — the rule stays per-file */ }
+    } catch { /* payload has no such file, so the rule stays per-file */ }
   }
+  return found
 }
 
 /*
@@ -1013,12 +1025,12 @@ const RULES = [
   whose rule the payload does not carry is dropped: shipping a rules file and
   leaving a rule out of it is how a payload declines that rule.
 */
-const ACTIVE = RULES.map((r) => {
+const activeRules = (guards) => RULES.map((r) => {
   const a = authored?.get(r.implements)
   if (authored && !a) return null
   // Discharged once in the stylesheet, so the per-file question no longer
   // applies. Reported by name below rather than just going quiet.
-  if (satisfiedGlobally.has(r.implements)) return null
+  if (guards.has(r.implements)) return null
   if (!a) return r
   return {
     ...r,
@@ -1037,22 +1049,33 @@ const ACTIVE = RULES.map((r) => {
   were broken". Reporting the uncovered rules turns the advisory ones from
   invisible into merely unenforced, which is a different and honest claim.
 */
-const covered = new Set(ACTIVE.map((r) => r.implements).filter(Boolean))
-const globallySatisfied = authored
-  ? [...satisfiedGlobally].filter(([id]) => authored.has(id)).map(([id, g]) => ({ id, ...g, label: authored.get(id).label }))
-  : []
-// A globally satisfied rule is neither checked nor advisory — it is discharged,
-// so it must not be counted among the rules nobody is looking at.
-const globalIds = new Set(globallySatisfied.map((g) => g.id))
-const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id) && !globalIds.has(r.id)) : []
-const coverage = authored
-  ? {
-      total: authored.size,
-      checked: covered.size,
-      satisfied_globally: globallySatisfied,
-      advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })),
-    }
-  : null
+const buildCoverage = (guards, active) => {
+  const covered = new Set(active.map((r) => r.implements).filter(Boolean))
+  const globallySatisfied = authored
+    ? [...guards].filter(([id]) => authored.has(id)).map(([id, g]) => ({ id, ...g, label: authored.get(id).label }))
+    : []
+  // A globally satisfied rule is neither checked nor advisory — it is discharged,
+  // so it must not be counted among the rules nobody is looking at.
+  const globalIds = new Set(globallySatisfied.map((g) => g.id))
+  const uncovered = authored ? [...authored.values()].filter((r) => !covered.has(r.id) && !globalIds.has(r.id)) : []
+  return authored
+    ? {
+        total: authored.size,
+        checked: covered.size,
+        satisfied_globally: globallySatisfied,
+        advisory: uncovered.map((r) => ({ id: r.id, severity: r.severity, label: r.label })),
+      }
+    : null
+}
+
+/*
+  The default view: guards on. Computed once because that is what the CLI, the
+  `ruleset` export and almost every call want, so the common path costs nothing.
+  A caller asking for guards OFF gets a freshly built pair instead.
+*/
+const DEFAULT_GUARDS = resolveGuards(true)
+const ACTIVE = activeRules(DEFAULT_GUARDS)
+const coverage = buildCoverage(DEFAULT_GUARDS, ACTIVE)
 
 // ---- collect files ----
 const CODE = new Set(['.tsx', '.jsx', '.ts', '.js', '.html'])
@@ -1132,8 +1155,13 @@ const inNodeModules = (p) => p.replace(/\\/g, '/').includes('/node_modules/')
  * @param {string[]} [opts.targets] paths to audit; empty means the default target
  * @param {string[]} [opts.ignore] extra ignore globs, as `--ignore` would supply
  * @param {string} [opts.cwd] directory that relative targets resolve from
+ * @param {boolean} [opts.globalGuards] honour the rules this payload discharges
+ *   globally (default true). Pass false to make every rule per-file again, which
+ *   is what the evals need to prove a detector still bites.
  */
-export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = {}) {
+export function checkUsage({ targets = [], ignore = [], cwd = process.cwd(), globalGuards = true } = {}) {
+  const active = globalGuards ? ACTIVE : activeRules(new Map())
+  const cov = globalGuards ? coverage : buildCoverage(new Map(), active)
   const resolveTarget = (t) => (t.startsWith('/') || /^[A-Za-z]:/.test(t) ? t : join(cwd, t))
   const isIgnored = makeIsIgnored(collectIgnoreGlobs(ignore, cwd))
 
@@ -1156,7 +1184,7 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
 
   // Shape stays identical on the failure paths so a caller can read `coverage`
   // and `scannedLabel` off a failed result without special-casing it.
-  const blank = { scanned: 0, scannedLabel, findings: [], errors: [], warnings: [], degraded: !coverage, coverage }
+  const blank = { scanned: 0, scannedLabel, findings: [], errors: [], warnings: [], degraded: !cov, coverage: cov }
 
   const files = []
   for (const p of inputs) {
@@ -1178,7 +1206,7 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
   for (const file of files) {
     const src = readFileSync(file, 'utf8')
     const lines = src.split('\n')
-    for (const rule of ACTIVE) {
+    for (const rule of active) {
       for (const hit of rule.test({ src, lines, file })) {
         findings.push({
           file: relative(root, file).replace(/\\/g, '/'),
@@ -1203,8 +1231,8 @@ export function checkUsage({ targets = [], ignore = [], cwd = process.cwd() } = 
     findings,
     errors: findings.filter((f) => f.severity === 'error'),
     warnings: findings.filter((f) => f.severity === 'warn'),
-    degraded: !coverage,
-    coverage,
+    degraded: !cov,
+    coverage: cov,
   }
 }
 
@@ -1237,7 +1265,8 @@ if (isMain) {
     if (!args[i].startsWith('--')) positional.push(args[i])
   }
 
-  const result = checkUsage({ targets: positional, ignore })
+  const result = checkUsage({ targets: positional, ignore, globalGuards: !args.includes('--no-global-guards') })
+  const cov = result.coverage
 
   if (!result.ok) {
     if (result.error.code === 'ENOENT') {
@@ -1255,14 +1284,14 @@ if (isMain) {
   const { findings, errors, warnings: warns, scanned } = result
 
   if (asJson) {
-    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, degraded: !coverage, coverage, findings }, null, 2))
+    console.log(JSON.stringify({ scanned, errors: errors.length, warnings: warns.length, degraded: !cov, coverage: cov, findings }, null, 2))
   } else {
-    const scope = coverage ? `${coverage.checked} of ${coverage.total} ${cfg.name} rules` : `the ${cfg.name} rules`
+    const scope = cov ? `${cov.checked} of ${cov.total} ${cfg.name} rules` : `the ${cfg.name} rules`
     console.log(`\n  check-usage — ${scanned} file(s) scanned against ${scope}\n`)
     // Degraded mode: the payload's rules file couldn't be resolved from `root`, so
     // only the built-in detectors ran — a REDUCED set. Say so loudly; a silent
     // "the N rules" (with no count) reads like full coverage when it isn't.
-    if (!coverage) {
+    if (!cov) {
       const rel = cfg.rel('rules')
       console.log(
         `  ⚠ Degraded coverage — no ${cfg.name} rules file resolved` +
@@ -1276,7 +1305,7 @@ if (isMain) {
     if (!findings.length) {
       // Never "✓ no violations" unqualified — that is the sentence that made an
       // inert rule look like a passing one for weeks.
-      console.log(coverage ? `  ✓ no violations of the ${coverage.checked} checkable rules\n` : '  ✓ no violations\n')
+      console.log(cov ? `  ✓ no violations of the ${cov.checked} checkable rules\n` : '  ✓ no violations\n')
     } else {
       let current = ''
       for (const f of [...errors, ...warns]) {
@@ -1293,14 +1322,14 @@ if (isMain) {
 
     // Named, not silent. A rule that stopped firing because the payload
     // discharged it must not look like a rule that simply passed.
-    for (const g of coverage?.satisfied_globally ?? []) {
+    for (const g of cov?.satisfied_globally ?? []) {
       console.log(`  ${g.id} is SATISFIED GLOBALLY by ${g.where} — ${g.note}. Not checked per file.`)
     }
 
-    if (coverage?.advisory.length) {
-      const musts = coverage.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
+    if (cov?.advisory.length) {
+      const musts = cov.advisory.filter((r) => r.severity === 'must' || r.severity === 'forbidden')
       console.log(
-        `  ${coverage.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
+        `  ${cov.advisory.length} rule(s) are ADVISORY — written in ${cfg.rel('rules')} but not mechanically checked` +
           (musts.length ? `, ${musts.length} of them "must"` : '') + '.',
       )
       if (draft && musts.length) {
@@ -1310,7 +1339,7 @@ if (isMain) {
         for (const r of musts) console.log(`    ☐ ${r.id.padEnd(24)} ${r.label}`)
         console.log('')
       } else if (args.includes('--coverage')) {
-        for (const r of coverage.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
+        for (const r of cov.advisory) console.log(`    · ${r.id.padEnd(26)} ${r.severity.padEnd(9)} ${r.label}`)
       } else {
         console.log('  Re-run with --coverage to list them, or --draft for a review checklist of the "must" rules. A clean run does not mean these hold.\n')
       }

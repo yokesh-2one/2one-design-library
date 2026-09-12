@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "description": "Rules this payload discharges ONCE, globally, rather than per file. A guard does not silently disable a detector: the rule moves to a third reported state and the report names the file that discharges it. Which rules can be settled this way is a fact about a design system, not about the engine, so it is declared here.",
+  "guards": [
+    {
+      "rule": "reduced-motion",
+      "path": "theme",
+      "pattern": "@media[^{]*prefers-reduced-motion\\s*:\\s*reduce",
+      "flags": "",
+      "note": "every animation is stilled under prefers-reduced-motion"
+    }
+  ]
+}

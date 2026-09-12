@@ -153,6 +153,10 @@
         "staleClaims": {
           "type": "string",
           "description": "Phrases that were true once and are not any more, which the engine fails the build on. Optional: a payload without this file simply has no stale-claim guard."
+        },
+        "globalGuards": {
+          "type": "string",
+          "description": "Rules this payload discharges once globally rather than per file. Optional: without it every rule is asked of every file."
         }
       }
     },
