@@ -26,6 +26,8 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { execFileSync } from 'node:child_process'
 import { join, relative, basename, resolve, sep } from 'node:path'
 
+import { CONFIG_FILE } from './lib/config.mjs'
+
 const args = process.argv.slice(2).filter((a) => a !== 'init')
 const flags = new Set(args.filter((a) => a.startsWith('--')))
 const target = args.find((a) => !a.startsWith('--')) ?? process.cwd()
@@ -47,7 +49,7 @@ const SKIP = new Set(['node_modules', '.git', 'build', 'out', '.next', '.turbo',
   the same class of error: the theme file it chose was a hashed CSS bundle in
   dist-site, which contains every token and authors none.
 */
-const isNestedPackage = (dir) => existsSync(join(dir, 'package.json')) || existsSync(join(dir, 'dls.config.json'))
+const isNestedPackage = (dir) => existsSync(join(dir, 'package.json')) || existsSync(join(dir, CONFIG_FILE))
 const rel = (p) => relative(target, p).split(sep).join('/')
 const readJson = (p) => { try { return JSON.parse(readFileSync(p, 'utf8')) } catch { return null } }
 
@@ -251,7 +253,7 @@ const report = {
   written: null,
 }
 
-const outFile = join(target, 'dls.config.json')
+const outFile = join(target, CONFIG_FILE)
 if (!dryRun && !missingRequired.length) {
   if (existsSync(outFile) && !flags.has('--force')) {
     report.written = false

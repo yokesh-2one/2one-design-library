@@ -272,7 +272,7 @@ const manifest = {
     ...(uxRules
       ? {
           rules: {
-            file: 'rules/ux-rules.json',
+            file: cfg.rel('rules'),
             count: uxRules.rules?.length ?? 0,
             version: uxRules.version ?? null,
             severity_levels: Object.keys(uxRules.severity_levels ?? {}),
@@ -290,7 +290,7 @@ const manifest = {
       schema_validation: 'npm run validate',
       output_audit: 'npm run check:usage (audits code written WITH the system)',
     },
-    schemas: { token: 'schema/token.schema.json', component: 'schema/component.schema.json', config: 'schema/config.schema.json' },
+    schemas: Object.fromEntries(['token', 'component', 'config'].map((k) => [k, `${cfg.rel('schemas')}/${k}.schema.json`])),
     graph: {
       file: cfg.rel('out.graph'),
       build: 'npm run graph',

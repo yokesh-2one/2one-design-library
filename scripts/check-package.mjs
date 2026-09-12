@@ -26,7 +26,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, posix } from 'node:path'
-import { config as cfg } from './lib/config.mjs'
+import { config as cfg, CONFIG_FILE } from './lib/config.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -95,7 +95,7 @@ const want = (p, from) => {
 for (const key of ['out.manifest', 'out.graph', 'out.tokens', 'out.dtcg']) {
   try { want(cfg.rel(key), 'dls.config.json → paths.' + key) } catch { /* not configured */ }
 }
-want('dls.config.json', 'lib/config.mjs')
+want(CONFIG_FILE, 'lib/config.mjs')
 if (cfg.identity !== null) want(cfg.identity ? 'dls.identity.json' : '', 'lib/config.mjs')
 
 // 2. Literal package-relative paths the consumer-facing scripts read.

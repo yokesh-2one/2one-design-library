@@ -17,6 +17,8 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
+import { config as cfg } from './lib/config.mjs'
+
 const here = dirname(fileURLToPath(import.meta.url))
 const cssPath = join(here, '..', 'src', 'styles', 'globals.css')
 const css = readFileSync(cssPath, 'utf8')
@@ -68,7 +70,7 @@ const flipped = overridden.filter((t) => L[t] !== D[t])
 if (problems.length) {
   console.error('\n  ✗ verify-themes — the palette does not fully swap between light and dark:\n')
   for (const p of problems) console.error(`    • ${p}`)
-  console.error(`\n  Fix the .dark block in ${'src/styles/globals.css'} so every core token carries a dark value.\n`)
+  console.error(`\n  Fix the .dark block in ${cfg.rel('theme')} so every core token carries a dark value.\n`)
   process.exit(1)
 }
 

@@ -12,7 +12,7 @@
 
   Run:  node scripts/audit-graph-colors.mjs   (exits 1 if any pair is below the floor)
 */
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { config as cfg } from './lib/config.mjs'
@@ -37,7 +37,8 @@ function apca(txt, bg) {
 }
 
 // ---- the node palette, parsed from the explorer (single source of truth) ----
-const src = readFileSync(join(root, 'dev/graph-main.ts'), 'utf8')
+const devEntry = cfg.rel('devEntry')
+const src = devEntry && existsSync(join(root, devEntry)) ? readFileSync(join(root, devEntry), 'utf8') : ''
 const typesBody = src.slice(src.indexOf('const TYPES'), src.indexOf('const REL'))
 const palette = []
 for (const m of typesBody.matchAll(/'([\w-]+)':\s*\{([^}]*)\}/g)) {

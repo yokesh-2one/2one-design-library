@@ -22,8 +22,10 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative, isAbsolute } from 'node:path'
 
+import { config as cfg } from './lib/config.mjs'
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const requested = process.argv.slice(2).length ? process.argv.slice(2) : ['src/blocks/marketing']
+const requested = process.argv.slice(2).length ? process.argv.slice(2) : [cfg.rel('marketingBlocks')]
 const targets = requested.map((t) => (isAbsolute(t) ? t : join(root, t)))
 for (const t of targets) if (!existsSync(t)) console.warn(`  ⚠ check:web-copy — target not found, skipping: ${t}`)
 const present = targets.filter((t) => existsSync(t))

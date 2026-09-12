@@ -29,7 +29,7 @@ const m = JSON.parse(readFileSync(join(root, cfg.rel('brand.logo'), 'manifest.js
 const s = m.sizing
 const errors = []
 
-if (!s) errors.push('brand/logo/manifest.json has no `sizing` block')
+if (!s) errors.push(`${cfg.rel('brand.logo')}/manifest.json has no \`sizing\` block`)
 else {
   if (s.standaloneMinPx !== m.rules.minWidthPx)
     errors.push(`sizing.standaloneMinPx (${s.standaloneMinPx}) must equal rules.minWidthPx (${m.rules.minWidthPx}) — one floor, stated once`)

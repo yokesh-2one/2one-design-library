@@ -22,6 +22,14 @@ import { dirname, join, resolve } from 'node:path'
 
 const engineRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
+/*
+  The filename a payload declares itself in. This is an ENGINE constant, not a
+  payload path: it is the one name the engine has to know in advance in order to
+  find anything else. Exported so no other script spells it out, which keeps the
+  seam guard's rule simple — engine code names no paths, including this one.
+*/
+export const CONFIG_FILE = 'dls.config.json'
+
 /** The 2one layout, used when a payload does not override a key. */
 const DEFAULTS = {
   name: 'design-system',
@@ -58,6 +66,24 @@ const DEFAULTS = {
     globalGuards: 'rules/global-guards.json',
     ontology: 'graph/ontology.json',
     decisions: 'graph/decisions.json',
+    /*
+      The DOCUMENTED layer. Every one of these is optional and every check that
+      reads one skips when it is absent, because a payload with no consuming
+      guide is undocumented, not invalid. They are named here so the engine can
+      ask "where is your install guide" instead of assuming `docs/consuming.md`,
+      which is 2one's filename and nobody else's.
+    */
+    docs: {
+      consuming: 'docs/consuming.md',
+      guide: 'docs/building-with-the-dls.md',
+      accessibility: 'docs/accessibility.md',
+      visualCoverage: 'docs/visual-coverage.md',
+      knowledgeBase: 'guide-app/knowledge-base.md',
+    },
+    skills: 'skills/2one-dls',
+    // The payload's own sampler app. Not shipped, and absent in most payloads.
+    devEntry: 'dev/graph-main.ts',
+    marketingBlocks: 'src/blocks/marketing',
   },
   rules: {
     wordmark: null,
